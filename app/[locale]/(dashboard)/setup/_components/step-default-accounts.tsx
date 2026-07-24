@@ -28,6 +28,8 @@ const PURPOSE_LABELS: Record<DefaultAccountPurpose, string> = {
     EXCHANGE_GAIN_LOSS: "Exchange Gain/Loss",
     SALARIES_EXPENSE: "Salaries Expense",
     PAYROLL_LIABILITY: "Payroll Liability",
+    PAYROLL_TAX_PAYABLE: "Payroll Tax Payable",
+    BPJS_PAYABLE: "BPJS Payable",
     WIP_INVENTORY: "Work-in-Progress Inventory",
     PRODUCTION_OVERHEAD: "Production Overhead",
 };
@@ -55,7 +57,7 @@ const PURPOSE_GROUPS: Record<string, DefaultAccountPurpose[]> = {
         "UNCATEGORIZED_INCOME",
         "EXCHANGE_GAIN_LOSS",
     ],
-    "Payroll": ["SALARIES_EXPENSE", "PAYROLL_LIABILITY"],
+    "Payroll": ["SALARIES_EXPENSE", "PAYROLL_LIABILITY", "PAYROLL_TAX_PAYABLE", "BPJS_PAYABLE"],
     "Production": ["WIP_INVENTORY", "PRODUCTION_OVERHEAD"],
 };
 
