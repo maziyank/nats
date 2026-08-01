@@ -34,6 +34,7 @@ import {
   FileText,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { StatValue } from "@/components/ui/stat-value";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
 interface DashboardViewProps {
@@ -154,9 +155,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <Rocket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.totalSales || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               Total value of invoiced sales
             </p>
@@ -170,9 +171,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.totalReceived || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               Total amount received from customers
             </p>
@@ -184,9 +185,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.outstandingAmount || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               Unpaid invoices amount
             </p>
