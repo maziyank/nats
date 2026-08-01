@@ -66,26 +66,10 @@ export default function ProductMarginReportPage() {
       : 0;
 
 
-  const exportColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "productSku", header: t("reports_col_sku") },
-    { key: "productName", header: t("reports_col_product") },
-    { key: "categoryName", header: t("reports_col_category") },
-    { key: "cost", header: t("reports_col_cost") },
-    { key: "averageCost", header: t("reports_col_avg_cost") },
-    { key: "sellingPrice", header: t("reports_col_selling_price") },
-    { key: "marginAmount", header: t("reports_col_margin_amount") },
-    { key: "marginPct", header: t("reports_col_margin") },
-    { key: "stockQty", header: t("reports_col_qty") },
-    { key: "stockValue", header: t("reports_col_stock_value") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `product-margin`,
-      sheetName: "Product Margin",
+    useReportExport({
+      serverJobId: "inventory.product_margin",
+      serverJobContext: () => ({ categoryId }),
       estimatedRowCount: report?.length,
     });
 

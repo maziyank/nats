@@ -63,25 +63,10 @@ export default function StockValuationReportPage() {
   );
 
 
-  const exportColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "productSku", header: t("reports_col_sku") },
-    { key: "productName", header: t("reports_col_product") },
-    { key: "categoryName", header: t("reports_col_category") },
-    { key: "unitSymbol", header: t("reports_col_unit") },
-    { key: "quantity", header: t("reports_col_qty") },
-    { key: "unitCost", header: t("reports_col_unit_cost") },
-    { key: "totalValue", header: t("reports_col_total_value") },
-    { key: "sellingPrice", header: t("reports_col_selling_price") },
-    { key: "potentialRevenue", header: t("reports_col_potential_revenue") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `stock-valuation`,
-      sheetName: "Stock Valuation",
+    useReportExport({
+      serverJobId: "inventory.stock_valuation",
+      serverJobContext: () => ({ warehouseId, categoryId }),
       estimatedRowCount: report?.length,
     });
 

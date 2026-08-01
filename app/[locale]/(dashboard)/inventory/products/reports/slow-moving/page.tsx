@@ -25,7 +25,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
 
 function StatusBadge({
   status,
@@ -79,25 +78,10 @@ export default function SlowMovingReportPage() {
   );
 
 
-  const exportColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "status", header: t("reports_col_status") },
-    { key: "productSku", header: t("reports_col_sku") },
-    { key: "productName", header: t("reports_col_product") },
-    { key: "categoryName", header: t("reports_col_category") },
-    { key: "quantity", header: t("reports_col_qty") },
-    { key: "stockValue", header: t("reports_col_stock_value") },
-    { key: "daysSinceMovement", header: t("reports_col_days_idle") },
-    { key: "lastMovementDate", header: t("reports_col_last_movement") },
-    { key: "movementCountInPeriod", header: t("reports_col_movements") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `slow-moving`,
-      sheetName: "Slow Moving",
+    useReportExport({
+      serverJobId: "inventory.slow_moving",
+      serverJobContext: () => ({ asOfDate, inactiveDays }),
       estimatedRowCount: report?.length,
     });
 

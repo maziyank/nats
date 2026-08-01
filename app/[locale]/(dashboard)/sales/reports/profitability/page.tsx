@@ -74,12 +74,9 @@ export default function ProfitabilityPage() {
   ];
 
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `sales-profitability-${startDate}-${endDate}`,
-      sheetName: "Profitability",
+    useReportExport({
+      serverJobId: "sales.profitability",
+      serverJobContext: () => ({ startDate, endDate }),
       estimatedRowCount: report?.length,
     });
 

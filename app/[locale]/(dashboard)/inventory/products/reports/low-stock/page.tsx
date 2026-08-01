@@ -24,7 +24,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
 
 function StatusBadge({
   status,
@@ -72,25 +71,10 @@ export default function LowStockReportPage() {
   };
 
 
-  const exportColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "status", header: t("reports_col_status") },
-    { key: "productSku", header: t("reports_col_sku") },
-    { key: "productName", header: t("reports_col_product") },
-    { key: "warehouseName", header: t("warehouse") },
-    { key: "quantity", header: t("reports_col_qty") },
-    { key: "availableQty", header: t("reports_col_available") },
-    { key: "reorderPoint", header: t("reports_col_reorder_point") },
-    { key: "minStock", header: t("reports_col_min_stock") },
-    { key: "deficit", header: t("reports_col_deficit") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `low-stock`,
-      sheetName: "Low Stock",
+    useReportExport({
+      serverJobId: "inventory.low_stock",
+      serverJobContext: () => ({ warehouseId }),
       estimatedRowCount: report?.length,
     });
 

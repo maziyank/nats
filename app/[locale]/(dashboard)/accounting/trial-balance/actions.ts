@@ -8,6 +8,7 @@ import {
 } from "../types";
 
 import { authorizedAction } from "@/lib/permissions/protected-action";
+import { getCumulativeBalancesAsOf } from "@/modules/accounting/services/period-balance.service";
 
 /**
  * Fetch Trial Balance report.
@@ -35,30 +36,8 @@ export const getTrialBalance = authorizedAction(
       },
     });
 
-    // 2. Get balances from journal entries
-    const balances = await prisma.journalEntryLine.groupBy({
-      by: ["accountId"],
-      where: {
-        journalEntry: {
-          status: "posted",
-          transactionDate: {
-            lte: targetDate,
-          },
-        },
-      },
-      _sum: {
-        debitAmount: true,
-        creditAmount: true,
-      },
-    });
-
-    const balanceMap = new Map<string, { debit: number; credit: number }>();
-    balances.forEach((b) => {
-      balanceMap.set(b.accountId, {
-        debit: b._sum.debitAmount?.toNumber() || 0,
-        credit: b._sum.creditAmount?.toNumber() || 0,
-      });
-    });
+    // 2. Cumulative balances via monthly snapshots + residual live scan
+    const balanceMap = await getCumulativeBalancesAsOf(targetDate);
 
     // 3. Prepare data structure for hierarchy and calculation
 

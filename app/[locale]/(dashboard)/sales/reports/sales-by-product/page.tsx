@@ -73,12 +73,9 @@ export default function SalesByProductPage() {
   ];
 
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `sales-by-product-${startDate}-${endDate}`,
-      sheetName: "Sales by Product",
+    useReportExport({
+      serverJobId: "sales.sales_by_product",
+      serverJobContext: () => ({ startDate, endDate }),
       estimatedRowCount: report?.length,
     });
 

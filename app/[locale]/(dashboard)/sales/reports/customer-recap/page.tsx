@@ -78,12 +78,9 @@ export default function CustomerRecapPage() {
   ];
 
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `sales-customer-recap-${startDate}-${endDate}`,
-      sheetName: "Customer Recap",
+    useReportExport({
+      serverJobId: "sales.customer_recap",
+      serverJobContext: () => ({ startDate, endDate }),
       estimatedRowCount: report?.length,
     });
 

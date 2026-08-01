@@ -19,7 +19,6 @@ import {
 import { useTranslations } from "next-intl";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
 
 export default function APAgingPage() {
   const t = useTranslations("Purchase");
@@ -42,43 +41,13 @@ export default function APAgingPage() {
 
   const loading = view === "summary" ? loadingSummary : loadingDetail;
 
-  const summaryColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "contactName", header: t("reports_col_vendor") },
-    { key: "invoiceCount", header: t("reports_col_invoices") },
-    { key: "current", header: t("reports_col_bucket_current") },
-    { key: "bucket1", header: t("reports_col_bucket_1_30") },
-    { key: "bucket2", header: t("reports_col_bucket_31_60") },
-    { key: "bucket3", header: t("reports_col_bucket_61_90") },
-    { key: "bucket4", header: t("reports_col_bucket_90_plus") },
-    { key: "totalOutstanding", header: t("reports_col_outstanding") },
-  ];
-
-  const detailColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "contactName", header: t("reports_col_vendor") },
-    { key: "invoiceNumber", header: t("invoice_number") },
-    { key: "invoiceDate", header: t("invoice_date") },
-    { key: "dueDate", header: t("due_date") },
-    { key: "totalAmount", header: t("reports_col_invoice_amount") },
-    { key: "paidAmount", header: t("paid_amount") },
-    { key: "balance", header: t("reports_col_balance") },
-    { key: "daysOverdue", header: t("reports_col_days_overdue") },
-    { key: "bucket", header: t("reports_col_bucket") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () => {
-        if (view === "summary") {
-          return (summary ?? []) as unknown as Array<Record<string, unknown>>;
-        }
-        return (detail ?? []) as unknown as Array<Record<string, unknown>>;
-      },
-      columns: view === "summary" ? summaryColumns : detailColumns,
-      filename: () =>
+    useReportExport({
+      serverJobId:
         view === "summary"
-          ? `ap-aging-summary-${asOfDate}`
-          : `ap-aging-detail-${asOfDate}`,
-      sheetName: view === "summary" ? "AP Aging Summary" : "AP Aging Detail",
+          ? "purchase.ap_aging.summary"
+          : "purchase.ap_aging.detail",
+      serverJobContext: () => ({ asOfDate }),
       estimatedRowCount:
         view === "summary" ? summary?.length : detail?.length,
     });

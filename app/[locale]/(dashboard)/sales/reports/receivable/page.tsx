@@ -67,22 +67,10 @@ export default function ReceivableReportPage() {
   );
 
 
-  const exportColumns: ExportColumn<Record<string, unknown>>[] = [
-    { key: "contactName", header: t("reports_col_customer") },
-    { key: "openingBalance", header: t("reports_col_opening_balance") },
-    { key: "invoiceAmount", header: t("reports_col_invoice_additions") },
-    { key: "returnAmount", header: t("reports_col_returns") },
-    { key: "paymentAmount", header: t("reports_col_payments") },
-    { key: "closingBalance", header: t("reports_col_closing_balance") },
-  ];
-
   const { isExporting, exportingFormat, exportCsv, exportExcel } =
-    useReportExport<Record<string, unknown>>({
-      fetchRows: async () =>
-        (report ?? []) as unknown as Array<Record<string, unknown>>,
-      columns: exportColumns,
-      filename: () => `sales-receivable-${startDate}-${endDate}`,
-      sheetName: "Receivable",
+    useReportExport({
+      serverJobId: "sales.receivable",
+      serverJobContext: () => ({ startDate, endDate }),
       estimatedRowCount: report?.length,
     });
 
