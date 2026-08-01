@@ -29,6 +29,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { StatValue } from "@/components/ui/stat-value";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
 interface DashboardViewProps {
@@ -119,9 +120,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.totalRevenue || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -133,9 +134,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.totalExpenses || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -145,9 +146,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.netIncome || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -157,9 +158,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.accountsReceivable || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               {t("outstanding_invoices")}
             </p>

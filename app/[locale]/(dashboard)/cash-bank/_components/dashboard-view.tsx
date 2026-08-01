@@ -10,6 +10,7 @@ import {
   List,
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
+import { StatValue } from "@/components/ui/stat-value";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -138,9 +139,9 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">
+                <StatValue>
                   {formatCurrency(summary.totalBalance)}
-                </div>
+                </StatValue>
               </CardContent>
             </Card>
             <Card>
@@ -150,9 +151,9 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <StatValue maxRem={1.5}>
                   {formatCurrency(summary.totalCash)}
-                </div>
+                </StatValue>
               </CardContent>
             </Card>
             <Card>
@@ -162,9 +163,9 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <StatValue maxRem={1.5}>
                   {formatCurrency(summary.totalBank)}
-                </div>
+                </StatValue>
               </CardContent>
             </Card>
           </div>

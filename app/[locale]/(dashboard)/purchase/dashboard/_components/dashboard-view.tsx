@@ -34,6 +34,7 @@ import {
   FileText,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { StatValue } from "@/components/ui/stat-value";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
 interface DashboardViewProps {
@@ -157,14 +158,14 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {format(summary?.totalPurchases || 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Total value of billed invoices
-            </p>
-          </CardContent>
+            <CardContent>
+              <StatValue maxRem={1.5}>
+                {format(summary?.totalPurchases || 0)}
+              </StatValue>
+              <p className="text-xs text-muted-foreground">
+                Total value of billed invoices
+              </p>
+            </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -172,9 +173,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.totalPaid || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               Total amount paid to vendors
             </p>
@@ -188,9 +189,9 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <StatValue maxRem={1.5}>
               {format(summary?.outstandingAmount || 0)}
-            </div>
+            </StatValue>
             <p className="text-xs text-muted-foreground">
               Unpaid invoices amount
             </p>

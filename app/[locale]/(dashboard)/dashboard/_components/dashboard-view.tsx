@@ -9,6 +9,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
+import { StatValue } from "@/components/ui/stat-value";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -172,9 +173,9 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+                        <StatValue className="text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(totalRevenue)}
-                        </div>
+                        </StatValue>
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("this_month")}
                         </p>
@@ -189,9 +190,9 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold text-red-600 dark:text-red-400">
+                        <StatValue className="text-red-600 dark:text-red-400">
                             {formatCurrency(totalExpenses)}
-                        </div>
+                        </StatValue>
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("this_month")}
                         </p>
@@ -206,9 +207,9 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
+                        <StatValue maxRem={1.5}>
                             {formatCurrency(accountsReceivable)}
-                        </div>
+                        </StatValue>
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("outstanding")}
                         </p>
@@ -223,9 +224,9 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">
+                        <StatValue maxRem={1.5}>
                             {formatCurrency(accountsPayable)}
-                        </div>
+                        </StatValue>
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("outstanding")}
                         </p>
@@ -236,20 +237,22 @@ export function DashboardView() {
             {/* Net Income Banner */}
             <Card className="bg-linear-to-r from-primary/5 to-primary/10 border-primary/20">
                 <CardContent className="flex items-center justify-between py-4">
-                    <div>
+                    <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-muted-foreground">
                             {t("net_income")}
                         </p>
-                        <p
-                            className={`text-2xl font-bold ${netIncome >= 0
-                                ? "text-emerald-600 dark:text-emerald-400"
-                                : "text-red-600 dark:text-red-400"
-                                }`}
+                        <StatValue
+                            maxRem={1.5}
+                            className={
+                                netIncome >= 0
+                                    ? "text-emerald-600 dark:text-emerald-400"
+                                    : "text-red-600 dark:text-red-400"
+                            }
                         >
                             {formatCurrency(netIncome)}
-                        </p>
+                        </StatValue>
                     </div>
-                    <p className="text-xs text-muted-foreground">{t("this_month")}</p>
+                    <p className="text-xs text-muted-foreground shrink-0 ml-4">{t("this_month")}</p>
                 </CardContent>
             </Card>
 

@@ -154,14 +154,14 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
             <Rocket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.totalSales || 0)}
-            </StatValue>
-            <p className="text-xs text-muted-foreground">
-              Total value of invoiced sales
-            </p>
-          </CardContent>
+            <CardContent>
+              <StatValue maxRem={1.5}>
+                {format(summary?.totalSales || 0)}
+              </StatValue>
+              <p className="text-xs text-muted-foreground">
+                Total value of invoiced sales
+              </p>
+            </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
