@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { DataTable, Column } from "@/components/ui/data-table";
 import { TableFooter, TableRow, TableCell } from "@/components/ui/table";
 import Link from "next/link";
-import { Pencil, Paperclip, ArrowLeft, PrinterIcon } from "lucide-react";
+import { Pencil, Paperclip, ArrowLeft, PrinterIcon, Building2, FolderKanban, User } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { useFormatDate } from "@/hooks/use-format-date";
@@ -62,29 +63,52 @@ export function JournalEntryDetails({
       cell: (line) => line.description || "-",
     },
     {
-      header: t("department"),
+      header: "",
       accessorKey: "department",
-      cell: (line) => line.department?.name || "-",
-    },
-    {
-      header: t("project"),
-      accessorKey: "project",
-      cell: (line) => line.project?.name || "-",
-    },
-    {
-      header: t("relevant_contact"),
-      accessorKey: "contact",
-      cell: (line) =>
-        line.contact ? (
-          <Link target="_blank"
-            href={`/general/contacts/${line.contact.id}`}
-            className="text-primary hover:underline"
-          >
-            {line.contact.name}
-          </Link>
-        ) : (
-          "-"
-        ),
+      className: "w-20",
+      cell: (line) => {
+        const hasAny = line.department || line.project || line.contact;
+        if (!hasAny) return null;
+        return (
+          <div className="flex items-center gap-1">
+            {line.department && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center justify-center rounded bg-muted p-1 cursor-default">
+                    <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{line.department.name}</TooltipContent>
+              </Tooltip>
+            )}
+            {line.project && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="inline-flex items-center justify-center rounded bg-muted p-1 cursor-default">
+                    <FolderKanban className="h-3.5 w-3.5 text-muted-foreground" />
+                  </span>
+                </TooltipTrigger>
+                <TooltipContent>{line.project.name}</TooltipContent>
+              </Tooltip>
+            )}
+            {line.contact && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    target="_blank"
+                    href={`/general/contacts/${line.contact.id}`}
+                    className="inline-flex items-center justify-center rounded bg-muted p-1 hover:bg-muted/80"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <User className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>{line.contact.name}</TooltipContent>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
     {
       header: tCommon("debit") || "Debit",
@@ -178,7 +202,7 @@ export function JournalEntryDetails({
                 footer={
                   <TableFooter>
                     <TableRow className="font-bold bg-muted/50">
-                      <TableCell colSpan={6} className="text-right">
+                      <TableCell colSpan={4} className="text-right">
                         {tCommon("total")}
                       </TableCell>
                       <TableCell className="text-right">
