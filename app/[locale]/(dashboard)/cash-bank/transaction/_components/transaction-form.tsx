@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { CustomInput } from "@/components/ui/custom-input";
 import { CustomSelect } from "@/components/ui/custom-select";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   Table,
@@ -293,6 +294,13 @@ export function TransactionForm({
               options={contacts.map((c) => ({
                 label: c.name,
                 value: c.id,
+                icon: (
+                  <Avatar size="sm">
+                    <AvatarFallback className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                      {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                ),
               }))}
               placeholder={t("select_contact")}
               disabled={readOnly}

@@ -43,6 +43,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAttendanceRecords, upsertAttendance, importAttendanceCsv } from "./actions";
 import { getEmployeeOptions } from "../employees/actions";
 import { SuperJSON } from "@/lib/superjson";
@@ -163,6 +164,13 @@ export default function AttendancePage() {
                 .map((e) => ({
                     value: e.employeeDetail!.id,
                     label: e.name,
+                    icon: (
+                        <Avatar size="sm">
+                            <AvatarFallback className="bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">
+                                {e.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                            </AvatarFallback>
+                        </Avatar>
+                    ),
                 })),
         [employees]
     );

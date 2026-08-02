@@ -61,6 +61,7 @@ import { Paperclip, PrinterIcon } from "lucide-react";
 import { ReportPreviewDialog } from "@/app/[locale]/(dashboard)/reporting/_components/report-preview-dialog";
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -584,6 +585,13 @@ export function SalesInvoiceForm({
                           options={customers.map((c) => ({
                             value: c.id,
                             label: c.name,
+                            icon: (
+                              <Avatar size="sm">
+                                <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                  {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ),
                           }))}
                           placeholder="Select Customer"
                           disabled={readonly || !!formData.salesOrderId}

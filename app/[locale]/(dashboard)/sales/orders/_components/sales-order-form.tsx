@@ -81,6 +81,7 @@ import { ReportPreviewDialog } from "@/app/[locale]/(dashboard)/reporting/_compo
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { checkBudgetAvailability } from "@/app/[locale]/(dashboard)/budgeting/actions";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import {
@@ -571,6 +572,13 @@ export function SalesOrderForm({
                         options={customers.map((c) => ({
                           value: c.id,
                           label: c.name,
+                          icon: (
+                            <Avatar size="sm">
+                              <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ),
                         }))}
                         placeholder={t("placeholder_select_customer")}
                         disabled={isReadOnly}

@@ -22,6 +22,7 @@ import {
 export interface SearchableSelectOption {
   value: string;
   label: string;
+  icon?: React.ReactNode;
 }
 
 export interface SearchableSelectProps {
@@ -71,7 +72,7 @@ export function SearchableSelect({
         }
       >
         <InputGroupAddon>
-          <Search className="size-2 text-muted-foreground" />
+          {selectedOption?.icon ?? <Search className="size-2 text-muted-foreground" />}
         </InputGroupAddon>
         <InputGroupInput
           value={inputValue}
@@ -96,6 +97,7 @@ export function SearchableSelect({
                     setOpen(false);
                   }}
                 >
+                  {option.icon}
                   {option.label}
                 </CommandItem>
               ))}

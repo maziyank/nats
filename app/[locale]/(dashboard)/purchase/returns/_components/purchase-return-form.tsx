@@ -46,6 +46,7 @@ import {
 import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useTranslations } from "next-intl";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
@@ -389,6 +390,13 @@ export function PurchaseReturnForm({
                           options={vendors.map((v) => ({
                             label: v.name,
                             value: v.id,
+                            icon: (
+                              <Avatar size="sm">
+                                <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                                  {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ),
                           }))}
                           disabled={readonly}
                           placeholder={t("placeholder_select_vendor")}

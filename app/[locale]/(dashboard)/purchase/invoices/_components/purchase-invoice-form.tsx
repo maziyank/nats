@@ -57,6 +57,7 @@ import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
 import { Paperclip } from "lucide-react";
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
@@ -596,6 +597,13 @@ export function PurchaseInvoiceForm({
                           options={vendors.map((v) => ({
                             value: v.id,
                             label: v.name,
+                            icon: (
+                              <Avatar size="sm">
+                                <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                                  {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ),
                           }))}
                           placeholder={t("placeholder_select_vendor")}
                           disabled={readonly || !!formData.purchaseOrderId}

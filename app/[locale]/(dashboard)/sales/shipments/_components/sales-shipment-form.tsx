@@ -46,6 +46,7 @@ import {
 import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   PageFormActions,
   PageFormContent,
@@ -356,6 +357,13 @@ export function SalesShipmentForm({
                           options={customers.map((c) => ({
                             label: c.name,
                             value: c.id,
+                            icon: (
+                              <Avatar size="sm">
+                                <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                  {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ),
                           }))}
                           disabled={readonly}
                           placeholder={t("placeholder_select_customer")}
