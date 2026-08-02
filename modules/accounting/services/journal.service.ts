@@ -3,7 +3,6 @@ import { Prisma } from "@/prisma/generated/prisma/client";
 import { EntryStatus } from "@/prisma/generated/prisma/enums";
 import { Decimal } from "decimal.js";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
-import { SuperJSON } from "@/lib/superjson";
 import { getPaginationMetadata } from "@/lib/pagination";
 import { createJournalEntrySchema } from "@/lib/validation/schemas";
 import { z } from "zod";
@@ -101,7 +100,10 @@ export class JournalService {
             department: { select: { name: true } },
             project: { select: { name: true } },
           },
-          orderBy: { lineNumber: "asc" },
+          orderBy: [
+            { debitAmount: "desc" },
+            { creditAmount: "desc" }
+          ],
         },
         user: {
           select: { name: true, email: true },
