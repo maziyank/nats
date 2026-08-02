@@ -20,11 +20,13 @@ import {
   Save,
   ArrowLeft,
   Paperclip,
-  X,
   StickyNote,
+  Folder,
+  Building2,
+  User,
 } from "lucide-react";
 import { useFormatCurrency } from "@/hooks";
-import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import {
   DndContext,
   closestCenter,
@@ -40,7 +42,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Account, Contact, Department, Project, Prisma, ContactType } from "@/prisma/generated/prisma/browser";
+import { Account, Contact, Department, Project, Prisma } from "@/prisma/generated/prisma/browser";
 import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
 import { CreateJournalEntryData } from "../../types";
 import { AttachmentDialog } from "@/components/ui/attachment-dialog";
@@ -93,6 +95,11 @@ export function JournalEntryForm({
     query: string;
     rect: DOMRect;
     selectedIndex: number;
+  } | null>(null);
+
+  const [selectState, setSelectState] = useState<{
+    lineIndex: number;
+    type: "department" | "project" | "contact";
   } | null>(null);
 
   const handleDescriptionChange = (
@@ -180,16 +187,6 @@ export function JournalEntryForm({
       setFormData({ ...formData, lines: newLines });
     }
     setActiveMention(null);
-  };
-
-  const removeContact = (index: number) => {
-    if (!formData) return;
-    const newLines = [...formData.lines];
-    newLines[index] = {
-      ...newLines[index],
-      contactId: null,
-    };
-    setFormData({ ...formData, lines: newLines });
   };
 
   const [isAttachmentDialogOpen, setIsAttachmentDialogOpen] = useState(false);
@@ -349,7 +346,7 @@ export function JournalEntryForm({
         </PageFormHeader>
 
         <PageFormContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex gap-4">
               <CustomInput
                 label={t("entry_no")}
@@ -398,8 +395,6 @@ export function JournalEntryForm({
                       <TableHead className="w-[40px]"></TableHead>
                       <TableHead className="w-[300px]">{t("account")}</TableHead>
                       <TableHead>{t("description")}</TableHead>
-                      <TableHead className="w-[150px]">{t("department")}</TableHead>
-                      <TableHead className="w-[150px]">{t("project")}</TableHead>
                       <TableHead className="w-[150px] text-right">
                         {tCommon("debit") || "Debit"}
                       </TableHead>
@@ -434,84 +429,14 @@ export function JournalEntryForm({
                             />
                           </TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-2 w-full">
-                              <input
-                                value={line.description || ""}
-                                onChange={(e) =>
-                                  handleDescriptionChange(index, e)
-                                }
-                                onKeyDown={handleKeyDown}
-                                className="flex-1 bg-transparent border-0 outline-none text-sm h-8 w-full placeholder:text-muted-foreground"
-                                placeholder={t("detailed_desc_mention")}
-                              />
-                              {line.contactId &&
-                                (() => {
-                                  const contact = contacts.find(
-                                    (c) => c.id === line.contactId,
-                                  );
-                                  if (!contact) return null;
-
-                                  let badgeClass =
-                                    "bg-gray-100 text-gray-800 hover:bg-gray-200";
-                                  if (contact.type === ContactType.CUSTOMER) {
-                                    badgeClass =
-                                      "bg-blue-100 text-blue-800 hover:bg-blue-200";
-                                  } else if (contact.type === ContactType.VENDOR) {
-                                    badgeClass =
-                                      "bg-orange-100 text-orange-800 hover:bg-orange-200";
-                                  } else if (contact.type === ContactType.EMPLOYEE) {
-                                    badgeClass =
-                                      "bg-green-100 text-green-800 hover:bg-green-200";
-                                  }
-
-                                  return (
-                                    <Badge
-                                      variant="secondary"
-                                      className={`shrink-0 h-6 pr-1 gap-1 cursor-default ${badgeClass}`}
-                                    >
-                                      <span className="truncate max-w-[120px]">
-                                        {contact.name}
-                                      </span>
-                                      <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-4 w-4 hover:bg-black/10 text-current p-0 rounded-full"
-                                        onClick={() => removeContact(index)}
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                    </Badge>
-                                  );
-                                })()}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <SearchableSelect
-                              value={line.departmentId || ""}
-                              onValueChange={(val) =>
-                                updateLine(index, "departmentId", val || null)
+                            <input
+                              value={line.description || ""}
+                              onChange={(e) =>
+                                handleDescriptionChange(index, e)
                               }
-                              placeholder={t("department")}
-                              className="w-full border-0"
-                              options={departments.map((d) => ({
-                                value: d.id,
-                                label: d.name,
-                              }))}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <SearchableSelect
-                              value={line.projectId || ""}
-                              onValueChange={(val) =>
-                                updateLine(index, "projectId", val || null)
-                              }
-                              placeholder={t("project")}
-                              className="w-full border-0"
-                              options={projects.map((p) => ({
-                                value: p.id,
-                                label: p.name,
-                              }))}
+                              onKeyDown={handleKeyDown}
+                              className="w-full bg-transparent border-0 outline-none text-sm h-8 placeholder:text-muted-foreground"
+                              placeholder={t("detailed_desc_mention")}
                             />
                           </TableCell>
                           <TableCell>
@@ -551,15 +476,93 @@ export function JournalEntryForm({
                             />
                           </TableCell>
                           <TableCell>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => removeLine(index)}
-                              disabled={formData.lines.length <= 2}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
+                            <div className="flex items-center gap-0.5">
+                              {contacts.length > 0 && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className={`h-7 w-7 ${line.contactId ? "text-sky-600 bg-sky-50 hover:bg-sky-100" : "text-muted-foreground"}`}
+                                      onClick={() =>
+                                        setSelectState({
+                                          lineIndex: index,
+                                          type: "contact",
+                                        })
+                                      }
+                                    >
+                                      <User className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">
+                                    {line.contactId
+                                      ? contacts.find((c) => c.id === line.contactId)?.name
+                                      : t("contact")}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              {departments.length > 0 && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className={`h-7 w-7 ${line.departmentId ? "text-indigo-600 bg-indigo-50 hover:bg-indigo-100" : "text-muted-foreground"}`}
+                                      onClick={() =>
+                                        setSelectState({
+                                          lineIndex: index,
+                                          type: "department",
+                                        })
+                                      }
+                                    >
+                                      <Building2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">
+                                    {line.departmentId
+                                      ? departments.find((d) => d.id === line.departmentId)?.name
+                                      : t("department")}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              {projects.length > 0 && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className={`h-7 w-7 ${line.projectId ? "text-amber-600 bg-amber-50 hover:bg-amber-100" : "text-muted-foreground"}`}
+                                      onClick={() =>
+                                        setSelectState({
+                                          lineIndex: index,
+                                          type: "project",
+                                        })
+                                      }
+                                    >
+                                      <Folder className="h-3.5 w-3.5" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="top">
+                                    {line.projectId
+                                      ? projects.find((p) => p.id === line.projectId)?.name
+                                      : t("project")}
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-muted-foreground"
+                                onClick={() => removeLine(index)}
+                                disabled={formData.lines.length <= 2}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
                           </TableCell>
                         </SortableTableRow>
                       ))}
@@ -567,7 +570,7 @@ export function JournalEntryForm({
                   </TableBody>
                   <TableFooter>
                     <TableRow>
-                      <TableCell colSpan={5} className="font-bold">
+                      <TableCell colSpan={3} className="font-bold">
                         {tCommon("total")}
                       </TableCell>
                       <TableCell className="text-right font-bold">
@@ -672,6 +675,74 @@ export function JournalEntryForm({
             }}
           />
         )}
+        <div className="hidden">
+          <SearchableSelect
+            open={selectState?.type === "department"}
+            onOpenChange={(open) => {
+              if (!open) setSelectState(null);
+            }}
+            value={
+              selectState?.type === "department"
+                ? formData.lines[selectState.lineIndex]?.departmentId || ""
+                : ""
+            }
+            onValueChange={(val) => {
+              if (selectState) {
+                updateLine(selectState.lineIndex, "departmentId", val || null);
+                setSelectState(null);
+              }
+            }}
+            placeholder={t("department")}
+            options={departments.map((d) => ({
+              value: d.id,
+              label: d.name,
+            }))}
+          />
+          <SearchableSelect
+            open={selectState?.type === "project"}
+            onOpenChange={(open) => {
+              if (!open) setSelectState(null);
+            }}
+            value={
+              selectState?.type === "project"
+                ? formData.lines[selectState.lineIndex]?.projectId || ""
+                : ""
+            }
+            onValueChange={(val) => {
+              if (selectState) {
+                updateLine(selectState.lineIndex, "projectId", val || null);
+                setSelectState(null);
+              }
+            }}
+            placeholder={t("project")}
+            options={projects.map((p) => ({
+              value: p.id,
+              label: p.name,
+            }))}
+          />
+          <SearchableSelect
+            open={selectState?.type === "contact"}
+            onOpenChange={(open) => {
+              if (!open) setSelectState(null);
+            }}
+            value={
+              selectState?.type === "contact"
+                ? formData.lines[selectState.lineIndex]?.contactId || ""
+                : ""
+            }
+            onValueChange={(val) => {
+              if (selectState) {
+                updateLine(selectState.lineIndex, "contactId", val || null);
+                setSelectState(null);
+              }
+            }}
+            placeholder={t("contact")}
+            options={contacts.map((c) => ({
+              value: c.id,
+              label: c.name,
+            }))}
+          />
+        </div>
       </PageFormLayout>
     )
   );
