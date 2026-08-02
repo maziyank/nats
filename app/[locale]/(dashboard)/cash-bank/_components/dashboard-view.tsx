@@ -10,6 +10,7 @@ import {
   List,
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
+import { useCompanyProfile } from "@/components/providers/session-provider";
 import { StatValue } from "@/components/ui/stat-value";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
@@ -38,6 +39,14 @@ export function DashboardView() {
   const tCommon = useTranslations("Common");
   const formatCurrency = useFormatCurrency();
   const formatDate = useFormatDate();
+  const profile = useCompanyProfile();
+
+  const currencyProps = {
+    currency: profile?.currency,
+    currencySymbol: profile?.currencySymbol || undefined,
+    currencyFormat: (profile?.currencyFormat as "standard" | "european" | "indian" | undefined) || undefined,
+    locale: profile?.locale,
+  };
 
   const { data: stats, isLoading: isLoadingStats } = useQuery({
     queryKey: ["cash-bank"],
@@ -139,9 +148,10 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <StatValue>
-                  {formatCurrency(summary.totalBalance)}
-                </StatValue>
+                <StatValue
+                  value={summary.totalBalance}
+                  {...currencyProps}
+                />
               </CardContent>
             </Card>
             <Card>
@@ -151,9 +161,11 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <StatValue maxRem={1.5}>
-                  {formatCurrency(summary.totalCash)}
-                </StatValue>
+                <StatValue
+                  maxRem={1.5}
+                  value={summary.totalCash}
+                  {...currencyProps}
+                />
               </CardContent>
             </Card>
             <Card>
@@ -163,9 +175,11 @@ export function DashboardView() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <StatValue maxRem={1.5}>
-                  {formatCurrency(summary.totalBank)}
-                </StatValue>
+                <StatValue
+                  maxRem={1.5}
+                  value={summary.totalBank}
+                  {...currencyProps}
+                />
               </CardContent>
             </Card>
           </div>

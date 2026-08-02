@@ -33,7 +33,6 @@ import {
   PlusCircle,
   FileText,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
 import { StatValue } from "@/components/ui/stat-value";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
@@ -42,14 +41,12 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ companyProfile }: DashboardViewProps) {
-  const currencyOptions = {
+  const currencyProps = {
     currency: companyProfile?.currency,
     currencySymbol: companyProfile?.currencySymbol || undefined,
-    currencyFormat: companyProfile?.currencyFormat || undefined,
+    currencyFormat: (companyProfile?.currencyFormat as "standard" | "european" | "indian" | undefined) || undefined,
     locale: companyProfile?.locale,
   };
-
-  const format = (val: number) => formatCurrency(val, currencyOptions);
 
   const { data: summary } = useQuery({
     queryKey: ["sales-dashboard-summary"],
@@ -155,9 +152,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <Rocket className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
             <CardContent>
-              <StatValue maxRem={1.5}>
-                {format(summary?.totalSales || 0)}
-              </StatValue>
+              <StatValue
+                maxRem={1.5}
+                value={summary?.totalSales || 0}
+                {...currencyProps}
+              />
               <p className="text-xs text-muted-foreground">
                 Total value of invoiced sales
               </p>
@@ -171,9 +170,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.totalReceived || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.totalReceived || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">
               Total amount received from customers
             </p>
@@ -185,9 +186,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.outstandingAmount || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.outstandingAmount || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">
               Unpaid invoices amount
             </p>

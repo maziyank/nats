@@ -9,6 +9,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
+import { useCompanyProfile } from "@/components/providers/session-provider";
 import { StatValue } from "@/components/ui/stat-value";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
@@ -59,6 +60,14 @@ export function DashboardView() {
     const tCommon = useTranslations("Common");
     const formatCurrency = useFormatCurrency();
     const formatDate = useFormatDate();
+    const profile = useCompanyProfile();
+
+    const currencyProps = {
+        currency: profile?.currency,
+        currencySymbol: profile?.currencySymbol || undefined,
+        currencyFormat: (profile?.currencyFormat as "standard" | "european" | "indian" | undefined) || undefined,
+        locale: profile?.locale,
+    };
 
     const { data: stats, isLoading } = useQuery({
         queryKey: ["main-dashboard"],
@@ -173,9 +182,11 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StatValue className="text-emerald-600 dark:text-emerald-400">
-                            {formatCurrency(totalRevenue)}
-                        </StatValue>
+                        <StatValue
+                            className="text-emerald-600 dark:text-emerald-400"
+                            value={totalRevenue}
+                            {...currencyProps}
+                        />
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("this_month")}
                         </p>
@@ -190,9 +201,11 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StatValue className="text-red-600 dark:text-red-400">
-                            {formatCurrency(totalExpenses)}
-                        </StatValue>
+                        <StatValue
+                            className="text-red-600 dark:text-red-400"
+                            value={totalExpenses}
+                            {...currencyProps}
+                        />
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("this_month")}
                         </p>
@@ -207,9 +220,11 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StatValue maxRem={1.5}>
-                            {formatCurrency(accountsReceivable)}
-                        </StatValue>
+                        <StatValue
+                            maxRem={1.5}
+                            value={accountsReceivable}
+                            {...currencyProps}
+                        />
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("outstanding")}
                         </p>
@@ -224,9 +239,11 @@ export function DashboardView() {
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <StatValue maxRem={1.5}>
-                            {formatCurrency(accountsPayable)}
-                        </StatValue>
+                        <StatValue
+                            maxRem={1.5}
+                            value={accountsPayable}
+                            {...currencyProps}
+                        />
                         <p className="text-xs text-muted-foreground mt-1">
                             {t("outstanding")}
                         </p>
@@ -248,9 +265,9 @@ export function DashboardView() {
                                     ? "text-emerald-600 dark:text-emerald-400"
                                     : "text-red-600 dark:text-red-400"
                             }
-                        >
-                            {formatCurrency(netIncome)}
-                        </StatValue>
+                            value={netIncome}
+                            {...currencyProps}
+                        />
                     </div>
                     <p className="text-xs text-muted-foreground shrink-0 ml-4">{t("this_month")}</p>
                 </CardContent>

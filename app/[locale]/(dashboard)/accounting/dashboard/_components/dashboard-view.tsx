@@ -26,9 +26,7 @@ import {
   Wallet,
   PlusCircle,
   FileText,
-  Loader2,
 } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
 import { StatValue } from "@/components/ui/stat-value";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
@@ -40,15 +38,12 @@ import { useTranslations } from "next-intl";
 
 export function DashboardView({ companyProfile }: DashboardViewProps) {
   const t = useTranslations("Accounting");
-  const tCommon = useTranslations("Common");
-  const currencyOptions = {
+  const currencyProps = {
     currency: companyProfile?.currency,
     currencySymbol: companyProfile?.currencySymbol || undefined,
-    currencyFormat: companyProfile?.currencyFormat || undefined,
+    currencyFormat: (companyProfile?.currencyFormat as "standard" | "european" | "indian" | undefined) || undefined,
     locale: companyProfile?.locale,
   };
-
-  const format = (val: number) => formatCurrency(val, currencyOptions);
 
   const { data: summary } = useQuery({
     queryKey: ["dashboard-summary"],
@@ -120,9 +115,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.totalRevenue || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.totalRevenue || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -134,9 +131,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <TrendingDown className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.totalExpenses || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.totalExpenses || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -146,9 +145,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.netIncome || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.netIncome || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">{t("current_month")}</p>
           </CardContent>
         </Card>
@@ -158,9 +159,11 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
             <Wallet className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <StatValue maxRem={1.5}>
-              {format(summary?.accountsReceivable || 0)}
-            </StatValue>
+            <StatValue
+              maxRem={1.5}
+              value={summary?.accountsReceivable || 0}
+              {...currencyProps}
+            />
             <p className="text-xs text-muted-foreground">
               {t("outstanding_invoices")}
             </p>
