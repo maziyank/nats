@@ -31,6 +31,7 @@ import { ContactDialog } from "./_components/contact-dialog";
 import { deleteContact, getContacts } from "./actions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CustomInput } from "@/components/ui/custom-input";
 import { Protect } from "@/components/ui/protect";
 import { ContactType } from "@/prisma/generated/prisma/browser";
@@ -124,6 +125,29 @@ export default function ContactsPage() {
     }
   };
 
+  const getTypeAvatarColor = (type: ContactType) => {
+    switch (type) {
+      case ContactType.CUSTOMER:
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300";
+      case ContactType.VENDOR:
+        return "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300";
+      case ContactType.EMPLOYEE:
+        return "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300";
+      default:
+        return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
+
   const getTypeLabel = (type: ContactType) => {
     switch (type) {
       case ContactType.CUSTOMER:
@@ -209,12 +233,21 @@ export default function ContactsPage() {
               contacts.map((contact) => (
                 <TableRow key={contact.id}>
                   <TableCell className="font-medium">
-                    <Link
-                      href={`/general/contacts/${contact.id}`}
-                      className="hover:underline"
-                    >
-                      {contact.name}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Avatar size="sm">
+                        <AvatarFallback
+                          className={getTypeAvatarColor(contact.type)}
+                        >
+                          {getInitials(contact.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <Link
+                        href={`/general/contacts/${contact.id}`}
+                        className="hover:underline"
+                      >
+                        {contact.name}
+                      </Link>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge
