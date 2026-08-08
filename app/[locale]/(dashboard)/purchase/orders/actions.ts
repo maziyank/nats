@@ -3,6 +3,10 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
+import {
+  purchaseOrderSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { getSession } from "@/lib/auth/auth";
 import { PurchaseOrderInput } from "./types";
@@ -151,11 +155,18 @@ export async function getPurchaseOrder(id: string) {
 export const createPurchaseOrder = authorizedAction(
   "purchase.create",
   async (data: PurchaseOrderInput) => {
+    const parsed = purchaseOrderSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
-      const result = await PurchaseOrderService.create(data, session.userId);
+      const result = await PurchaseOrderService.create(parsed.data, session.userId);
 
       revalidatePath("/purchase/orders");
       return { success: true, data: SuperJSON.serialize(result) };
@@ -169,11 +180,18 @@ export const createPurchaseOrder = authorizedAction(
 export const updatePurchaseOrder = authorizedAction(
   "purchase.edit",
   async (id: string, data: PurchaseOrderInput) => {
+    const parsed = purchaseOrderSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
-      const result = await PurchaseOrderService.update(id, data, session.userId);
+      const result = await PurchaseOrderService.update(id, parsed.data, session.userId);
 
       revalidatePath("/purchase/orders");
       revalidatePath(`/purchase/orders/${id}`);
@@ -189,6 +207,10 @@ export const updatePurchaseOrder = authorizedAction(
 export const issuePurchaseOrder = authorizedAction(
   "purchase.edit",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
@@ -209,6 +231,10 @@ export const issuePurchaseOrder = authorizedAction(
 export const cancelPurchaseOrder = authorizedAction(
   "purchase.edit",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
@@ -229,6 +255,10 @@ export const cancelPurchaseOrder = authorizedAction(
 export const closePurchaseOrder = authorizedAction(
   "purchase.edit",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
@@ -249,6 +279,10 @@ export const closePurchaseOrder = authorizedAction(
 export const deletePurchaseOrder = authorizedAction(
   "purchase.delete",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       await PurchaseOrderService.delete(id);
       revalidatePath("/purchase/orders");

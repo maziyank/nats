@@ -3,6 +3,7 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { SalesInvoiceInput } from "@/app/[locale]/(dashboard)/sales/invoices/types";
 import { CalculationService } from "@/lib/utils/calculation-service";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { salesInvoiceSchema, requiredIdSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
@@ -12,6 +13,8 @@ type CreateSalesInvoiceInput = Omit<SalesInvoiceInput, "invoiceNumber"> & {
 
 export class SalesInvoiceService {
   static async create(data: CreateSalesInvoiceInput, userId: string) {
+    data = salesInvoiceSchema.parse(data);
+
     const invoiceNumber =
       data.invoiceNumber || (await this.generateInvoiceNumber());
 
@@ -72,6 +75,9 @@ export class SalesInvoiceService {
     data: CreateSalesInvoiceInput,
     userId: string,
   ) {
+    requiredIdSchema.parse(id);
+    data = salesInvoiceSchema.parse(data);
+
     // 1. Validation: Check if invoice exists and is editable
     const currentInvoice = await prisma.salesInvoice.findUnique({
       where: { id },
@@ -142,6 +148,7 @@ export class SalesInvoiceService {
   }
 
   static async delete(id: string) {
+    requiredIdSchema.parse(id);
     const currentInvoice = await prisma.salesInvoice.findUnique({
       where: { id },
     });

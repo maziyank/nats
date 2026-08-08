@@ -6,6 +6,7 @@ import { departmentSchema, projectSchema } from "./schemas";
 import { z } from "zod";
 import { getTranslations } from "next-intl/server";
 import { authorizedAction } from "@/lib/permissions/protected-action";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 
 // --- Departments ---
 
@@ -34,11 +35,15 @@ export async function createDepartment(data: z.infer<typeof departmentSchema>) {
 export const updateDepartment = authorizedAction(
   "departments.edit",
   async (id: string, data: z.infer<typeof departmentSchema>) => {
+    const parsedId = requiredIdSchema.safeParse(id);
+    if (!parsedId.success) {
+      return { success: false, error: "Invalid id" };
+    }
     const t = await getTranslations("General.Departments");
     try {
       const parsed = departmentSchema.parse(data);
       const department = await prisma.department.update({
-        where: { id },
+        where: { id: parsedId.data },
         data: parsed,
       });
       revalidatePath("/general/departments");
@@ -53,10 +58,14 @@ export const updateDepartment = authorizedAction(
 export const deleteDepartment = authorizedAction(
   "departments.delete",
   async (id: string) => {
+    const parsedId = requiredIdSchema.safeParse(id);
+    if (!parsedId.success) {
+      return { success: false, error: "Invalid id" };
+    }
     const t = await getTranslations("General.Departments");
     try {
       await prisma.department.update({
-        where: { id },
+        where: { id: parsedId.data },
         data: { isActive: false },
       });
       revalidatePath("/general/departments");
@@ -118,11 +127,15 @@ export async function createProject(data: z.infer<typeof projectSchema>) {
 export const updateProject = authorizedAction(
   "projects.edit",
   async (id: string, data: z.infer<typeof projectSchema>) => {
+    const parsedId = requiredIdSchema.safeParse(id);
+    if (!parsedId.success) {
+      return { success: false, error: "Invalid id" };
+    }
     const t = await getTranslations("General.Projects");
     try {
       const parsed = projectSchema.parse(data);
       const project = await prisma.project.update({
-        where: { id },
+        where: { id: parsedId.data },
         data: parsed,
       });
       revalidatePath("/general/projects");
@@ -137,10 +150,14 @@ export const updateProject = authorizedAction(
 export const deleteProject = authorizedAction(
   "projects.delete",
   async (id: string) => {
+    const parsedId = requiredIdSchema.safeParse(id);
+    if (!parsedId.success) {
+      return { success: false, error: "Invalid id" };
+    }
     const t = await getTranslations("General.Projects");
     try {
       await prisma.project.delete({
-        where: { id },
+        where: { id: parsedId.data },
       });
       revalidatePath("/general/projects");
       return { success: true };

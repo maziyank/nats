@@ -4,6 +4,19 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { SuperJSON } from "@/lib/superjson";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const documentNumberingValueSchema = z.object({
+    prefix: z.string(),
+    suffix: z.string(),
+    sequenceDigits: z.number().int().min(1),
+    includeYear: z.boolean(),
+    yearFormat: z.string(),
+    includeMonth: z.boolean(),
+    resetYearly: z.boolean(),
+    resetMonthly: z.boolean(),
+});
 
 const DEFAULT_ENTITIES = [
     { entityType: "SALES_ORDER", name: "Sales Order", prefix: "SO-" },
@@ -61,18 +74,26 @@ export const updateDocumentNumberingSetting = authorizedAction(
             resetMonthly: boolean;
         }
     ) => {
+        const parsedId = requiredIdSchema.safeParse(id);
+        if (!parsedId.success) {
+            return { success: false, error: "Invalid id" };
+        }
+        const parsed = documentNumberingValueSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+        }
         try {
             const result = await prisma.documentNumbering.update({
-                where: { id },
+                where: { id: parsedId.data },
                 data: {
-                    prefix: data.prefix,
-                    suffix: data.suffix,
-                    sequenceDigits: data.sequenceDigits,
-                    includeYear: data.includeYear,
-                    yearFormat: data.yearFormat,
-                    includeMonth: data.includeMonth,
-                    resetYearly: data.resetYearly,
-                    resetMonthly: data.resetMonthly,
+                    prefix: parsed.data.prefix,
+                    suffix: parsed.data.suffix,
+                    sequenceDigits: parsed.data.sequenceDigits,
+                    includeYear: parsed.data.includeYear,
+                    yearFormat: parsed.data.yearFormat,
+                    includeMonth: parsed.data.includeMonth,
+                    resetYearly: parsed.data.resetYearly,
+                    resetMonthly: parsed.data.resetMonthly,
                 },
             });
 

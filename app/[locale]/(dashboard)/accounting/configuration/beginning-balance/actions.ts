@@ -1,10 +1,15 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { getSession } from "@/lib/auth/auth";
 import { revalidatePath } from "next/cache";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import {
+  nonNegativeDecimalSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 
 export type BeginningBalanceItem = {
   accountId: string;
@@ -91,14 +96,33 @@ export const saveBeginningBalances = authorizedAction(
   "ledger.create",
   async (inputs: BeginningBalanceInput[]) => {
     try {
+      const beginningBalanceSchema = z
+        .array(
+          z.object({
+            accountId: requiredIdSchema,
+            debit: nonNegativeDecimalSchema,
+            credit: nonNegativeDecimalSchema,
+          }),
+        )
+        .min(1, "At least one balance line is required");
+
+      const parseResult = beginningBalanceSchema.safeParse(inputs);
+      if (!parseResult.success) {
+        return {
+          success: false,
+          error: parseResult.error.issues[0]?.message ?? "Invalid input",
+        };
+      }
+      const validatedInputs = parseResult.data;
+
       const session = await getSession();
       if (!session?.userId) {
         return { success: false, error: "Unauthorized" };
       }
 
       // 1. Validate Balance
-      const totalDebitInput = inputs.reduce((sum, i) => sum + i.debit, 0);
-      const totalCreditInput = inputs.reduce((sum, i) => sum + i.credit, 0);
+      const totalDebitInput = validatedInputs.reduce((sum, i) => sum + i.debit, 0);
+      const totalCreditInput = validatedInputs.reduce((sum, i) => sum + i.credit, 0);
 
       if (Math.abs(totalDebitInput - totalCreditInput) > 0.01) {
         return {
@@ -138,7 +162,7 @@ export const saveBeginningBalances = authorizedAction(
 
       let lineNumber = 1;
 
-      for (const input of inputs) {
+      for (const input of validatedInputs) {
         const currentNet = currentBalanceMap.get(input.accountId) || 0;
         const targetNet = input.debit - input.credit;
         const diff = targetNet - currentNet;

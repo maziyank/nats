@@ -43,11 +43,16 @@ export async function getWarehouses(page: number = 1, limit: number = 10) {
 
 import { authorizedAction } from "@/lib/permissions/protected-action";
 
-import { WarehouseService } from "@/modules/inventory/services/warehouse.service";
+import { WarehouseService, warehouseDataSchema } from "@/modules/inventory/services/warehouse.service";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 
 export const createWarehouse = authorizedAction(
   "warehouses.create",
   async (data: { name: string; location?: string }) => {
+    const result = warehouseDataSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const warehouse = await prisma.$transaction(async (tx) => {
         return await WarehouseService.createWarehouse(tx, data);
@@ -64,6 +69,11 @@ export const createWarehouse = authorizedAction(
 export const updateWarehouse = authorizedAction(
   "warehouses.edit",
   async (id: string, data: { name: string; location?: string }) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    const dataResult = warehouseDataSchema.safeParse(data);
+    if (!idResult.success || !dataResult.success) {
+      return { success: false, error: dataResult.success ? "Invalid id" : (dataResult.error.issues[0]?.message ?? "Invalid input") };
+    }
     try {
       const warehouse = await prisma.$transaction(async (tx) => {
         return await WarehouseService.updateWarehouse(tx, id, data);
@@ -80,6 +90,9 @@ export const updateWarehouse = authorizedAction(
 export const deleteWarehouse = authorizedAction(
   "warehouses.delete",
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       await prisma.$transaction(async (tx) => {
         await WarehouseService.deleteWarehouse(tx, id);

@@ -3,6 +3,7 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { PurchasePaymentInput } from "@/app/[locale]/(dashboard)/purchase/payments/types";
 import { generateDocumentNumber } from "@/lib/document-numbering";
 import { Decimal } from "decimal.js";
+import { purchasePaymentSchema } from "@/lib/validation/schemas";
 
 const OVERPAYMENT_TOLERANCE = 0.01;
 
@@ -15,6 +16,8 @@ type CreatePurchasePaymentInput = Omit<
 
 export class PurchasePaymentService {
   static async create(data: CreatePurchasePaymentInput, userId: string) {
+    data = purchasePaymentSchema.parse(data);
+
     const invoice = await prisma.purchaseInvoice.findUnique({
       where: { id: data.purchaseInvoiceId },
       include: { payments: true },

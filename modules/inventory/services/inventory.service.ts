@@ -1,6 +1,12 @@
 import { MovementType, Prisma } from "@/prisma/generated/prisma/client";
 import { Decimal } from "decimal.js";
+import { z } from "zod";
 import { enqueueIntegrationEventOnce } from "@/modules/integration/outbox";
+import {
+  requiredIdSchema,
+  dateSchema,
+  nonNegativeDecimalSchema,
+} from "@/lib/validation/schemas";
 
 export interface CreateInventoryMovementData {
     type: MovementType;
@@ -17,6 +23,33 @@ export interface CreateInventoryMovementData {
     transactionDate?: Date;
     status?: "PENDING" | "COMPLETED";
 }
+
+const movementItemSchema = z.object({
+    productId: requiredIdSchema,
+    quantity: nonNegativeDecimalSchema,
+    unitCost: nonNegativeDecimalSchema.optional(),
+    batchNumber: z.string().optional(),
+    notes: z.string().optional(),
+});
+
+const createInventoryMovementSchema = z.object({
+    type: z.nativeEnum(MovementType),
+    items: z.array(movementItemSchema).min(1, "At least 1 item required"),
+    warehouseId: z.string().optional(),
+    reference: z.string().optional(),
+    notes: z.string().optional(),
+    transactionDate: dateSchema.optional(),
+    status: z.enum(["PENDING", "COMPLETED"]).optional(),
+});
+
+const updateInventoryParamsSchema = z.object({
+    productId: requiredIdSchema,
+    warehouseId: requiredIdSchema,
+    quantity: z.number(),
+    type: z.nativeEnum(MovementType),
+    unitCost: nonNegativeDecimalSchema.optional(),
+    batchNumber: z.string().optional(),
+});
 
 type ProductCache = {
     id: string;
@@ -47,6 +80,7 @@ export class InventoryService {
         tx: Prisma.TransactionClient,
         data: CreateInventoryMovementData
     ) {
+        createInventoryMovementSchema.parse(data);
         const {
             type,
             items,
@@ -132,6 +166,8 @@ export class InventoryService {
     }
 
     static async approveMovement(tx: Prisma.TransactionClient, movementId: string, approvedById: string) {
+        requiredIdSchema.parse(movementId);
+        requiredIdSchema.parse(approvedById);
         const movement = await tx.inventoryMovement.findUniqueOrThrow({
             where: { id: movementId },
             include: { details: true },
@@ -359,6 +395,7 @@ export class InventoryService {
             batchNumber?: string;
         }
     ) {
+        updateInventoryParamsSchema.parse(params);
         await this.applyInventoryUpdates(tx, {
             type: params.type,
             warehouseId: params.warehouseId,

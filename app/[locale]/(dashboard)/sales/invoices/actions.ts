@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { SuperJSON } from "@/lib/superjson";
 import { revalidatePath } from "next/cache";
@@ -230,6 +231,8 @@ export const deleteSalesInvoice = authorizedAction(
   "sales.delete",
   async (id: string) => {
     try {
+      const idResult = z.string().cuid().safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid invoice id" };
       await SalesInvoiceService.delete(id);
 
       revalidatePath("/sales/invoices");
@@ -250,6 +253,8 @@ export const postSalesInvoice = authorizedAction<
   [string]
 >("sales.edit", async (id: string) => {
   try {
+    const idResult = z.string().cuid().safeParse(id);
+    if (!idResult.success) return { success: false, error: "Invalid invoice id" };
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
 

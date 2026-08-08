@@ -7,6 +7,18 @@ import { revalidatePath } from "next/cache";
 import { SuperJSON } from "@/lib/superjson";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const locationDataSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  code: z.string().min(1, "Code is required"),
+  type: z.nativeEnum(LocationType),
+});
+
+const createLocationDataSchema = locationDataSchema.extend({
+  warehouseId: requiredIdSchema,
+});
 
 export async function getLocations(
   warehouseId: string,
@@ -51,6 +63,10 @@ export async function getWarehouse(warehouseId: string) {
 export const createLocation = authorizedAction(
   "warehouses.edit",
   async (data: { warehouseId: string; name: string; code: string; type: LocationType }) => {
+    const result = createLocationDataSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const location = await prisma.location.create({
         data,
@@ -67,6 +83,11 @@ export const createLocation = authorizedAction(
 export const updateLocation = authorizedAction(
   "warehouses.edit",
   async (id: string, data: { name: string; code: string; type: LocationType }) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    const dataResult = locationDataSchema.safeParse(data);
+    if (!idResult.success || !dataResult.success) {
+      return { success: false, error: dataResult.success ? "Invalid id" : (dataResult.error.issues[0]?.message ?? "Invalid input") };
+    }
     try {
       const location = await prisma.location.update({
         where: { id },
@@ -84,6 +105,9 @@ export const updateLocation = authorizedAction(
 export const deleteLocation = authorizedAction(
   "warehouses.edit",
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const location = await prisma.location.delete({
         where: { id },

@@ -5,12 +5,21 @@
 
 "use server";
 
+import { z } from "zod";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { AccountType } from "@/prisma/generated/prisma/enums";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 import { AccountService } from "@/modules/accounting/services/account.service";
+
+const createAccountSchema = z.object({
+  code: z.string().min(1, "Account code is required"),
+  name: z.string().min(1, "Account name is required"),
+  type: z.nativeEnum(AccountType),
+  parentId: z.string().cuid().optional().nullable(),
+});
 
 const fetchAccountsCached = unstable_cache(
   async (page?: number, pageSize?: number) => {
@@ -72,12 +81,24 @@ export const createAccount = authorizedAction(
     parentId?: string;
   }) => {
     try {
+      const parseResult = createAccountSchema.safeParse(data);
+      if (!parseResult.success) {
+        return {
+          success: false,
+          error: parseResult.error.issues[0]?.message ?? "Invalid input",
+        };
+      }
+      const parsed = parseResult.data;
+
       const session = await getSession();
       if (!session?.userId) {
         return { success: false, error: "User not authenticated" };
       }
 
-      const account = await AccountService.createAccount(data, session.userId);
+      const account = await AccountService.createAccount(
+        parsed as Parameters<typeof AccountService.createAccount>[0],
+        session.userId,
+      );
 
       revalidatePath("/accounting/accounts");
       revalidateTag("chart-of-accounts", "max");
@@ -118,7 +139,20 @@ export async function getNextAccountCode(
  */
 export async function updateAccount(id: string, data: { name: string }) {
   try {
-    await AccountService.updateAccount(id, data);
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid account id" };
+    }
+    const dataResult = z
+      .object({ name: z.string().min(1, "Account name is required") })
+      .safeParse(data);
+    if (!dataResult.success) {
+      return {
+        success: false,
+        error: dataResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    await AccountService.updateAccount(idResult.data, dataResult.data);
     revalidatePath("/accounting/accounts");
     revalidateTag("chart-of-accounts", "max");
     return { success: true };
@@ -137,8 +171,13 @@ export async function deleteAccount(id: string) {
     return { success: false, error: "Unauthorized" };
   }
 
+  const idResult = requiredIdSchema.safeParse(id);
+  if (!idResult.success) {
+    return { success: false, error: "Invalid account id" };
+  }
+
   try {
-    await AccountService.deleteAccount(id);
+    await AccountService.deleteAccount(idResult.data);
     revalidatePath("/accounting/accounts");
     revalidateTag("chart-of-accounts", "max");
     return { success: true };

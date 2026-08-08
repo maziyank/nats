@@ -6,6 +6,8 @@ import bcrypt from "bcryptjs";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 
 interface UserCreateData {
   name: string;
@@ -20,6 +22,20 @@ interface UserUpdateData {
   password?: string;
   roleId?: string;
 }
+
+const createUserSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
+  roleId: z.string().min(1, "Role is required"),
+});
+
+const updateUserSchema = z.object({
+  name: z.string().min(1, "Name cannot be empty").optional(),
+  email: z.string().email("Invalid email").optional(),
+  password: z.string().min(6, "Password must be at least 6 characters").optional(),
+  roleId: z.string().optional(),
+});
 
 export async function getUsers(page: number, limit: number) {
   const skip = (page - 1) * limit;
@@ -66,6 +82,10 @@ export async function getRoles() {
 export const createUser = authorizedAction(
   "users.create",
   async (data: UserCreateData) => {
+    const parsed = createUserSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       if (!data.name) {
         return { success: false, error: "Name is required" };
@@ -108,6 +128,10 @@ export const createUser = authorizedAction(
 export const updateUser = authorizedAction(
   "users.edit",
   async (id: string, data: UserUpdateData) => {
+    const parsed = updateUserSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       if (data.name !== undefined && !data.name) {
         return { success: false, error: "Name cannot be empty" };
@@ -154,9 +178,13 @@ export const updateUser = authorizedAction(
 export const deleteUser = authorizedAction(
   "users.delete",
   async (id: string) => {
+    const parsed = requiredIdSchema.safeParse(id);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid id" };
+    }
     try {
       await prisma.user.delete({
-        where: { id },
+        where: { id: parsed.data },
       });
       revalidatePath("/admin/users");
       return { success: true };

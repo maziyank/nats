@@ -1,9 +1,32 @@
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@/prisma/generated/prisma/client";
 import { Decimal } from "decimal.js";
+import { z } from "zod";
+import {
+  requiredIdSchema,
+  nonNegativeDecimalSchema,
+} from "@/lib/validation/schemas";
 
 const HOLD_ID_PREFIX = "HOLD";
 const HELD_ORDER_EXPIRATION_MS = 24 * 60 * 60 * 1000;
+
+const heldOrderCartItemSchema = z
+    .object({
+        id: requiredIdSchema,
+        quantity: z.number().positive("Quantity must be greater than 0"),
+        price: nonNegativeDecimalSchema,
+        discount: nonNegativeDecimalSchema,
+    })
+    .passthrough();
+
+const holdOrderSchema = z.object({
+    cart: z.array(heldOrderCartItemSchema).min(1, "At least 1 item required"),
+    totalAmount: nonNegativeDecimalSchema,
+    note: z.string().optional(),
+    customerId: z.string().cuid().optional(),
+    customerName: z.string().optional(),
+    globalDiscount: nonNegativeDecimalSchema.default(0),
+});
 
 export class HeldOrderService {
     static async hold(
@@ -15,6 +38,21 @@ export class HeldOrderService {
         customerName?: string,
         globalDiscount: number = 0,
     ) {
+        const parsed = holdOrderSchema.parse({
+            cart,
+            totalAmount,
+            note,
+            customerId,
+            customerName,
+            globalDiscount,
+        });
+        cart = parsed.cart;
+        totalAmount = parsed.totalAmount;
+        note = parsed.note;
+        customerId = parsed.customerId;
+        customerName = parsed.customerName;
+        globalDiscount = parsed.globalDiscount;
+
         const posSession = await prisma.pOSSession.findFirst({
             where: { cashierId: userId, status: "OPEN" },
         });
@@ -42,6 +80,8 @@ export class HeldOrderService {
     }
 
     static async resume(heldOrderId: string) {
+        requiredIdSchema.parse(heldOrderId);
+
         const heldOrder = await prisma.heldOrder.findUnique({
             where: { id: heldOrderId },
         });
@@ -56,6 +96,8 @@ export class HeldOrderService {
     }
 
     static async delete(heldOrderId: string) {
+        requiredIdSchema.parse(heldOrderId);
+
         await prisma.heldOrder.delete({
             where: { id: heldOrderId },
         });

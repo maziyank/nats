@@ -171,7 +171,7 @@ export async function getPurchaseOrdersForSelect() {
   return SuperJSON.serialize(orders);
 }
 
-import { purchaseInvoiceSchema } from "@/lib/validation/schemas";
+import { purchaseInvoiceSchema, requiredIdSchema } from "@/lib/validation/schemas";
 
 export const createPurchaseInvoice = authorizedAction(
   "purchase.create",
@@ -355,6 +355,10 @@ export const updatePurchaseInvoice = authorizedAction(
 export const deletePurchaseInvoice = authorizedAction(
   "purchase.delete",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const currentInvoice = await prisma.purchaseInvoice.findUnique({
         where: { id },
@@ -383,6 +387,10 @@ export const postPurchaseInvoice = authorizedAction<
   PostPurchaseInvoiceResult,
   [string]
 >("purchase.edit", async (id: string) => {
+  const idResult = requiredIdSchema.safeParse(id);
+  if (!idResult.success) {
+    return { success: false, error: "Invalid id" };
+  }
   try {
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");

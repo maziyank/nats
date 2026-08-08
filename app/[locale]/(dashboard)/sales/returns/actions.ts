@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { InventoryService } from "@/modules/inventory/services/inventory.service";
 
 import { prisma } from "@/lib/prisma";
@@ -13,6 +14,32 @@ import { getSalesInvoice } from "../invoices/actions";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
 import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+
+const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
+const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, "Must be non-negative");
+const requiredIdSchema = z.string().cuid();
+const dateSchema = z.coerce.date();
+
+const salesReturnItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  unitPrice: nonNegativeDecimalSchema,
+});
+
+const salesReturnSchema = z.object({
+  returnNumber: z.string(),
+  contactId: requiredIdSchema,
+  salesOrderId: z.string().optional(),
+  salesInvoiceId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  returnDate: dateSchema,
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.enum(["DRAFT", "APPROVED", "COMPLETED", "CANCELLED"]).optional(),
+  items: z.array(salesReturnItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
 
 export { getSalesOrder, getSalesInvoice };
 
@@ -190,6 +217,11 @@ export const createSalesReturn = authorizedAction(
   "sales.create",
   async (data: SalesReturnInput) => {
     try {
+      const parseResult = salesReturnSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
@@ -209,6 +241,13 @@ export const updateSalesReturn = authorizedAction(
   "sales.edit",
   async (id: string, data: SalesReturnInput) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid return id" };
+      const parseResult = salesReturnSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
@@ -340,6 +379,8 @@ export const deleteSalesReturn = authorizedAction(
   "sales.delete",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid return id" };
       const currentReturn = await prisma.salesReturn.findUnique({
         where: { id },
       });

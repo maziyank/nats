@@ -2,6 +2,12 @@ import { prisma } from "@/lib/prisma";
 import { Asset, AssetStatus, DepreciationMethod, Prisma } from "@/prisma/generated/prisma/client";
 import { Decimal } from "decimal.js";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
+import { z } from "zod";
+import {
+  dateSchema,
+  nonNegativeDecimalSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 
 export type CreateAssetParams = {
     code: string;
@@ -22,6 +28,24 @@ export type CreateAssetParams = {
 };
 
 export type UpdateAssetParams = Partial<CreateAssetParams> & { userId: string };
+
+const assetSchema = z.object({
+  code: z.string().min(1, "Asset code is required"),
+  name: z.string().min(1, "Asset name is required"),
+  description: z.string().optional(),
+  serialNumber: z.string().optional(),
+  barcode: z.string().optional(),
+  purchaseDate: dateSchema,
+  acquisitionCost: nonNegativeDecimalSchema,
+  residualValue: nonNegativeDecimalSchema,
+  usefulLife: z.number().int().positive("Useful life must be a positive integer"),
+  depreciationMethod: z.nativeEnum(DepreciationMethod),
+  categoryId: requiredIdSchema,
+  location: z.string().optional(),
+  department: z.string().optional(),
+  assignedTo: z.string().optional(),
+  userId: requiredIdSchema,
+});
 
 export class AssetService {
     static async getAssets() {
@@ -47,6 +71,7 @@ export class AssetService {
     }
 
     static async createAsset(params: CreateAssetParams): Promise<Asset> {
+        params = assetSchema.parse(params);
         return await prisma.$transaction(async (tx) => {
             const asset = await tx.asset.create({
                 data: {
@@ -88,6 +113,8 @@ export class AssetService {
     }
 
     static async updateAsset(id: string, params: UpdateAssetParams): Promise<Asset> {
+        requiredIdSchema.parse(id);
+        assetSchema.partial().parse(params);
         return await prisma.$transaction(async (tx) => {
             const updateData: Prisma.AssetUpdateInput = {
                 ...params,
@@ -125,6 +152,8 @@ export class AssetService {
     }
 
     static async activateAsset(id: string, userId: string): Promise<Asset> {
+        requiredIdSchema.parse(id);
+        requiredIdSchema.parse(userId);
         return await prisma.$transaction(async (tx) => {
             const asset = await tx.asset.update({
                 where: { id },
@@ -156,6 +185,13 @@ export class AssetService {
             userId: string;
         }
     ): Promise<void> {
+        requiredIdSchema.parse(id);
+        z.object({
+            date: dateSchema,
+            amount: nonNegativeDecimalSchema,
+            reason: z.string().min(1, "Disposal reason is required"),
+            userId: requiredIdSchema,
+        }).parse(params);
         await prisma.$transaction(async (tx) => {
             const asset = await tx.asset.findUnique({
                 where: { id },

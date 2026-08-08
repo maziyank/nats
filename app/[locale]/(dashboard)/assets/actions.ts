@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { SuperJSON } from "@/lib/superjson";
 import { AssetService } from "@/modules/fixed-assets/services/asset.service";
@@ -9,6 +10,11 @@ import { AssetStatus, DepreciationMethod } from "@/prisma/generated/prisma/clien
 import { Decimal } from "decimal.js";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth/auth";
+import {
+  dateSchema,
+  nonNegativeDecimalSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 
 // --- Types ---
 export type AssetFormData = {
@@ -39,6 +45,34 @@ export type AssetCategoryFormData = {
   depreciationExpenseAccountId: string;
 };
 
+const assetSchema = z.object({
+  code: z.string().min(1, "Asset code is required"),
+  name: z.string().min(1, "Asset name is required"),
+  description: z.string().optional(),
+  serialNumber: z.string().optional(),
+  barcode: z.string().optional(),
+  purchaseDate: dateSchema,
+  acquisitionCost: nonNegativeDecimalSchema,
+  residualValue: nonNegativeDecimalSchema,
+  usefulLife: z.number().int().positive("Useful life must be a positive integer"),
+  depreciationMethod: z.nativeEnum(DepreciationMethod),
+  categoryId: requiredIdSchema,
+  location: z.string().optional(),
+  department: z.string().optional(),
+  assignedTo: z.string().optional(),
+});
+
+const assetCategorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
+  code: z.string().min(1, "Category code is required"),
+  description: z.string().optional(),
+  defaultUsefulLife: z.number().int().positive().optional(),
+  defaultMethod: z.nativeEnum(DepreciationMethod).optional(),
+  assetAccountId: requiredIdSchema,
+  accumDepreciationAccountId: requiredIdSchema,
+  depreciationExpenseAccountId: requiredIdSchema,
+});
+
 // --- Asset Actions ---
 
 export async function getAssets() {
@@ -53,21 +87,30 @@ export async function getAsset(id: string) {
 
 export async function createAsset(data: AssetFormData) {
   try {
+    const parseResult = assetSchema.safeParse(data);
+    if (!parseResult.success) {
+      return {
+        success: false,
+        error: parseResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    const parsed = parseResult.data;
+
     const session = await getSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
     const asset = await AssetService.createAsset({
-      ...data,
+      ...parsed,
       userId: session.userId,
     });
 
     // Calculate initial depreciation schedule (preview)
     const schedule = DepreciationService.calculateDepreciationSchedule(
-      new Decimal(data.acquisitionCost),
-      new Decimal(data.residualValue),
-      data.usefulLife,
-      data.depreciationMethod,
-      data.purchaseDate
+      new Decimal(parsed.acquisitionCost),
+      new Decimal(parsed.residualValue),
+      parsed.usefulLife,
+      parsed.depreciationMethod,
+      parsed.purchaseDate
     );
 
     if (schedule.length > 0) {
@@ -90,11 +133,24 @@ export async function createAsset(data: AssetFormData) {
 
 export async function updateAsset(id: string, data: Partial<AssetFormData>) {
   try {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid asset id" };
+    }
+    const parseResult = assetSchema.partial().safeParse(data);
+    if (!parseResult.success) {
+      return {
+        success: false,
+        error: parseResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    const parsed = parseResult.data;
+
     const session = await getSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
-    const asset = await AssetService.updateAsset(id, {
-      ...data,
+    const asset = await AssetService.updateAsset(idResult.data, {
+      ...parsed,
       userId: session.userId,
     });
 
@@ -152,13 +208,32 @@ export async function disposeAsset(
   userId: string
 ) {
   try {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid asset id" };
+    }
+    const parseResult = z
+      .object({
+        date: dateSchema,
+        amount: nonNegativeDecimalSchema,
+        reason: z.string().min(1, "Disposal reason is required"),
+      })
+      .safeParse({ date, amount, reason });
+    if (!parseResult.success) {
+      return {
+        success: false,
+        error: parseResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    const parsed = parseResult.data;
+
     const session = await getSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
-    await AssetService.disposeAsset(id, {
-      date,
-      amount,
-      reason,
+    await AssetService.disposeAsset(idResult.data, {
+      date: parsed.date,
+      amount: parsed.amount,
+      reason: parsed.reason,
       userId: session.userId,
     });
 
@@ -178,7 +253,14 @@ export async function getAssetCategories() {
 
 export async function createAssetCategory(data: AssetCategoryFormData) {
   try {
-    const category = await CategoryService.createCategory(data);
+    const parseResult = assetCategorySchema.safeParse(data);
+    if (!parseResult.success) {
+      return {
+        success: false,
+        error: parseResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    const category = await CategoryService.createCategory(parseResult.data);
     revalidatePath("/assets/categories");
     return { success: true, data: SuperJSON.serialize(category) };
   } catch (error: any) {
@@ -195,11 +277,23 @@ export async function getDueDepreciationSchedules() {
 
 export async function postDepreciationRun(scheduleIds: string[], userId: string) {
   try {
+    const idsResult = z
+      .array(requiredIdSchema)
+      .min(1, "At least one schedule id is required")
+      .safeParse(scheduleIds);
+    if (!idsResult.success) {
+      return {
+        success: false,
+        error: idsResult.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
+    const validatedIds = idsResult.data;
+
     const session = await getSession();
     if (!session?.userId) throw new Error("Unauthorized");
 
     let count = 0;
-    for (const id of scheduleIds) {
+    for (const id of validatedIds) {
       await DepreciationService.postDepreciation(id, session.userId);
       count++;
     }

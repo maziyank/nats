@@ -1,9 +1,34 @@
 import { Prisma } from "@/prisma/generated/prisma/client";
+import { z } from "zod";
 import { enqueueIntegrationEventOnce } from "@/modules/integration/outbox";
 import { ProductInput } from "@/app/[locale]/(dashboard)/inventory/types";
+import {
+  decimalSchema,
+  nonNegativeDecimalSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
+
+export const productInputSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  sku: z.string().min(1, "SKU is required"),
+  description: z.string().nullable().optional(),
+  image: z.string().nullable().optional(),
+  categoryId: z.string().nullable().optional(),
+  price: nonNegativeDecimalSchema,
+  cost: nonNegativeDecimalSchema,
+  minStock: nonNegativeDecimalSchema,
+  isActive: z.boolean(),
+  baseUnitId: z.string().nullable().optional(),
+  purchaseUnitId: z.string().nullable().optional(),
+  purchaseConversionFactor: decimalSchema.optional(),
+  salesUnitId: z.string().nullable().optional(),
+  salesConversionFactor: decimalSchema.optional(),
+  taxRateId: z.string().nullable().optional(),
+});
 
 export class ProductService {
     static async createProduct(tx: Prisma.TransactionClient, data: ProductInput) {
+        productInputSchema.parse(data);
         const product = await tx.product.create({
             data: {
                 name: data.name,
@@ -50,6 +75,8 @@ export class ProductService {
     }
 
     static async updateProduct(tx: Prisma.TransactionClient, id: string, data: ProductInput) {
+        requiredIdSchema.parse(id);
+        productInputSchema.parse(data);
         const currentProduct = await tx.product.findUnique({
             where: { id },
             select: { price: true },
@@ -96,6 +123,7 @@ export class ProductService {
     }
 
     static async deleteProduct(tx: Prisma.TransactionClient, id: string) {
+        requiredIdSchema.parse(id);
         await tx.product.delete({
             where: { id },
         });

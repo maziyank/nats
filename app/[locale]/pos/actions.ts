@@ -10,6 +10,58 @@ import { POSTransactionService } from "@/modules/pos/services/pos-transaction.se
 import { POSSessionService } from "@/modules/pos/services/pos-session.service";
 import { HeldOrderService } from "@/modules/pos/services/held-order.service";
 import { POSCartItem } from "./types";
+import { z } from "zod";
+import {
+  requiredIdSchema,
+  nonNegativeDecimalSchema,
+} from "@/lib/validation/schemas";
+
+// --- POS validation schemas ---
+const posTransactionItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: z.number().positive("Quantity must be greater than 0"),
+  price: nonNegativeDecimalSchema,
+  discount: nonNegativeDecimalSchema,
+});
+
+const processPOSTransactionSchema = z.object({
+  sessionId: requiredIdSchema,
+  items: z.array(posTransactionItemSchema).min(1, "At least 1 item required"),
+  paymentMethod: z.enum(["CASH", "CARD", "QRIS"]),
+  amountPaid: nonNegativeDecimalSchema,
+  globalDiscount: nonNegativeDecimalSchema.default(0),
+  customerId: z.string().cuid().optional(),
+});
+
+const openPOSSessionSchema = z.object({
+  openingCash: nonNegativeDecimalSchema,
+  warehouseId: requiredIdSchema,
+  departmentId: z.string().cuid().optional().nullable(),
+});
+
+const closePOSSessionSchema = z.object({
+  sessionId: requiredIdSchema,
+  actualCash: nonNegativeDecimalSchema,
+  notes: z.string().optional(),
+});
+
+const posCartItemSchema = z
+  .object({
+    id: requiredIdSchema,
+    quantity: z.number().positive("Quantity must be greater than 0"),
+    price: nonNegativeDecimalSchema,
+    discount: nonNegativeDecimalSchema,
+  })
+  .passthrough();
+
+const holdOrderSchema = z.object({
+  cart: z.array(posCartItemSchema).min(1, "At least 1 item required"),
+  totalAmount: nonNegativeDecimalSchema,
+  note: z.string().optional(),
+  customerId: z.string().cuid().optional(),
+  customerName: z.string().optional(),
+  globalDiscount: nonNegativeDecimalSchema.default(0),
+});
 
 export async function getPOSSessions(page: number = 1, limit: number = 50) {
   const session = await getSession();
@@ -315,11 +367,17 @@ export async function openPOSSession(
   if (!userId || !hasPermission(session.permissions, "pos.access"))
     throw new Error("Unauthorized");
 
-  const newSession = await POSSessionService.open(
-    userId,
+  const parsed = openPOSSessionSchema.parse({
     openingCash,
     warehouseId,
     departmentId,
+  });
+
+  const newSession = await POSSessionService.open(
+    userId,
+    parsed.openingCash,
+    parsed.warehouseId,
+    parsed.departmentId,
   );
 
   revalidatePath("/pos");
@@ -336,7 +394,17 @@ export async function closePOSSession(
     throw new Error("Unauthorized");
   }
 
-  await POSSessionService.close(sessionId, actualCash, notes);
+  const parsed = closePOSSessionSchema.parse({
+    sessionId,
+    actualCash,
+    notes,
+  });
+
+  await POSSessionService.close(
+    parsed.sessionId,
+    parsed.actualCash,
+    parsed.notes,
+  );
 
   revalidatePath("/pos");
 }
@@ -428,14 +496,32 @@ export async function processPOSTransaction(
     };
   }>
 > {
+  const validation = processPOSTransactionSchema.safeParse({
+    sessionId,
+    items,
+    paymentMethod,
+    amountPaid,
+    globalDiscount,
+    customerId,
+  });
+
+  if (!validation.success) {
+    return {
+      success: false,
+      error: validation.error.issues[0]?.message ?? "Invalid input",
+    };
+  }
+
+  const parsed = validation.data;
+
   try {
     const result = await POSTransactionService.process(
-      sessionId,
-      items,
-      paymentMethod,
-      amountPaid,
-      globalDiscount,
-      customerId,
+      parsed.sessionId,
+      parsed.items,
+      parsed.paymentMethod,
+      parsed.amountPaid,
+      parsed.globalDiscount,
+      parsed.customerId,
     );
 
     return {
@@ -465,14 +551,23 @@ export async function holdOrder(
   const userId = session?.userId;
   if (!userId) throw new Error("Unauthorized");
 
-  const heldOrder = await HeldOrderService.hold(
-    userId,
+  const parsed = holdOrderSchema.parse({
     cart,
     totalAmount,
     note,
     customerId,
     customerName,
     globalDiscount,
+  });
+
+  const heldOrder = await HeldOrderService.hold(
+    userId,
+    parsed.cart,
+    parsed.totalAmount,
+    parsed.note,
+    parsed.customerId,
+    parsed.customerName,
+    parsed.globalDiscount,
   );
 
   revalidatePath("/pos");
@@ -569,6 +664,8 @@ export async function resumeOrder(heldOrderId: string) {
   const session = await getSession();
   if (!session?.userId) throw new Error("Unauthorized");
 
+  requiredIdSchema.parse(heldOrderId);
+
   const heldOrder = await HeldOrderService.resume(heldOrderId);
 
   revalidatePath("/pos");
@@ -578,6 +675,8 @@ export async function resumeOrder(heldOrderId: string) {
 export async function deleteHeldOrder(heldOrderId: string) {
   const session = await getSession();
   if (!session?.userId) throw new Error("Unauthorized");
+
+  requiredIdSchema.parse(heldOrderId);
 
   await HeldOrderService.delete(heldOrderId);
 

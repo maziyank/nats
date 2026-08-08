@@ -4,7 +4,10 @@ import { EntryStatus } from "@/prisma/generated/prisma/enums";
 import { Decimal } from "decimal.js";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { getPaginationMetadata } from "@/lib/pagination";
-import { createJournalEntrySchema } from "@/lib/validation/schemas";
+import {
+  createJournalEntrySchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 import { z } from "zod";
 import { generateDocumentNumber } from "@/lib/document-numbering";
 
@@ -124,6 +127,8 @@ export class JournalService {
     userId: string,
     tx?: Prisma.TransactionClient,
   ) {
+    data = createJournalEntrySchema.parse(data);
+
     // Validate debit = credit using Decimal for precision
     const totalDebit = data.lines.reduce(
       (sum, line) => sum.plus(new Decimal(line?.debitAmount || 0)),
@@ -209,6 +214,9 @@ export class JournalService {
    * Update a journal entry
    */
   static async updateJournalEntry(id: string, data: CreateJournalEntryInput) {
+    requiredIdSchema.parse(id);
+    data = createJournalEntrySchema.parse(data);
+
     const existingEntry = await prisma.journalEntry.findUnique({
       where: { id },
     });

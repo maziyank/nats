@@ -1,6 +1,23 @@
 import { prisma } from '@/lib/prisma';
 import { CreateLeaveRequestDTO, ReviewLeaveRequestDTO } from '../types';
-import { LeaveRequestStatus, Prisma } from '@/prisma/generated/prisma/client';
+import { LeaveRequestStatus, LeaveType, Prisma } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const createLeaveRequestSchema: z.ZodType<CreateLeaveRequestDTO> = z.object({
+    employeeDetailId: requiredIdSchema,
+    leaveType: z.nativeEnum(LeaveType),
+    startDate: dateSchema,
+    endDate: dateSchema,
+    days: z.number().positive(),
+    reason: z.string().optional(),
+});
+
+const reviewLeaveRequestSchema: z.ZodType<ReviewLeaveRequestDTO> = z.object({
+    requestId: requiredIdSchema,
+    status: z.enum(['APPROVED', 'REJECTED', 'CANCELLED']),
+    approvedById: z.string().optional(),
+});
 
 export class LeaveService {
     static async listRequests({
@@ -42,6 +59,7 @@ export class LeaveService {
     }
 
     static async createRequest(data: CreateLeaveRequestDTO) {
+        data = createLeaveRequestSchema.parse(data);
         if (data.endDate < data.startDate) {
             throw new Error('End date must be on or after start date');
         }
@@ -86,6 +104,7 @@ export class LeaveService {
     }
 
     static async reviewRequest(data: ReviewLeaveRequestDTO) {
+        data = reviewLeaveRequestSchema.parse(data);
         const request = await prisma.leaveRequest.findUnique({
             where: { id: data.requestId },
         });

@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 interface CompanyProfileData {
   name: string;
@@ -19,6 +20,25 @@ interface CompanyProfileData {
   timezone: string;
 }
 
+const companyProfileSchema = z.object({
+  name: z.string().min(1, "Company name is required"),
+  address: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  email: z
+    .string()
+    .nullable()
+    .optional()
+    .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "Invalid email"),
+  website: z.string().nullable().optional(),
+  taxId: z.string().nullable().optional(),
+  currency: z.string().min(1, "Currency is required"),
+  currencySymbol: z.string().min(1, "Currency symbol is required"),
+  dateFormat: z.string().min(1, "Date format is required"),
+  currencyFormat: z.string().min(1, "Currency format is required"),
+  locale: z.string().min(1, "Locale is required"),
+  timezone: z.string().min(1, "Timezone is required"),
+});
+
 /**
  * Update company profile settings.
  * Permission: "company.settings"
@@ -29,6 +49,10 @@ interface CompanyProfileData {
 export const updateCompanyProfile = authorizedAction(
   "company.settings",
   async (data: CompanyProfileData) => {
+    const parsed = companyProfileSchema.safeParse(data);
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    }
     if (!data.name) {
       return { success: false, error: "Company name is required" };
     }

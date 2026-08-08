@@ -3,11 +3,37 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { SalesOrderInput } from "@/app/[locale]/(dashboard)/sales/orders/types";
 import { CalculationService } from "@/lib/utils/calculation-service";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { SalesOrderStatus } from "@/prisma/generated/prisma/client";
+import { z } from "zod";
+import { requiredIdSchema, dateSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
+const salesOrderSchema: z.ZodType<SalesOrderInput> = z.object({
+  contactId: requiredIdSchema,
+  orderDate: dateSchema,
+  expectedDate: dateSchema.nullable().optional(),
+  notes: z.string().nullable().optional(),
+  status: z.nativeEnum(SalesOrderStatus).optional(),
+  items: z
+    .array(
+      z.object({
+        productId: requiredIdSchema,
+        quantity: z.coerce.number().positive(),
+        unitPrice: z.coerce.number().nonnegative(),
+        taxRate: z.coerce.number().optional(),
+        discountRate: z.coerce.number().optional(),
+      }),
+    )
+    .min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+});
+
 export class SalesOrderService {
   static async create(data: SalesOrderInput, userId: string) {
+    data = salesOrderSchema.parse(data);
     const orderNumber = `DRAFT-${Date.now()}`;
 
     const { itemsData, totals } = this.calculateItemsAndTotals(data);
@@ -58,6 +84,9 @@ export class SalesOrderService {
   }
 
   static async update(id: string, data: SalesOrderInput, userId: string) {
+    requiredIdSchema.parse(id);
+    data = salesOrderSchema.parse(data);
+
     const currentOrder = await prisma.salesOrder.findUnique({
       where: { id },
     });

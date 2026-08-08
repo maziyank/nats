@@ -10,6 +10,39 @@ import { authorizedAction } from "@/lib/permissions/protected-action";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
 import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { requiredIdSchema, dateSchema } from "@/lib/validation/schemas";
+import { EmploymentStatus, Gender, MaritalStatus, TaxFilingStatus } from "@/prisma/generated/prisma/client";
+
+const createEmployeeSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email").optional().or(z.literal("")),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    taxId: z.string().optional(),
+    employeeNumber: z.string().optional(),
+    joinDate: dateSchema,
+    terminationDate: dateSchema.optional(),
+    employmentStatus: z.nativeEnum(EmploymentStatus),
+    jobTitle: z.string().min(1, "Job title is required"),
+    department: z.string().optional(),
+    departmentId: z.string().optional(),
+    managerId: z.string().optional(),
+    dateOfBirth: dateSchema.optional(),
+    gender: z.nativeEnum(Gender).optional(),
+    maritalStatus: z.nativeEnum(MaritalStatus).optional(),
+    nationalId: z.string().optional(),
+    employeeTaxId: z.string().optional(),
+    taxFilingStatus: z.nativeEnum(TaxFilingStatus).optional(),
+    hasNpwp: z.boolean().optional(),
+    emergencyContactName: z.string().optional(),
+    emergencyContactPhone: z.string().optional(),
+    bankName: z.string().optional(),
+    bankAccount: z.string().optional(),
+    bankHolder: z.string().optional(),
+});
+
+const updateEmployeeSchema = z.object({ ...createEmployeeSchema.shape, isActive: z.boolean().optional() }).partial();
 
 export async function getEmployees(
     page = 1,
@@ -49,8 +82,12 @@ export async function getEmployee(id: string): Promise<ActionResponse<SuperJSONR
 export const createEmployee = authorizedAction(
     "hr.employees.create",
     async (data: CreateEmployeeDTO): Promise<ActionResponse> => {
+        const parsed = createEmployeeSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+        }
         try {
-            const employee = await EmployeeService.createEmployee(data);
+            const employee = await EmployeeService.createEmployee(parsed.data);
             revalidatePath('/hr/employees');
             return { success: true, data: SuperJSON.serialize(employee) };
         } catch (error) {
@@ -62,11 +99,19 @@ export const createEmployee = authorizedAction(
 export const updateEmployee = authorizedAction(
     "hr.employees.edit",
     async (id: string, data: UpdateEmployeeDTO): Promise<ActionResponse> => {
+        const parsedId = requiredIdSchema.safeParse(id);
+        if (!parsedId.success) {
+            return { success: false, error: parsedId.error.issues[0]?.message ?? "Invalid input" };
+        }
+        const parsed = updateEmployeeSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+        }
         try {
             const session = await getSession();
             const employee = await EmployeeService.updateEmployee(
-                id,
-                data,
+                parsedId.data,
+                parsed.data,
                 session?.userId || 'system',
             );
             revalidatePath('/hr/employees');

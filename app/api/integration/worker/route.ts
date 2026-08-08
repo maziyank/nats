@@ -1,5 +1,24 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { runOutboxWorker } from "@/modules/integration/worker";
+
+const workerParamsSchema = z
+  .object({
+    limitPerBatch: z.coerce.number().finite().optional().catch(undefined),
+    maxBatches: z.coerce.number().finite().optional().catch(undefined),
+    deadlineMs: z.coerce.number().finite().optional().catch(undefined),
+    concurrency: z.coerce.number().finite().optional().catch(undefined),
+    drain: z.string().optional(),
+    safeMode: z.string().optional(),
+  })
+  .transform((v) => ({
+    limitPerBatch: v.limitPerBatch || undefined,
+    maxBatches: v.maxBatches || undefined,
+    deadlineMs: v.deadlineMs || undefined,
+    concurrency: v.concurrency || undefined,
+    drain: v.drain === "true" ? true : undefined,
+    safeMode: v.safeMode === "true" ? true : undefined,
+  }));
 
 export async function POST(request: Request) {
   const key = request.headers.get("x-integration-dispatch-key");
@@ -8,21 +27,9 @@ export async function POST(request: Request) {
   }
 
   const url = new URL(request.url);
-  const limitPerBatch = Number(url.searchParams.get("limitPerBatch")) || undefined;
-  const maxBatches = Number(url.searchParams.get("maxBatches")) || undefined;
-  const deadlineMs = Number(url.searchParams.get("deadlineMs")) || undefined;
-  const concurrency = Number(url.searchParams.get("concurrency")) || undefined;
-  const drain = url.searchParams.get("drain") === "true" ? true : undefined;
-  const safeMode = url.searchParams.get("safeMode") === "true" ? true : undefined;
+  const params = workerParamsSchema.parse(Object.fromEntries(url.searchParams));
 
-  const result = await runOutboxWorker({
-    limitPerBatch,
-    maxBatches,
-    deadlineMs,
-    concurrency,
-    drain,
-    safeMode,
-  });
+  const result = await runOutboxWorker(params);
 
   return NextResponse.json({ success: true, result });
 }

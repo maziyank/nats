@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
 import { generateExportFile } from "@/lib/export/generate";
@@ -11,6 +12,12 @@ type JobBody = {
   format?: ExportFormat;
   context?: Record<string, unknown>;
 };
+
+const jobBodySchema = z.object({
+  jobId: z.string().min(1, "jobId is required"),
+  format: z.enum(["csv", "xlsx"]).optional(),
+  context: z.record(z.string(), z.unknown()).optional(),
+});
 
 /**
  * Server-side export job runner.
@@ -28,6 +35,15 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  const parsed = jobBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid request body" },
+      { status: 400 },
+    );
+  }
+  body = parsed.data;
 
   const jobId = body.jobId;
   if (!jobId) {

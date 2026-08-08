@@ -3,11 +3,13 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { PurchaseOrderInput } from "@/app/[locale]/(dashboard)/purchase/orders/types";
 import { generateDocumentNumber } from "@/lib/document-numbering";
 import { CalculationService } from "@/lib/utils/calculation-service";
+import { purchaseOrderSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
 export class PurchaseOrderService {
   static async create(data: PurchaseOrderInput, userId: string) {
+    purchaseOrderSchema.parse(data);
     const orderNumber = `DRAFT-${Date.now()}`;
 
     const { itemsData, totals } = this.calculateItemsAndTotals(data);
@@ -55,6 +57,7 @@ export class PurchaseOrderService {
   }
 
   static async update(id: string, data: PurchaseOrderInput, userId: string) {
+    purchaseOrderSchema.parse(data);
     const currentOrder = await prisma.purchaseOrder.findUnique({
       where: { id },
     });

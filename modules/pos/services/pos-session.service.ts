@@ -1,7 +1,22 @@
 import { prisma } from "@/lib/prisma";
 import { Decimal } from "decimal.js";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 
 const SESSION_NUMBER_PREFIX = "SES";
+
+const openSessionSchema = z.object({
+    userId: requiredIdSchema,
+    openingCash: z.number().nonnegative(),
+    warehouseId: requiredIdSchema,
+    departmentId: z.string().nullable().optional(),
+});
+
+const closeSessionSchema = z.object({
+    sessionId: requiredIdSchema,
+    actualCash: z.number(),
+    notes: z.string().optional(),
+});
 
 export interface OpenSessionInput {
     userId: string;
@@ -50,6 +65,15 @@ export class POSSessionService {
         warehouseId: string,
         departmentId?: string | null,
     ) {
+        const parsed = openSessionSchema.parse({
+            openingCash,
+            warehouseId,
+            departmentId,
+        });
+        openingCash = parsed.openingCash;
+        warehouseId = parsed.warehouseId;
+        departmentId = parsed.departmentId;
+
         // Close any existing open sessions for this user
         await prisma.pOSSession.updateMany({
             where: { cashierId: userId, status: "OPEN" },
@@ -106,6 +130,15 @@ export class POSSessionService {
     }
 
     static async close(sessionId: string, actualCash: number, notes?: string) {
+        const parsed = closeSessionSchema.parse({
+            sessionId,
+            actualCash,
+            notes,
+        });
+        sessionId = parsed.sessionId;
+        actualCash = parsed.actualCash;
+        notes = parsed.notes;
+
         const payments = await prisma.salesPayment.findMany({
             where: {
                 posSessionId: sessionId,

@@ -1,4 +1,9 @@
+import { z } from "zod";
 import { dispatchPendingIntegrationEvents } from "@/modules/integration/outbox";
+
+const dispatchParamsSchema = z.object({
+  limit: z.coerce.number().finite().optional().catch(undefined),
+});
 
 export async function POST(request: Request) {
   const expectedKey = process.env.INTEGRATION_DISPATCH_KEY;
@@ -9,12 +14,9 @@ export async function POST(request: Request) {
   }
 
   const url = new URL(request.url);
-  const limitParam = url.searchParams.get("limit");
-  const limit = limitParam ? Number(limitParam) : undefined;
+  const { limit } = dispatchParamsSchema.parse(Object.fromEntries(url.searchParams));
 
-  const result = await dispatchPendingIntegrationEvents({
-    limit: typeof limit === "number" && Number.isFinite(limit) ? limit : undefined,
-  });
+  const result = await dispatchPendingIntegrationEvents({ limit });
 
   return Response.json(result);
 }

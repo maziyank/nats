@@ -3,11 +3,38 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { SalesReturnInput } from "@/app/[locale]/(dashboard)/sales/returns/types";
 import { generateDocumentNumber } from "@/lib/document-numbering";
 import { CalculationService } from "@/lib/utils/calculation-service";
+import { z } from "zod";
+import { requiredIdSchema, dateSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
+const salesReturnSchema: z.ZodType<SalesReturnInput> = z.object({
+  returnNumber: z.string().min(1, "Return number is required"),
+  contactId: requiredIdSchema,
+  salesOrderId: z.string().optional(),
+  salesInvoiceId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  returnDate: dateSchema,
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.enum(["DRAFT", "APPROVED", "COMPLETED", "CANCELLED"]).optional(),
+  items: z
+    .array(
+      z.object({
+        productId: requiredIdSchema,
+        quantity: z.coerce.number().positive(),
+        unitPrice: z.coerce.number().nonnegative(),
+      }),
+    )
+    .min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
+
 export class SalesReturnService {
   static async create(data: SalesReturnInput, userId: string) {
+    data = salesReturnSchema.parse(data);
+
     const returnNumber =
       data.returnNumber || (await this.generateReturnNumber());
 
@@ -158,6 +185,7 @@ export class SalesReturnService {
   }
 
   static async delete(id: string) {
+    requiredIdSchema.parse(id);
     const currentReturn = await prisma.salesReturn.findUnique({
       where: { id },
     });

@@ -1,5 +1,6 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
@@ -12,6 +13,34 @@ import { hasPermission } from "@/lib/permissions/utils";
 import { JournalService } from "@/modules/accounting/services/journal.service";
 import { Decimal } from "decimal.js";
 import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+
+const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
+const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, "Must be non-negative");
+const requiredIdSchema = z.string().cuid();
+const dateSchema = z.coerce.date();
+
+const salesShipmentItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  salesOrderItemId: z.string().optional(),
+});
+
+const salesShipmentSchema = z.object({
+  contactId: requiredIdSchema,
+  salesOrderId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  shipmentDate: dateSchema,
+  notes: z.string().optional(),
+  trackingNumber: z.string().optional(),
+  carrier: z.string().optional(),
+  items: z.array(salesShipmentItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
+
+const salesShipmentUpdateSchema = salesShipmentSchema.extend({
+  status: z.enum(["DRAFT", "COMPLETED", "CANCELLED"]).optional(),
+});
 
 export { getSalesOrder };
 
@@ -175,6 +204,11 @@ export const createSalesShipment = authorizedAction(
   "sales.create",
   async (data: SalesShipmentInput) => {
     try {
+      const parseResult = salesShipmentSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
@@ -199,6 +233,13 @@ export const updateSalesShipment = authorizedAction(
     },
   ) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid shipment id" };
+      const parseResult = salesShipmentUpdateSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
@@ -402,6 +443,8 @@ export const deleteSalesShipment = authorizedAction(
   "sales.delete",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid shipment id" };
       const currentShipment = await prisma.salesShipment.findUnique({
         where: { id },
       });

@@ -1,8 +1,9 @@
 "use server";
 
+import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Prisma } from "@/prisma/generated/prisma/client";
+import { Prisma, SalesOrderStatus } from "@/prisma/generated/prisma/client";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { getSession } from "@/lib/auth/auth";
 import { SalesOrderInput } from "./types";
@@ -11,6 +12,31 @@ import { hasPermission } from "@/lib/permissions/utils";
 import { SalesOrderService } from "@/modules/sales/services/sales-order.service";
 import { generateDocumentNumber } from "@/lib/document-numbering";
 import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+
+const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
+const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, "Must be non-negative");
+const requiredIdSchema = z.string().cuid();
+const dateSchema = z.coerce.date();
+
+const salesOrderItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  unitPrice: nonNegativeDecimalSchema,
+  taxRate: decimalSchema.optional(),
+  discountRate: decimalSchema.optional(),
+});
+
+const salesOrderSchema = z.object({
+  contactId: requiredIdSchema,
+  orderDate: dateSchema,
+  expectedDate: dateSchema.nullable().optional(),
+  notes: z.string().nullable().optional(),
+  status: z.nativeEnum(SalesOrderStatus).optional(),
+  items: z.array(salesOrderItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+});
 
 export async function getSalesOrders(
   page: number = 1,
@@ -156,6 +182,11 @@ export const createSalesOrder = authorizedAction(
   "sales.create",
   async (data: SalesOrderInput) => {
     try {
+      const parseResult = salesOrderSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
@@ -174,6 +205,13 @@ export const updateSalesOrder = authorizedAction(
   "sales.edit",
   async (id: string, data: SalesOrderInput) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid order id" };
+      const parseResult = salesOrderSchema.safeParse(data);
+      if (!parseResult.success) {
+        return { success: false, error: parseResult.error.issues[0]?.message ?? "Invalid input" };
+      }
+      data = parseResult.data;
       const session = await getSession();
       const currentOrder = await prisma.salesOrder.findUnique({
         where: { id },
@@ -252,6 +290,8 @@ export const confirmSalesOrder = authorizedAction(
   "sales.edit",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid order id" };
       const session = await getSession();
       const currentOrder = await prisma.salesOrder.findUnique({
         where: { id },
@@ -288,6 +328,8 @@ export const cancelSalesOrder = authorizedAction(
   "sales.edit",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid order id" };
       const session = await getSession();
       const currentOrder = await prisma.salesOrder.findUnique({
         where: { id },
@@ -323,6 +365,8 @@ export const closeSalesOrder = authorizedAction(
   "sales.edit",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid order id" };
       const session = await getSession();
       const currentOrder = await prisma.salesOrder.findUnique({
         where: { id },
@@ -358,6 +402,8 @@ export const deleteSalesOrder = authorizedAction(
   "sales.delete",
   async (id: string) => {
     try {
+      const idResult = requiredIdSchema.safeParse(id);
+      if (!idResult.success) return { success: false, error: "Invalid order id" };
       const currentOrder = await prisma.salesOrder.findUnique({
         where: { id },
       });

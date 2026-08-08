@@ -1,6 +1,18 @@
 import { prisma } from '@/lib/prisma';
 import { CreateAttendanceDTO, ImportAttendanceResult, ImportAttendanceRowDTO } from '../types';
 import { AttendanceStatus, Prisma } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const upsertAttendanceSchema: z.ZodType<CreateAttendanceDTO> = z.object({
+    employeeDetailId: requiredIdSchema,
+    date: dateSchema,
+    status: z.nativeEnum(AttendanceStatus),
+    checkIn: dateSchema.optional(),
+    checkOut: dateSchema.optional(),
+    overtimeHours: z.coerce.number().nonnegative().optional(),
+    notes: z.string().optional(),
+});
 
 function startOfDay(date: Date) {
     const d = new Date(date);
@@ -56,6 +68,7 @@ export class AttendanceService {
     }
 
     static async upsert(data: CreateAttendanceDTO) {
+        data = upsertAttendanceSchema.parse(data);
         const date = startOfDay(data.date);
         return prisma.attendanceRecord.upsert({
             where: {
@@ -89,6 +102,8 @@ export class AttendanceService {
     }
 
     static async bulkMarkPresent(employeeDetailIds: string[], date: Date) {
+        z.array(requiredIdSchema).min(1, "At least 1 employee required").parse(employeeDetailIds);
+        dateSchema.parse(date);
         const day = startOfDay(date);
         const results = [];
         for (const employeeDetailId of employeeDetailIds) {
@@ -108,6 +123,18 @@ export class AttendanceService {
      * Each row is upserted by (employeeDetailId, date).
      */
     static async importRows(rows: ImportAttendanceRowDTO[]): Promise<ImportAttendanceResult> {
+        z.array(
+            z.object({
+                employeeNumber: z.string().optional(),
+                email: z.string().optional(),
+                date: dateSchema,
+                status: z.nativeEnum(AttendanceStatus),
+                checkIn: dateSchema.optional(),
+                checkOut: dateSchema.optional(),
+                overtimeHours: z.coerce.number().nonnegative().optional(),
+                notes: z.string().optional(),
+            }),
+        ).parse(rows);
         const result: ImportAttendanceResult = { imported: 0, failed: 0, errors: [] };
 
         const employeeNumbers = [
@@ -210,6 +237,9 @@ export class AttendanceService {
     }
 
     static async getOvertimeHours(employeeDetailId: string, from: Date, to: Date) {
+        requiredIdSchema.parse(employeeDetailId);
+        dateSchema.parse(from);
+        dateSchema.parse(to);
         const records = await prisma.attendanceRecord.findMany({
             where: {
                 employeeDetailId,

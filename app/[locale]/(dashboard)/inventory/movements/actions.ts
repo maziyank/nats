@@ -8,6 +8,13 @@ import { SuperJSON } from "@/lib/superjson";
 
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const rejectMovementSchema = z.object({
+  movementId: requiredIdSchema,
+  reason: z.string().min(1, "Reason is required"),
+});
 
 export async function getCompanyProfile() {
   const session = await getSession();
@@ -219,6 +226,9 @@ export const createBatchMovement = authorizedAction(
 export const approveMovement = authorizedAction(
   "inventory_movements.create", // TODO: Add specific permission for approval?
   async (movementId: string) => {
+    if (!requiredIdSchema.safeParse(movementId).success) {
+      return { success: false, error: "Invalid movement id" };
+    }
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
 
@@ -245,6 +255,10 @@ export const approveMovement = authorizedAction(
 export const rejectMovement = authorizedAction(
   "inventory_movements.create",
   async ({ movementId, reason }: { movementId: string; reason: string }) => {
+    const validation = rejectMovementSchema.safeParse({ movementId, reason });
+    if (!validation.success) {
+      return { success: false, error: validation.error.issues[0]?.message ?? "Invalid input" };
+    }
     const session = await getSession();
     if (!session) throw new Error("Unauthorized");
 

@@ -8,7 +8,24 @@ import { SuperJSON } from '@/lib/superjson';
 import { authorizedAction } from '@/lib/permissions/protected-action';
 import { getSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/permissions/utils';
-import { LeaveRequestStatus } from '@/prisma/generated/prisma/client';
+import { LeaveRequestStatus, LeaveType } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const createLeaveRequestSchema = z.object({
+    employeeDetailId: requiredIdSchema,
+    leaveType: z.nativeEnum(LeaveType),
+    startDate: dateSchema,
+    endDate: dateSchema,
+    days: z.number().int().positive(),
+    reason: z.string().optional(),
+});
+
+const reviewLeaveRequestSchema = z.object({
+    requestId: requiredIdSchema,
+    status: z.enum(['APPROVED', 'REJECTED', 'CANCELLED']),
+    approvedById: z.string().optional(),
+});
 
 export async function getLeaveRequests(params: {
     page?: number;
@@ -31,8 +48,12 @@ export async function getLeaveRequests(params: {
 export const createLeaveRequest = authorizedAction(
     'hr.leave.manage',
     async (data: CreateLeaveRequestDTO): Promise<ActionResponse> => {
+        const parsed = createLeaveRequestSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const request = await LeaveService.createRequest(data);
+            const request = await LeaveService.createRequest(parsed.data);
             revalidatePath('/hr/leaves');
             return { success: true, data: SuperJSON.serialize(request) };
         } catch (error) {
@@ -44,8 +65,12 @@ export const createLeaveRequest = authorizedAction(
 export const reviewLeaveRequest = authorizedAction(
     'hr.leave.manage',
     async (data: ReviewLeaveRequestDTO): Promise<ActionResponse> => {
+        const parsed = reviewLeaveRequestSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const request = await LeaveService.reviewRequest(data);
+            const request = await LeaveService.reviewRequest(parsed.data);
             revalidatePath('/hr/leaves');
             return { success: true, data: SuperJSON.serialize(request) };
         } catch (error) {

@@ -5,6 +5,13 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const categoryDataSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
 
 export async function getCategories(
   page: number = 1,
@@ -61,6 +68,10 @@ import { authorizedAction } from "@/lib/permissions/protected-action";
 export const createCategory = authorizedAction(
   "categories.create",
   async (data: { name: string; description?: string }) => {
+    const result = categoryDataSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const category = await prisma.category.create({
         data,
@@ -77,6 +88,11 @@ export const createCategory = authorizedAction(
 export const updateCategory = authorizedAction(
   "categories.edit",
   async (id: string, data: { name: string; description?: string }) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    const dataResult = categoryDataSchema.safeParse(data);
+    if (!idResult.success || !dataResult.success) {
+      return { success: false, error: dataResult.success ? "Invalid id" : (dataResult.error.issues[0]?.message ?? "Invalid input") };
+    }
     try {
       const category = await prisma.category.update({
         where: { id },
@@ -94,6 +110,9 @@ export const updateCategory = authorizedAction(
 export const deleteCategory = authorizedAction(
   "categories.delete",
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       await prisma.category.delete({
         where: { id },

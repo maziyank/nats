@@ -3,6 +3,19 @@ import { prisma } from "@/lib/prisma";
 import { AccountType } from "@/prisma/generated/prisma/enums";
 import { getPaginationMetadata } from "@/lib/pagination";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const createAccountSchema = z.object({
+    code: z.string().min(1, "Code is required"),
+    name: z.string().min(1, "Name is required"),
+    type: z.nativeEnum(AccountType),
+    parentId: z.string().optional(),
+});
+
+const updateAccountSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+});
 
 export class AccountService {
     /**
@@ -61,6 +74,8 @@ export class AccountService {
         },
         userId: string
     ) {
+        data = createAccountSchema.parse(data);
+
         return prisma.$transaction(async (tx) => {
             let level = 0;
 
@@ -130,6 +145,8 @@ export class AccountService {
      * Generate the next available account code based on parent and type.
      */
     static async getNextAccountCode(parentId: string | null, type: AccountType) {
+        z.string().nullable().optional().parse(parentId);
+        z.nativeEnum(AccountType).parse(type);
         if (!parentId) {
             // Root level logic
             const prefixMap: Record<AccountType, string> = {
@@ -201,6 +218,8 @@ export class AccountService {
      * Update an existing account's name.
      */
     static async updateAccount(id: string, data: { name: string }) {
+        requiredIdSchema.parse(id);
+        data = updateAccountSchema.parse(data);
         return prisma.account.update({
             where: { id },
             data: { name: data.name },
@@ -211,6 +230,7 @@ export class AccountService {
      * Delete an account if it is not referenced by any journal entry.
      */
     static async deleteAccount(id: string) {
+        requiredIdSchema.parse(id);
         const usageCount = await prisma.journalEntryLine.count({
             where: { accountId: id },
         });

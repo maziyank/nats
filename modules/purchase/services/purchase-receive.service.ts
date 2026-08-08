@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { PurchaseReceiveInput } from "@/app/[locale]/(dashboard)/purchase/receives/types";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { purchaseReceiveSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
 export class PurchaseReceiveService {
   static async create(data: PurchaseReceiveInput, userId: string) {
+    purchaseReceiveSchema.parse(data);
     const receiveNumber = await this.generateReceiveNumber();
 
     return await prisma.$transaction(async (tx) => {

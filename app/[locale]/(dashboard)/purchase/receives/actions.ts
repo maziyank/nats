@@ -6,6 +6,10 @@ import { getRequiredDefaultAccount } from "@/lib/accounting/default-account.serv
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma, ContactType } from "@/prisma/generated/prisma/client";
+import {
+  purchaseReceiveSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { PurchaseReceiveInput } from "./types";
 import { getPurchaseOrder } from "../orders/actions";
@@ -173,11 +177,18 @@ export async function getPurchaseOrdersForSelect() {
 export const createPurchaseReceive = authorizedAction(
   "purchase.create",
   async (data: PurchaseReceiveInput) => {
+    const parsed = purchaseReceiveSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
-      const result = await PurchaseReceiveService.create(data, session.userId);
+      const result = await PurchaseReceiveService.create(parsed.data, session.userId);
 
       revalidatePath("/purchase/receives");
       return { success: true, data: SuperJSON.serialize(result) };
@@ -196,6 +207,13 @@ export const updatePurchaseReceive = authorizedAction(
       status?: "DRAFT" | "COMPLETED" | "CANCELLED";
     },
   ) => {
+    const parsed = purchaseReceiveSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
@@ -403,6 +421,10 @@ export const updatePurchaseReceive = authorizedAction(
 export const deletePurchaseReceive = authorizedAction(
   "purchase.delete",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const currentReceive = await prisma.purchaseReceive.findUnique({
         where: { id },

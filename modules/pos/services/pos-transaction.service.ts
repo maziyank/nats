@@ -8,8 +8,29 @@ import {
 } from "@/modules/integration/outbox";
 import { CalculationService } from "@/lib/utils/calculation-service";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { z } from "zod";
+import {
+  requiredIdSchema,
+  nonNegativeDecimalSchema,
+} from "@/lib/validation/schemas";
 
 const DEFAULT_WALK_IN_CUSTOMER_NAME = "Walk-in Customer";
+
+const posTransactionItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: z.number().positive("Quantity must be greater than 0"),
+  price: nonNegativeDecimalSchema,
+  discount: nonNegativeDecimalSchema,
+});
+
+const processPOSTransactionSchema = z.object({
+  sessionId: requiredIdSchema,
+  items: z.array(posTransactionItemSchema).min(1, "At least 1 item required"),
+  paymentMethod: z.enum(["CASH", "CARD", "QRIS"]),
+  amountPaid: nonNegativeDecimalSchema,
+  globalDiscount: nonNegativeDecimalSchema.default(0),
+  customerId: z.string().cuid().optional(),
+});
 
 interface POSTransactionItem {
   productId: string;
@@ -36,6 +57,21 @@ export class POSTransactionService {
     globalDiscount: number = 0,
     customerId?: string,
   ): Promise<POSTransactionOutboxResult> {
+    const parsed = processPOSTransactionSchema.parse({
+      sessionId,
+      items,
+      paymentMethod,
+      amountPaid,
+      globalDiscount,
+      customerId,
+    });
+    sessionId = parsed.sessionId;
+    items = parsed.items;
+    paymentMethod = parsed.paymentMethod;
+    amountPaid = parsed.amountPaid;
+    globalDiscount = parsed.globalDiscount;
+    customerId = parsed.customerId;
+
     const result = await prisma.$transaction(async (tx) => {
       const session = await this.validateSession(tx, sessionId);
       const contactId = await this.resolveCustomer(tx, customerId);

@@ -10,8 +10,20 @@ import type { ActionResponse } from '@/types/actions';
 import { SuperJSON } from '@/lib/superjson';
 import { authorizedAction } from '@/lib/permissions/protected-action';
 import { getSession } from '@/lib/auth/auth';
-import { hasPermission } from '@/lib/permissions/utils';
+import { hasPermission } from "@/lib/permissions/utils";
 import { AttendanceStatus } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const upsertAttendanceSchema = z.object({
+    employeeDetailId: requiredIdSchema,
+    date: dateSchema,
+    status: z.nativeEnum(AttendanceStatus),
+    checkIn: dateSchema.optional(),
+    checkOut: dateSchema.optional(),
+    overtimeHours: z.number().optional(),
+    notes: z.string().optional(),
+});
 
 export async function getAttendanceRecords(params: {
     page?: number;
@@ -41,8 +53,12 @@ export async function getAttendanceRecords(params: {
 export const upsertAttendance = authorizedAction(
     'hr.attendance.manage',
     async (data: CreateAttendanceDTO): Promise<ActionResponse> => {
+        const parsed = upsertAttendanceSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const record = await AttendanceService.upsert(data);
+            const record = await AttendanceService.upsert(parsed.data);
             revalidatePath('/hr/attendance');
             return { success: true, data: SuperJSON.serialize(record) };
         } catch (error) {
@@ -54,10 +70,18 @@ export const upsertAttendance = authorizedAction(
 export const bulkMarkPresent = authorizedAction(
     'hr.attendance.manage',
     async (employeeDetailIds: string[], dateIso: string): Promise<ActionResponse> => {
+        const parsedIds = z.array(requiredIdSchema).safeParse(employeeDetailIds);
+        if (!parsedIds.success) {
+            return { success: false, error: parsedIds.error.issues[0]?.message ?? 'Invalid input' };
+        }
+        const parsedDate = dateSchema.safeParse(dateIso);
+        if (!parsedDate.success) {
+            return { success: false, error: parsedDate.error.issues[0]?.message ?? 'Invalid date' };
+        }
         try {
             const records = await AttendanceService.bulkMarkPresent(
-                employeeDetailIds,
-                new Date(dateIso)
+                parsedIds.data,
+                parsedDate.data
             );
             revalidatePath('/hr/attendance');
             return { success: true, data: SuperJSON.serialize(records) };
@@ -79,8 +103,12 @@ export const bulkMarkPresent = authorizedAction(
 export const importAttendanceCsv = authorizedAction(
     'hr.attendance.manage',
     async (csvText: string): Promise<ActionResponse> => {
+        const parsed = z.string().min(1, 'CSV text is required').safeParse(csvText);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const rows = parseAttendanceCsv(csvText);
+            const rows = parseAttendanceCsv(parsed.data);
             if (!rows.length) {
                 return { success: false, error: 'No valid rows found in CSV' };
             }

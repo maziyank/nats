@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { PurchaseInvoiceInput } from "@/app/[locale]/(dashboard)/purchase/invoices/types";
 import { CalculationService } from "@/lib/utils/calculation-service";
+import { purchaseInvoiceSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
 export class PurchaseInvoiceService {
   static async create(data: PurchaseInvoiceInput, userId: string) {
+    purchaseInvoiceSchema.parse(data);
     await this.assertUniqueInvoiceNumber(data.invoiceNumber, data.contactId);
 
     const taxRates = await prisma.taxRate.findMany();
@@ -61,6 +63,7 @@ export class PurchaseInvoiceService {
   }
 
   static async update(id: string, data: PurchaseInvoiceInput, userId: string) {
+    purchaseInvoiceSchema.parse(data);
     const currentInvoice = await prisma.purchaseInvoice.findUnique({
       where: { id },
     });

@@ -8,6 +8,13 @@ import { authorizedAction } from "@/lib/permissions/protected-action";
 import { SuperJSON } from "@/lib/superjson";
 import { getSession } from "@/lib/auth/auth";
 import { hasPermission } from "@/lib/permissions/utils";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const categoryDataSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
 
 // Categories
 
@@ -28,6 +35,10 @@ export const createCategory = authorizedAction(
     name: string;
     description?: string;
   }) => {
+    const result = categoryDataSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const category = await prisma.category.create({
         data,
@@ -166,11 +177,15 @@ export async function getProductsByIds(ids: string[]) {
   return SuperJSON.serialize(products);
 }
 
-import { ProductService } from "@/modules/inventory/services/product.service";
+import { ProductService, productInputSchema } from "@/modules/inventory/services/product.service";
 
 export const createProduct = authorizedAction(
   "products.create",
   async (data: ProductInput) => {
+    const result = productInputSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const product = await prisma.$transaction(async (tx) => {
         return await ProductService.createProduct(tx, data);
@@ -191,6 +206,11 @@ export const createProduct = authorizedAction(
 export const updateProduct = authorizedAction(
   "products.edit",
   async (id: string, data: ProductInput) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    const dataResult = productInputSchema.safeParse(data);
+    if (!idResult.success || !dataResult.success) {
+      return { success: false, error: dataResult.success ? "Invalid id" : (dataResult.error.issues[0]?.message ?? "Invalid input") };
+    }
     try {
       const product = await prisma.$transaction(async (tx) => {
         return await ProductService.updateProduct(tx, id, data);
@@ -211,6 +231,9 @@ export const updateProduct = authorizedAction(
 export const deleteProduct = authorizedAction(
   "products.delete",
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       await prisma.$transaction(async (tx) => {
         await ProductService.deleteProduct(tx, id);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getSession } from "@/lib/auth/auth";
 import { getAIService } from "@/lib/ai/service";
 import { getAIConfig } from "@/lib/ai/config";
@@ -7,6 +8,20 @@ import { toAIUserContext } from "@/lib/ai/context";
 import { prisma } from "@/lib/prisma";
 import { AIChatMessage } from "@/lib/ai/types";
 
+const chatBodySchema = z.object({
+  messages: z.array(
+    z.object({
+      role: z.enum(["system", "user", "assistant", "function"]),
+      content: z.string(),
+      name: z.string().optional(),
+      function_call: z
+        .object({ name: z.string(), arguments: z.string() })
+        .optional(),
+    }),
+  ),
+  sessionId: z.string().optional(),
+});
+
 export async function POST(req: NextRequest) {
   const session = await getSession();
   if (!session) {
@@ -14,15 +29,14 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const { messages, sessionId } = body;
-
-    if (!messages || !Array.isArray(messages)) {
+    const parsed = chatBodySchema.safeParse(await req.json().catch(() => null));
+    if (!parsed.success) {
       return NextResponse.json(
         { error: "Invalid request body: messages array required" },
         { status: 400 },
       );
     }
+    const { messages, sessionId } = parsed.data;
 
     // Rate Limiting: 50 requests per hour per user
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);

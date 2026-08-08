@@ -4,6 +4,7 @@ import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { JournalService } from "@/modules/accounting/services/journal.service";
 import { DepreciationSchedule } from "@/prisma/generated/prisma/client";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { requiredIdSchema } from "@/lib/validation/schemas";
 
 export class DepreciationService {
   /**
@@ -90,6 +91,8 @@ export class DepreciationService {
     scheduleId: string,
     userId: string,
   ): Promise<void> {
+    requiredIdSchema.parse(scheduleId);
+    requiredIdSchema.parse(userId);
     const schedule = await prisma.depreciationSchedule.findUnique({
       where: { id: scheduleId },
       include: {

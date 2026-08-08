@@ -14,12 +14,53 @@ import { authorizedAction } from "@/lib/permissions/protected-action";
 import { hasPermission } from "@/lib/permissions/utils";
 import { StatutoryService } from '@/modules/payroll/services/statutory.service';
 import { StatutoryRuleType } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const createPayrollPeriodSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    startDate: dateSchema,
+    endDate: dateSchema,
+});
+
+const createSalaryComponentSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    type: z.enum(['EARNING', 'DEDUCTION']),
+    isTaxable: z.boolean().optional(),
+    description: z.string().optional(),
+    accountId: z.string().optional(),
+});
+
+const createSalaryStructureSchema = z.object({
+    contactId: requiredIdSchema,
+    name: z.string().min(1, 'Name is required'),
+    baseSalary: z.number(),
+    createdById: z.string().optional(),
+    items: z.array(z.object({
+        componentId: requiredIdSchema,
+        amount: z.number(),
+        formula: z.string().optional(),
+    })).min(1, 'At least one salary item is required'),
+});
+
+const upsertStatutoryRuleSchema = z.object({
+    id: z.string().optional(),
+    name: z.string().min(1, 'Name is required'),
+    type: z.nativeEnum(StatutoryRuleType),
+    config: z.record(z.string(), z.unknown()),
+    description: z.string().optional(),
+    isActive: z.boolean().optional(),
+});
 
 export const createPayrollPeriod = authorizedAction(
     "payroll.create",
     async (data: CreatePayrollPeriodDTO): Promise<ActionResponse> => {
+        const parsed = createPayrollPeriodSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const period = await PayrollService.createPayrollPeriod(data);
+            const period = await PayrollService.createPayrollPeriod(parsed.data);
             revalidatePath('/hr/payroll');
             return { success: true, data: SuperJSON.serialize(period) };
         } catch (error) {
@@ -31,14 +72,18 @@ export const createPayrollPeriod = authorizedAction(
 export const configureSalaryStructure = authorizedAction(
     "payroll.configure",
     async (data: CreateSalaryStructureDTO): Promise<ActionResponse> => {
+        const parsed = createSalaryStructureSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
             const { userId } = await verifySession();
             const structure = await PayrollService.configureSalaryStructure({
-                ...data,
+                ...parsed.data,
                 createdById: userId,
             });
             revalidatePath('/hr/payroll/salary-structures');
-            revalidatePath(`/hr/payroll/salary-structures/${data.contactId}`);
+            revalidatePath(`/hr/payroll/salary-structures/${parsed.data.contactId}`);
             return { success: true, data: SuperJSON.serialize(structure) };
         } catch (error) {
             return { success: false, error: (error as Error).message };
@@ -97,8 +142,12 @@ export async function getSalaryStructure(contactId: string): Promise<ActionRespo
 export const runPayroll = authorizedAction(
     "payroll.create",
     async (periodId: string): Promise<ActionResponse> => {
+        const parsed = requiredIdSchema.safeParse(periodId);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const result = await PayrollService.runPayroll(periodId);
+            const result = await PayrollService.runPayroll(parsed.data);
             revalidatePath('/hr/payroll');
             revalidatePath(`/hr/payroll/${periodId}`);
             return { success: true, data: SuperJSON.serialize(result) };
@@ -111,8 +160,16 @@ export const runPayroll = authorizedAction(
 export const approvePayrollRun = authorizedAction(
     "payroll.approve",
     async (periodId: string, userId: string): Promise<ActionResponse> => {
+        const parsedPeriod = requiredIdSchema.safeParse(periodId);
+        if (!parsedPeriod.success) {
+            return { success: false, error: parsedPeriod.error.issues[0]?.message ?? 'Invalid input' };
+        }
+        const parsedUser = z.string().min(1).safeParse(userId);
+        if (!parsedUser.success) {
+            return { success: false, error: parsedUser.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            await PayrollService.approvePayrollRun(periodId, userId);
+            await PayrollService.approvePayrollRun(parsedPeriod.data, parsedUser.data);
             revalidatePath('/hr/payroll');
             revalidatePath(`/hr/payroll/${periodId}`);
             return { success: true, data: SuperJSON.serialize(null) };
@@ -168,8 +225,12 @@ export async function getSalaryComponents(): Promise<ActionResponse<SuperJSONRes
 export const createSalaryComponent = authorizedAction(
     "payroll.configure",
     async (data: CreateSalaryComponentDTO): Promise<ActionResponse> => {
+        const parsed = createSalaryComponentSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const component = await SalaryComponentService.create(data);
+            const component = await SalaryComponentService.create(parsed.data);
             revalidatePath('/hr/payroll/components');
             return { success: true, data: SuperJSON.serialize(component) };
         } catch (error) {
@@ -207,8 +268,16 @@ export async function getPayrollReadiness(): Promise<ActionResponse<SuperJSONRes
 export const markSlipsPaid = authorizedAction(
     "payroll.pay",
     async (periodId: string, slipIds?: string[]): Promise<ActionResponse> => {
+        const parsedPeriod = requiredIdSchema.safeParse(periodId);
+        if (!parsedPeriod.success) {
+            return { success: false, error: parsedPeriod.error.issues[0]?.message ?? 'Invalid input' };
+        }
+        const parsedIds = slipIds ? z.array(z.string().min(1)).safeParse(slipIds) : { success: true as const, data: slipIds };
+        if (!parsedIds.success) {
+            return { success: false, error: parsedIds.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const result = await PayrollService.markSlipsPaid(periodId, slipIds);
+            const result = await PayrollService.markSlipsPaid(parsedPeriod.data, parsedIds.data);
             revalidatePath(`/hr/payroll/${periodId}`);
             return { success: true, data: SuperJSON.serialize(result) };
         } catch (error) {
@@ -293,8 +362,12 @@ export const upsertStatutoryRule = authorizedAction(
         description?: string;
         isActive?: boolean;
     }): Promise<ActionResponse> => {
+        const parsed = upsertStatutoryRuleSchema.safeParse(data);
+        if (!parsed.success) {
+            return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' };
+        }
         try {
-            const rule = await StatutoryService.upsertRule(data as any);
+            const rule = await StatutoryService.upsertRule(parsed.data as any);
             return { success: true, data: SuperJSON.serialize(rule) };
         } catch (error) {
             return { success: false, error: (error as Error).message };

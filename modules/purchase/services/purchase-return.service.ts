@@ -2,11 +2,13 @@ import { prisma } from "@/lib/prisma";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { PurchaseReturnInput } from "@/app/[locale]/(dashboard)/purchase/returns/types";
 import { CalculationService } from "@/lib/utils/calculation-service";
+import { purchaseReturnSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
 export class PurchaseReturnService {
   static async create(data: PurchaseReturnInput, userId: string) {
+    purchaseReturnSchema.parse(data);
     await this.assertUniqueReturnNumber(data.returnNumber);
 
     const itemsWithCalculations = data.items.map((item) => {
@@ -84,6 +86,7 @@ export class PurchaseReturnService {
   }
 
   static async update(id: string, data: PurchaseReturnInput, userId: string) {
+    purchaseReturnSchema.parse(data);
     const currentReturn = await prisma.purchaseReturn.findUnique({
       where: { id },
     });

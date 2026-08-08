@@ -6,6 +6,10 @@ import { prisma } from "@/lib/prisma";
 import { SuperJSON } from "@/lib/superjson";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
+import {
+  purchaseReturnSchema,
+  requiredIdSchema,
+} from "@/lib/validation/schemas";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { PurchaseReturnInput } from "./types";
 import { getPurchaseOrder } from "../orders/actions";
@@ -209,11 +213,18 @@ export async function getPurchaseInvoicesForReturn() {
 export const createPurchaseReturn = authorizedAction(
   "purchase.create",
   async (data: PurchaseReturnInput) => {
+    const parsed = purchaseReturnSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
 
-      const result = await PurchaseReturnService.create(data, session.userId);
+      const result = await PurchaseReturnService.create(parsed.data, session.userId);
 
       revalidatePath("/purchase/returns");
       return { success: true, data: SuperJSON.serialize(result) };
@@ -230,6 +241,13 @@ export const createPurchaseReturn = authorizedAction(
 export const updatePurchaseReturn = authorizedAction(
   "purchase.edit",
   async (id: string, data: PurchaseReturnInput) => {
+    const parsed = purchaseReturnSchema.safeParse(data);
+    if (!parsed.success) {
+      return {
+        success: false,
+        error: parsed.error.issues[0]?.message ?? "Invalid input",
+      };
+    }
     try {
       const session = await getSession();
       if (!session) throw new Error("Unauthorized");
@@ -359,6 +377,10 @@ export const updatePurchaseReturn = authorizedAction(
 export const deletePurchaseReturn = authorizedAction(
   "purchase.delete",
   async (id: string) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    if (!idResult.success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       const currentReturn = await prisma.purchaseReturn.findUnique({
         where: { id },

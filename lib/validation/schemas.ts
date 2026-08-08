@@ -1,17 +1,24 @@
 import { z } from "zod";
-import { SalesInvoiceStatus, MovementType, CashTransactionType } from "@/prisma/generated/prisma/client";
+import {
+  SalesInvoiceStatus,
+  MovementType,
+  CashTransactionType,
+  PurchaseOrderStatus,
+  PurchaseReceiveStatus,
+  PurchaseReturnStatus,
+} from "@/prisma/generated/prisma/client";
 
 // --- Shared Schemas ---
-const idSchema = z.string().cuid().optional();
-const requiredIdSchema = z.string().cuid();
-const dateSchema = z.coerce.date();
-const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
+export const idSchema = z.string().cuid().optional();
+export const requiredIdSchema = z.string().cuid();
+export const dateSchema = z.coerce.date();
+export const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
 /** Non-negative decimal (0 allowed). Use an extra `.refine(val => val > 0)` for strict positivity. */
-const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, {
+export const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, {
   message: "Must be non-negative",
 });
 /** @deprecated Use nonNegativeDecimalSchema; kept as alias for existing call sites. */
-const positiveDecimalSchema = nonNegativeDecimalSchema;
+export const positiveDecimalSchema = nonNegativeDecimalSchema;
 export const auditLogQuerySchema = z.object({
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(50).default(20),
@@ -115,6 +122,66 @@ export const purchaseInvoiceSchema = z.object({
   departmentId: z.string().optional().nullable(),
   projectId: z.string().optional().nullable(),
   items: z.array(purchaseInvoiceItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
+
+// --- Purchase Order ---
+export const purchaseOrderItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  unitCost: nonNegativeDecimalSchema,
+});
+
+export const purchaseOrderSchema = z.object({
+  contactId: requiredIdSchema,
+  orderDate: dateSchema,
+  expectedDate: dateSchema.nullable().optional(),
+  notes: z.string().nullable().optional(),
+  status: z.nativeEnum(PurchaseOrderStatus).optional(),
+  items: z.array(purchaseOrderItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+});
+
+// --- Purchase Receive ---
+export const purchaseReceiveItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  purchaseOrderItemId: z.string().optional(),
+});
+
+export const purchaseReceiveSchema = z.object({
+  contactId: requiredIdSchema,
+  purchaseOrderId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  receiveDate: dateSchema,
+  notes: z.string().optional(),
+  status: z.nativeEnum(PurchaseReceiveStatus).optional(),
+  items: z.array(purchaseReceiveItemSchema).min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
+
+// --- Purchase Return ---
+export const purchaseReturnItemSchema = z.object({
+  productId: requiredIdSchema,
+  quantity: decimalSchema.refine((val) => val > 0, "Quantity must be greater than 0"),
+  unitPrice: nonNegativeDecimalSchema,
+});
+
+export const purchaseReturnSchema = z.object({
+  returnNumber: z.string().min(1, "Return number is required"),
+  contactId: requiredIdSchema,
+  purchaseOrderId: z.string().optional(),
+  purchaseInvoiceId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  returnDate: dateSchema,
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+  status: z.nativeEnum(PurchaseReturnStatus).optional(),
+  items: z.array(purchaseReturnItemSchema).min(1, "At least 1 item required"),
   attachmentIds: z.array(z.string()).optional(),
 });
 

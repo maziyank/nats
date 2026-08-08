@@ -2,11 +2,36 @@ import { prisma } from "@/lib/prisma";
 import { enqueueIntegrationEvent } from "@/modules/integration/outbox";
 import { SalesShipmentInput } from "@/app/[locale]/(dashboard)/sales/shipments/types";
 import { generateDocumentNumber } from "@/lib/document-numbering";
+import { z } from "zod";
+import { requiredIdSchema, dateSchema } from "@/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;
 
+const salesShipmentSchema: z.ZodType<SalesShipmentInput> = z.object({
+  contactId: requiredIdSchema,
+  salesOrderId: z.string().optional(),
+  departmentId: z.string().nullable().optional(),
+  projectId: z.string().nullable().optional(),
+  shipmentDate: dateSchema,
+  notes: z.string().optional(),
+  trackingNumber: z.string().optional(),
+  carrier: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        productId: requiredIdSchema,
+        quantity: z.coerce.number().positive(),
+        salesOrderItemId: z.string().optional(),
+      }),
+    )
+    .min(1, "At least 1 item required"),
+  attachmentIds: z.array(z.string()).optional(),
+});
+
 export class SalesShipmentService {
   static async create(data: SalesShipmentInput, userId: string) {
+    data = salesShipmentSchema.parse(data);
+
     const shipmentNumber = await this.generateShipmentNumber();
 
     return await prisma.$transaction(async (tx) => {
@@ -58,6 +83,7 @@ export class SalesShipmentService {
   }
 
   static async delete(id: string) {
+    requiredIdSchema.parse(id);
     const currentShipment = await prisma.salesShipment.findUnique({
       where: { id },
     });

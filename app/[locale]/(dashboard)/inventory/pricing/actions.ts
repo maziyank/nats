@@ -8,6 +8,60 @@ import { BatchPricingInput, PriceCalculationResult } from './types';
 import { SuperJSON } from '@/lib/superjson';
 import { getSession } from '@/lib/auth/auth';
 import { hasPermission } from '@/lib/permissions/utils';
+import { z } from 'zod';
+import {
+  requiredIdSchema,
+  dateSchema,
+  nonNegativeDecimalSchema,
+} from '@/lib/validation/schemas';
+
+const singlePriceSchema = z.object({
+  id: requiredIdSchema,
+  price: nonNegativeDecimalSchema,
+});
+
+const discountInputSchema = z.object({
+  code: z.string().min(1, 'Code is required'),
+  description: z.string().optional(),
+  type: z.nativeEnum(DiscountType),
+  value: nonNegativeDecimalSchema,
+  startDate: dateSchema,
+  endDate: dateSchema.optional(),
+  minQuantity: z.number().int().nonnegative().optional(),
+  priority: z.number().int().optional(),
+});
+
+const createDiscountSchema = discountInputSchema.extend({
+  productId: requiredIdSchema,
+});
+
+const toggleDiscountSchema = z.object({
+  discountId: requiredIdSchema,
+  isActive: z.boolean(),
+});
+
+const removeDiscountSchema = z.object({
+  productId: requiredIdSchema,
+  discountId: requiredIdSchema,
+});
+
+const updateGlobalDiscountSchema = discountInputSchema.extend({
+  id: requiredIdSchema,
+  isActive: z.boolean(),
+});
+
+const batchPricingSchema = z.object({
+  scope: z.enum(['ALL', 'CATEGORY']),
+  categoryId: z.string().optional(),
+  action: z.enum([
+    'PERCENTAGE_INC',
+    'PERCENTAGE_DEC',
+    'COST_MARGIN',
+    'FIXED_AMOUNT_INC',
+    'FIXED_AMOUNT_DEC',
+  ]),
+  value: nonNegativeDecimalSchema,
+});
 
 export async function getCategories() {
   const session = await getSession();
@@ -121,6 +175,10 @@ export async function getAllPricingProductIds(
 export const updateSinglePrice = authorizedAction(
   'products.edit',
   async (data: { id: string; price: number }) => {
+    const result = singlePriceSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       await updateProductPrice(data.id, data.price);
       revalidatePath('/inventory/pricing');
@@ -162,6 +220,10 @@ export const createAndAssignDiscount = authorizedAction(
     minQuantity?: number;
     priority?: number;
   }) => {
+    const result = createDiscountSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       // Create discount and connect to product
       // We check if discount with code exists first
@@ -235,6 +297,10 @@ export const createAndAssignDiscount = authorizedAction(
 export const toggleDiscountStatus = authorizedAction(
   'products.edit',
   async (data: { discountId: string; isActive: boolean }) => {
+    const result = toggleDiscountSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       await prisma.discount.update({
         where: { id: data.discountId },
@@ -252,6 +318,10 @@ export const toggleDiscountStatus = authorizedAction(
 export const removeDiscountFromProduct = authorizedAction(
   'products.edit',
   async (data: { productId: string; discountId: string }) => {
+    const result = removeDiscountSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       await prisma.product.update({
         where: { id: data.productId },
@@ -302,6 +372,10 @@ export const createGlobalDiscount = authorizedAction(
     minQuantity?: number;
     priority?: number;
   }) => {
+    const result = discountInputSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       const existing = await prisma.discount.findUnique({
         where: { code: data.code },
@@ -345,6 +419,10 @@ export const updateGlobalDiscount = authorizedAction(
     priority?: number;
     isActive: boolean;
   }) => {
+    const result = updateGlobalDiscountSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? 'Invalid input' };
+    }
     try {
       const discount = await prisma.discount.update({
         where: { id: data.id },
@@ -372,6 +450,9 @@ export const updateGlobalDiscount = authorizedAction(
 export const deleteGlobalDiscount = authorizedAction(
   'products.edit',
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: 'Invalid id' };
+    }
     try {
       await prisma.discount.delete({
         where: { id },
@@ -483,6 +564,14 @@ async function updateProductPrice(id: string, price: number) {
 export const applyBatchPricing = authorizedAction(
   'products.edit',
   async (data: BatchPricingInput) => {
+    const result = batchPricingSchema.safeParse(data);
+    if (!result.success) {
+      return {
+        success: false,
+        count: undefined,
+        error: result.error.issues[0]?.message ?? 'Invalid input',
+      };
+    }
     try {
       const preview = await previewPriceChanges(data);
 

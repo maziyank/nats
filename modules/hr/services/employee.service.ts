@@ -1,6 +1,40 @@
 import { prisma } from '@/lib/prisma';
 import { CreateEmployeeDTO, UpdateEmployeeDTO } from '../types';
-import { ContactType, Prisma } from '@/prisma/generated/prisma/client';
+import { ContactType, Prisma, EmploymentStatus, Gender, MaritalStatus, TaxFilingStatus } from '@/prisma/generated/prisma/client';
+import { z } from 'zod';
+import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+
+const createEmployeeSchema = z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().optional(),
+    phone: z.string().optional(),
+    address: z.string().optional(),
+    taxId: z.string().optional(),
+    employeeNumber: z.string().optional(),
+    joinDate: dateSchema,
+    terminationDate: dateSchema.optional(),
+    employmentStatus: z.nativeEnum(EmploymentStatus),
+    jobTitle: z.string().min(1, 'Job title is required'),
+    department: z.string().optional(),
+    departmentId: z.string().optional(),
+    managerId: z.string().optional(),
+    dateOfBirth: dateSchema.optional(),
+    gender: z.nativeEnum(Gender).optional(),
+    maritalStatus: z.nativeEnum(MaritalStatus).optional(),
+    nationalId: z.string().optional(),
+    employeeTaxId: z.string().optional(),
+    taxFilingStatus: z.nativeEnum(TaxFilingStatus).optional(),
+    hasNpwp: z.boolean().optional(),
+    emergencyContactName: z.string().optional(),
+    emergencyContactPhone: z.string().optional(),
+    bankName: z.string().optional(),
+    bankAccount: z.string().optional(),
+    bankHolder: z.string().optional(),
+});
+
+const updateEmployeeSchema = createEmployeeSchema
+    .partial()
+    .extend({ isActive: z.boolean().optional() });
 
 async function resolveDepartmentName(departmentId?: string | null, fallback?: string) {
     if (departmentId) {
@@ -86,6 +120,7 @@ export class EmployeeService {
     }
 
     static async createEmployee(data: CreateEmployeeDTO) {
+        data = createEmployeeSchema.parse(data);
         const departmentName = await resolveDepartmentName(data.departmentId, data.department);
 
         return prisma.$transaction(async (tx) => {
@@ -154,6 +189,8 @@ export class EmployeeService {
     }
 
     static async updateEmployee(id: string, data: UpdateEmployeeDTO, userId = 'system') {
+        requiredIdSchema.parse(id);
+        data = updateEmployeeSchema.parse(data);
         const departmentName = data.departmentId !== undefined
             ? await resolveDepartmentName(data.departmentId, data.department)
             : data.department;

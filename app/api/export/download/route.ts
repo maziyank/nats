@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { getSession } from "@/lib/auth/auth";
 import { generateExportFile } from "@/lib/export/generate";
 import type { ExportColumn, ExportFormat } from "@/lib/export/types";
@@ -11,6 +12,23 @@ type ExportBody = {
   filename?: string;
   sheetName?: string;
 };
+
+const exportBodySchema = z.object({
+  rows: z.array(z.record(z.string(), z.unknown())).optional(),
+  columns: z
+    .array(
+      z.object({
+        key: z.string(),
+        header: z.string(),
+        accessor: z.unknown().optional(),
+        format: z.unknown().optional(),
+      }),
+    )
+    .optional(),
+  format: z.enum(["csv", "xlsx"]).optional(),
+  filename: z.string().optional(),
+  sheetName: z.string().optional(),
+});
 
 /**
  * Binary export download — avoids base64 triple-copy over the server-action path.
@@ -28,6 +46,12 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  const parsed = exportBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+  body = parsed.data as unknown as ExportBody;
 
   const rows = body.rows ?? [];
   const columns = body.columns ?? [];

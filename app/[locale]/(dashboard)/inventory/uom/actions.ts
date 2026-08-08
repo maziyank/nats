@@ -3,6 +3,13 @@
 import { prisma } from "@/lib/prisma";
 import { authorizedAction } from "@/lib/permissions/protected-action";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { requiredIdSchema } from "@/lib/validation/schemas";
+
+const unitDataSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  symbol: z.string().min(1, "Symbol is required"),
+});
 
 /**
  * Retrieves a paginated list of units of measurement.
@@ -33,6 +40,10 @@ export async function getUnits(page: number = 1, limit: number = 10) {
 export const createUnit = authorizedAction(
   "products.create", // Reusing product permission for now
   async (data: { name: string; symbol: string }) => {
+    const result = unitDataSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: result.error.issues[0]?.message ?? "Invalid input" };
+    }
     try {
       const unit = await prisma.unit.create({
         data,
@@ -52,6 +63,11 @@ export const createUnit = authorizedAction(
 export const updateUnit = authorizedAction(
   "inventory_products.edit",
   async (id: string, data: { name: string; symbol: string }) => {
+    const idResult = requiredIdSchema.safeParse(id);
+    const dataResult = unitDataSchema.safeParse(data);
+    if (!idResult.success || !dataResult.success) {
+      return { success: false, error: dataResult.success ? "Invalid id" : (dataResult.error.issues[0]?.message ?? "Invalid input") };
+    }
     try {
       const unit = await prisma.unit.update({
         where: { id },
@@ -77,6 +93,9 @@ export const updateUnit = authorizedAction(
 export const deleteUnit = authorizedAction(
   "inventory_products.delete",
   async (id: string) => {
+    if (!requiredIdSchema.safeParse(id).success) {
+      return { success: false, error: "Invalid id" };
+    }
     try {
       // Check usage first
       const usageCount = await prisma.product.count({
