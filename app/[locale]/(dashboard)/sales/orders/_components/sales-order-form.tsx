@@ -359,22 +359,6 @@ export function SalesOrderForm({
     }
   };
 
-  useEffect(() => {
-    // For Sales Orders, budget checks might be different (Revenue Budget?).
-    // But the user asked for "budget tracking system" which usually implies spending.
-    // However, sales contribute to Revenue Budget.
-    // If we want to check Revenue Target, we can use similar logic but reverse check (Warning if below target?).
-    // The requirement "budget validation logic that checks transaction amounts against the assigned budget... provides real-time warnings when approaching or exceeding budget limits".
-    // "Approaching or exceeding limits" usually means spending limits.
-    // For Sales, it might be "Credit Limit"?
-    // But since the request is about "Budgeting Module Integration", and usually budgets track expenses or revenue targets.
-    // Let's assume for now we validate against budget just to link it.
-    // BUT, checking "availability" (spending) doesn't make sense for Sales (Income).
-    // So for Sales, we might just want to LINK it, but NOT warn about "exceeding budget" (unless we are exceeding a SALES QUOTA? which is good).
-    // I will skip the warning logic for SalesOrder unless I inverse it.
-    // But I will keep the linkage.
-  }, []);
-
   const displayOrderNumber = order?.orderNumber?.startsWith("DRAFT")
     ? "Draft"
     : order?.orderNumber;
