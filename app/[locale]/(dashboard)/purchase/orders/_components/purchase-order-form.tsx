@@ -47,8 +47,11 @@ import {
   CheckCircle,
   Trash2Icon,
   ArrowLeftSquare,
+  PrinterIcon,
+  DoorClosedIcon,
 } from "lucide-react";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import {
   createPurchaseOrder,
   updatePurchaseOrder,
@@ -76,14 +79,22 @@ import {
   Attachment,
 } from "@/components/ui/attachment-dialog";
 import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
-import { Paperclip, PrinterIcon } from "lucide-react";
+import { Paperclip } from "lucide-react";
 import { ReportPreviewDialog } from "@/app/[locale]/(dashboard)/reporting/_components/report-preview-dialog";
 import { Department, Project } from "@/prisma/generated/prisma/client";
 import { checkBudgetAvailability } from "@/app/[locale]/(dashboard)/budgeting/actions";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
-import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import {
+  PageFormActions,
+  PageFormContent,
+  PageFormHeader,
+  PageFormLayout,
+  PageFormTitle,
+} from "@/components/layout/page/form-layout";
+import { useTranslations } from "next-intl";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface PurchaseOrderFormProps {
   order?: SuperJSONResult;
@@ -113,6 +124,8 @@ export function PurchaseOrderForm({
       : [];
 
   const router = useRouter();
+  const t = useTranslations("Purchase");
+  const tCommon = useTranslations("Common");
   const formatCurrency = useFormatCurrency();
   const [isLoading, setIsLoading] = useState(false);
   const isEditing = !!order;
@@ -225,28 +238,28 @@ export function PurchaseOrderForm({
     if (isReadOnly) return;
 
     if (!formData.contactId) {
-      await alert({ title: "Error", description: "Please select a vendor" });
+      await alert({ title: tCommon("error"), description: t("error_select_vendor") });
       return;
     }
     if (formData.items.length === 0) {
       await alert({
-        title: "Error",
-        description: "Please add at least one item",
+        title: tCommon("error"),
+        description: t("error_add_item"),
       });
       return;
     }
     for (const item of formData.items) {
       if (!item.productId) {
         await alert({
-          title: "Error",
-          description: "Please select a product for all items",
+          title: tCommon("error"),
+          description: t("error_select_product"),
         });
         return;
       }
       if (item.quantity <= 0) {
         await alert({
-          title: "Error",
-          description: "Quantity must be greater than 0",
+          title: tCommon("error"),
+          description: t("error_quantity_greater_zero"),
         });
         return;
       }
@@ -274,11 +287,11 @@ export function PurchaseOrderForm({
           // Revalidation happens in action, so UI updates.
         }
       } else {
-        await alert({ title: "Error", description: result.error });
+        await alert({ title: tCommon("error"), description: result.error });
       }
     } catch (error) {
       console.error(error);
-      await alert({ title: "Error", description: "An error occurred" });
+      await alert({ title: tCommon("error"), description: tCommon("error_occurred") });
     } finally {
       setIsLoading(false);
     }
@@ -288,17 +301,16 @@ export function PurchaseOrderForm({
     if (!order) return;
     if (
       await confirm({
-        title: "Issue Purchase Order",
-        description:
-          "Are you sure you want to issue this PO? This will make it immutable and ready to be sent to the vendor.",
-        confirmText: "Issue Order",
+        title: t("issue_purchase_order"),
+        description: t("issue_purchase_order_desc"),
+        confirmText: t("issue_order"),
       })
     ) {
       setIsLoading(true);
       try {
         const result = await issuePurchaseOrder(order.id);
         if (!result.success)
-          await alert({ title: "Error", description: result.error });
+          await alert({ title: tCommon("error"), description: result.error });
       } finally {
         setIsLoading(false);
       }
@@ -309,10 +321,9 @@ export function PurchaseOrderForm({
     if (!order) return;
     if (
       await confirm({
-        title: "Cancel Purchase Order",
-        description:
-          "Are you sure you want to cancel this PO? This action cannot be undone.",
-        confirmText: "Cancel Order",
+        title: t("cancel_purchase_order"),
+        description: t("cancel_purchase_order_desc"),
+        confirmText: t("cancel_order"),
         variant: "destructive",
       })
     ) {
@@ -320,7 +331,7 @@ export function PurchaseOrderForm({
       try {
         const result = await cancelPurchaseOrder(order.id);
         if (!result.success)
-          await alert({ title: "Error", description: result.error });
+          await alert({ title: tCommon("error"), description: result.error });
       } finally {
         setIsLoading(false);
       }
@@ -331,17 +342,16 @@ export function PurchaseOrderForm({
     if (!order) return;
     if (
       await confirm({
-        title: "Close Purchase Order",
-        description:
-          "Are you sure you want to close this PO? This indicates that all items have been received or the order is finalized.",
-        confirmText: "Close Order",
+        title: t("close_purchase_order"),
+        description: t("close_purchase_order_desc"),
+        confirmText: t("close_order"),
       })
     ) {
       setIsLoading(true);
       try {
         const result = await closePurchaseOrder(order.id);
         if (!result.success)
-          await alert({ title: "Error", description: result.error });
+          await alert({ title: tCommon("error"), description: result.error });
       } finally {
         setIsLoading(false);
       }
@@ -381,74 +391,74 @@ export function PurchaseOrderForm({
     formData.orderDate,
   ]);
 
+  const selectedVendor = vendors.find((v) => v.id === formData.contactId);
+
   return (
-    <div className="flex-1 space-y-4 px-4 pt-0">
-      <div className="flex items-center justify-between space-y-2">
-        <div className="flex gap-5">
-          <h2 className="text-xl font-bold tracking-tight flex-1">
-            {displayOrderNumber === "Draft"
-              ? "Draft Purchase Order"
-              : `Purchase Order ${displayOrderNumber || "New"}`}
-          </h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={cn(
-                "h-2.5 w-2.5 rounded-full",
-                formData.status === "DRAFT"
-                  ? "bg-gray-500"
-                  : formData.status === "ISSUED"
-                    ? "bg-blue-500"
-                    : formData.status === "PARTIALLY_RECEIVED"
-                      ? "bg-yellow-500"
-                      : formData.status === "CLOSED"
-                        ? "bg-green-500"
-                        : "bg-red-500",
-              )}
-            />
-            <span className="font-medium">
-              {formData.status?.replace("_", " ")}
-            </span>
-            {order && (
-              <StatusHistoryDialog
-                events={[
-                  {
-                    event: "Created",
-                    at: order.createdAt,
-                    byName: order.createdBy?.name,
-                  },
-                  {
-                    event: "Last Updated",
-                    at: order.updatedAt,
-                    byName: order.updatedBy?.name,
-                  },
-                  {
-                    event: "Issued",
-                    at: order.issuedAt,
-                    byName: order.issuedBy?.name,
-                  },
-                  {
-                    event: "Closed",
-                    at: order.closedAt,
-                    byName: order.closedBy?.name,
-                  },
-                  {
-                    event: "Cancelled",
-                    at: order.cancelledAt,
-                    byName: order.cancelledBy?.name,
-                  },
-                ]}
-              />
+    <PageFormLayout>
+      <PageFormHeader>
+        <PageFormTitle>
+          {displayOrderNumber === "Draft"
+            ? t("draft_purchase_order")
+            : `${t("purchase_order")} ${displayOrderNumber || t("new")}`}
+        </PageFormTitle>
+        <div className="flex items-center gap-2">
+          <div
+            className={cn(
+              "h-2.5 w-2.5 rounded-full",
+              formData.status === "DRAFT"
+                ? "bg-gray-500"
+                : formData.status === "ISSUED"
+                  ? "bg-blue-500"
+                  : formData.status === "PARTIALLY_RECEIVED"
+                    ? "bg-yellow-500"
+                    : formData.status === "CLOSED"
+                      ? "bg-green-500"
+                      : "bg-red-500",
             )}
-          </div>
+          />
+          <span className="font-medium">
+            {formData.status?.replace("_", " ")}
+          </span>
+          {order && (
+            <StatusHistoryDialog
+              events={[
+                {
+                  event: tCommon("created"),
+                  at: order.createdAt,
+                  byName: order.createdBy?.name,
+                },
+                {
+                  event: tCommon("last_updated"),
+                  at: order.updatedAt,
+                  byName: order.updatedBy?.name,
+                },
+                {
+                  event: t("issued"),
+                  at: order.issuedAt,
+                  byName: order.issuedBy?.name,
+                },
+                {
+                  event: tCommon("closed"),
+                  at: order.closedAt,
+                  byName: order.closedBy?.name,
+                },
+                {
+                  event: tCommon("cancelled"),
+                  at: order.cancelledAt,
+                  byName: order.cancelledBy?.name,
+                },
+              ]}
+            />
+          )}
         </div>
-        <div className="flex gap-2 text-sm">
+        <PageFormActions>
           {/* Action Buttons */}
           {isDraft && !readonly && (
             <>
               <Button type="submit" disabled={isLoading} onClick={handleSubmit}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {!isLoading && <SaveIcon />}
-                {isEditing ? "Save" : "Create"}
+                {!isLoading && <SaveIcon className="mr-2 h-4 w-4" />}
+                {isEditing ? tCommon("save") : tCommon("create")}
               </Button>
               {isEditing && (
                 <Button
@@ -456,8 +466,8 @@ export function PurchaseOrderForm({
                   onClick={handleIssue}
                   disabled={isLoading}
                 >
-                  <CheckCheckIcon />
-                  Issue
+                  <CheckCheckIcon className="mr-2 h-4 w-4" />
+                  {t("issue")}
                 </Button>
               )}
             </>
@@ -466,8 +476,8 @@ export function PurchaseOrderForm({
           {formData.status === "ISSUED" && !readonly && (
             <>
               <Button type="button" onClick={handleClose} disabled={isLoading}>
-                <CheckCircle />
-                Finish
+                <CheckCircle className="mr-2 h-4 w-4" />
+                {tCommon("finish")}
               </Button>
               <Button
                 type="button"
@@ -475,8 +485,8 @@ export function PurchaseOrderForm({
                 onClick={handleCancel}
                 disabled={isLoading}
               >
-                <Trash2Icon />
-                Discard
+                <Trash2Icon className="mr-2 h-4 w-4" />
+                {tCommon("cancel")}
               </Button>
             </>
           )}
@@ -488,8 +498,8 @@ export function PurchaseOrderForm({
               disabled={isLoading}
               className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
             >
-              <CheckCircle />
-              Finish
+              <CheckCircle className="mr-2 h-4 w-4" />
+              {tCommon("finish")}
             </Button>
           )}
 
@@ -501,8 +511,8 @@ export function PurchaseOrderForm({
               onClick={handleCancel}
               disabled={isLoading}
             >
-              <Trash2Icon />
-              Discard
+              <Trash2Icon className="mr-2 h-4 w-4" />
+              {tCommon("cancel")}
             </Button>
           )}
 
@@ -515,14 +525,14 @@ export function PurchaseOrderForm({
                 onClick={() => setIsReportPreviewOpen(true)}
               >
                 <PrinterIcon className="mr-2 h-4 w-4" />
-                Print
+                {tCommon("print")}
               </Button>
               <ReportPreviewDialog
                 isOpen={isReportPreviewOpen}
                 onOpenChange={setIsReportPreviewOpen}
                 code="PURCHASE_ORDER"
                 input={{ orderId: order.id }}
-                title={`Purchase Order #${order.orderNumber}`}
+                title={`${t("purchase_order")} #${order.orderNumber}`}
               />
             </>
           )}
@@ -533,27 +543,27 @@ export function PurchaseOrderForm({
             size="sm"
             onClick={() => router.back()}
           >
-            <ArrowLeftSquare />
-            Back
+            <ArrowLeftSquare className="mr-2 h-4 w-4" />
+            {tCommon("back")}
           </Button>
-        </div>
-      </div>
+        </PageFormActions>
+      </PageFormHeader>
       <form onSubmit={handleSubmit}>
         {budgetWarning && (
           <Alert variant="destructive" className="mb-4">
             <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Budget Warning</AlertTitle>
+            <AlertTitle>{t("budget_warning")}</AlertTitle>
             <AlertDescription>{budgetWarning}</AlertDescription>
           </Alert>
         )}
-        <div className="grid gap-4">
+        <PageFormContent className="grid gap-4 mt-4 p-0 bg-transparent border-none shadow-none">
           <div className="space-y-4">
             <CollapsibleSection
-              title="Overview"
+              title={t("overview")}
               collapsedContent={
                 <div className="flex gap-4 text-sm text-muted-foreground">
-                  <span>Vendor: {vendors.find((v) => v.id === formData.contactId)?.name || "-"}</span>
-                  <span>Order Date: {formData.orderDate ? format(formData.orderDate, "dd/MM/yyyy") : "-"}</span>
+                  <span>{t("vendor")}: {selectedVendor?.name || "-"}</span>
+                  <span>{t("order_date")}: {formData.orderDate ? format(formData.orderDate, "dd/MM/yyyy") : "-"}</span>
                 </div>
               }
             >
@@ -561,11 +571,11 @@ export function PurchaseOrderForm({
                 <div className="flex flex-col gap-2">
                   <CustomSelect
                     value={formData.contactId}
-                    label="Vendor"
+                    label={t("vendor")}
                     onValueChange={(val) =>
                       setFormData((prev) => ({ ...prev, contactId: val }))
                     }
-                    placeholder="Select Vendor"
+                    placeholder={t("placeholder_select_vendor")}
                     disabled={isReadOnly}
                   >
                     {vendors.map((v) => (
@@ -577,7 +587,7 @@ export function PurchaseOrderForm({
                   <div className="grid grid-cols-2 gap-2">
                     <CustomInput
                       type="date"
-                      label="Order Date"
+                      label={t("order_date")}
                       id="order_date"
                       value={
                         formData.orderDate
@@ -596,7 +606,7 @@ export function PurchaseOrderForm({
                     />
                     <CustomInput
                       type="date"
-                      label="Expected Date"
+                      label={t("expected_date")}
                       id="expected_date"
                       value={
                         formData.expectedDate
@@ -618,7 +628,7 @@ export function PurchaseOrderForm({
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        Department
+                        {t("department")}
                       </label>
                       <SearchableSelect
                         value={formData.departmentId || ""}
@@ -632,12 +642,12 @@ export function PurchaseOrderForm({
                           value: d.id,
                           label: d.name,
                         }))}
-                        placeholder="Default Budget"
+                        placeholder={t("placeholder_default_budget")}
                         disabled={isReadOnly}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Project</label>
+                      <label className="text-sm font-medium">{t("project")}</label>
                       <SearchableSelect
                         value={formData.projectId || ""}
                         onValueChange={(val) =>
@@ -650,7 +660,7 @@ export function PurchaseOrderForm({
                           value: p.id,
                           label: p.name,
                         }))}
-                        placeholder="Default Budget"
+                        placeholder={t("placeholder_default_budget")}
                         disabled={isReadOnly}
                       />
                     </div>
@@ -658,7 +668,7 @@ export function PurchaseOrderForm({
                 </div>
                 <CustomTextarea
                   value={formData.notes || ""}
-                  label="Notes"
+                  label={t("notes")}
                   className="resize-none"
                   onChange={(e) =>
                     setFormData((prev) => ({
@@ -676,7 +686,7 @@ export function PurchaseOrderForm({
                     className="w-fit"
                   >
                     <Paperclip className="mr-2 h-4 w-4" />
-                    Attachments ({attachments.length})
+                    {tCommon("attachments")} ({attachments.length})
                   </Button>
                   <div className="flex flex-wrap gap-2">
                     {attachments.map((file) => (
@@ -701,7 +711,7 @@ export function PurchaseOrderForm({
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Ordered Items</CardTitle>
+                <CardTitle>{t("ordered_items")}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <DndContext
@@ -713,12 +723,12 @@ export function PurchaseOrderForm({
                     <TableHeader>
                       <TableRow>
                         <TableHead className="w-[40px]"></TableHead>
-                        <TableHead>Product</TableHead>
-                        <TableHead className="w-[120px]">Order Qty</TableHead>
-                        <TableHead className="w-[80px]">Unit</TableHead>
-                        <TableHead className="w-[150px]">Price</TableHead>
-                        <TableHead className="w-[140px]">Tax Rate</TableHead>
-                        <TableHead className="w-[150px]">Total</TableHead>
+                        <TableHead>{tCommon("product")}</TableHead>
+                        <TableHead className="w-[120px]">{t("order_qty")}</TableHead>
+                        <TableHead className="w-[80px]">{tCommon("unit")}</TableHead>
+                        <TableHead className="w-[150px]">{tCommon("price")}</TableHead>
+                        <TableHead className="w-[140px]">{t("tax_rate")}</TableHead>
+                        <TableHead className="w-[150px]">{tCommon("total")}</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -735,7 +745,7 @@ export function PurchaseOrderForm({
                                 onValueChange={(val) =>
                                   handleItemChange(index, "productId", val)
                                 }
-                                placeholder="Select Product"
+                                placeholder={t("placeholder_select_product")}
                                 disabled={isReadOnly}
                               >
                                 {products?.map(
@@ -834,7 +844,7 @@ export function PurchaseOrderForm({
                 </DndContext>
                 {formData.items.length === 0 && (
                   <div className="py-8 text-center text-muted-foreground">
-                    No items added.
+                    {t("no_items_added")}
                   </div>
                 )}
               </CardContent>
@@ -846,18 +856,17 @@ export function PurchaseOrderForm({
                   disabled={isReadOnly}
                   onClick={handleAddItem}
                 >
-                  <Plus className="mr-2 h-4 w-4" /> Add Item
+                  <Plus className="mr-2 h-4 w-4" /> {t("add_item")}
                 </Button>
                 <div className="flex items-center gap-2 text-md">
-                  <span>Total Amount:</span>
+                  <span>{t("total_amount")}:</span>
                   <span>{formatCurrency(totalAmount)}</span>
                 </div>
               </CardFooter>
             </Card>
           </div>
-        </div>
+        </PageFormContent>
       </form>
-
       <AttachmentDialog
         open={isAttachmentDialogOpen}
         onOpenChange={setIsAttachmentDialogOpen}
@@ -869,6 +878,6 @@ export function PurchaseOrderForm({
         }}
         readonly={isReadOnly}
       />
-    </div>
+    </PageFormLayout>
   );
 }
