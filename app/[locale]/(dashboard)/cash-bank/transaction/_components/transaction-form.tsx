@@ -11,6 +11,11 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import {
+  Card,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import {
   Table,
   TableBody,
   TableCell,
@@ -44,6 +49,8 @@ import {
 } from "@/components/layout/page/form-layout";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
+import { format } from "date-fns";
 
 interface TransactionFormProps {
   cashAccounts: CashAccount[];
@@ -236,6 +243,9 @@ export function TransactionForm({
     0,
   );
 
+  const selectedCashAccount = cashAccounts.find(a => a.id === formData.cashAccountId);
+  const selectedContact = contacts.find(c => c.id === formData.contactId);
+
   return (
     <PageFormLayout>
       <PageFormHeader>
@@ -257,226 +267,238 @@ export function TransactionForm({
         </PageFormActions>
       </PageFormHeader>
 
-      <PageFormContent className="space-y-8">
-        <div className="grid grid-cols-2 gap-4">
-          <CustomSelect
-            label={t("type")}
-            value={formData.type}
-            onValueChange={(val) =>
-              setFormData({ ...formData, type: val as CashTransactionType })
-            }
-            options={[
-              { label: t("revenue_in"), value: CashTransactionType.INCOME },
-              { label: t("expense_out"), value: CashTransactionType.EXPENSE },
-            ]}
-            disabled={readOnly}
-          />
-          <CustomInput
-            label={t("date")}
-            type="date"
-            value={
-              formData.date instanceof Date
-                ? formData.date.toISOString().split("T")[0]
-                : formData.date
-            }
-            onChange={(e) =>
-              setFormData({ ...formData, date: new Date(e.target.value) })
-            }
-            disabled={readOnly}
-          />
-          <div className="space-y-1">
-            <Label>{t("contact_optional")}</Label>
-            <SearchableSelect
-              value={formData.contactId}
-              onValueChange={(val) =>
-                setFormData({ ...formData, contactId: val || undefined })
-              }
-              options={contacts.map((c) => ({
-                label: c.name,
-                value: c.id,
-                icon: (
-                  <Avatar size="sm">
-                    <AvatarFallback className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
-                      {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                ),
-              }))}
-              placeholder={t("select_contact")}
-              disabled={readOnly}
-            />
-          </div>
-          <CustomInput
-            label={t("reference")}
-            value={formData.reference || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, reference: e.target.value })
-            }
-            placeholder={t("optional_reference")}
-            disabled={readOnly}
-          />
-          <CustomSelect
-            label={t("cash_bank_account")}
-            value={formData.cashAccountId}
-            onValueChange={(val) =>
-              setFormData({ ...formData, cashAccountId: val })
-            }
-            options={cashAccounts.map((acc) => ({
-              label: acc.name,
-              value: acc.id,
-            }))}
-            placeholder={t("select_account")}
-            disabled={readOnly}
-          />
-
-          <CustomInput
-            label={t("description")}
-            value={formData.description || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
-            }
-            placeholder={t("transaction_description")}
-            disabled={readOnly}
-          />
-
-          <div className="col-span-2 grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label>{t("department")}</Label>
-              <SearchableSelect
-                value={formData.departmentId || ""}
-                onValueChange={(val) => setFormData({ ...formData, departmentId: val || undefined })}
-                options={departments?.map(d => ({ value: d.id, label: d.name })) || []}
-                placeholder={t("select_department")}
-                disabled={readOnly}
-              />
-            </div>
-            <div className="space-y-1">
-              <Label>{t("project")}</Label>
-              <SearchableSelect
-                value={formData.projectId || ""}
-                onValueChange={(val) => setFormData({ ...formData, projectId: val || undefined })}
-                options={projects?.map(p => ({ value: p.id, label: p.name })) || []}
-                placeholder={t("select_project")}
-                disabled={readOnly}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Allocations Table */}
+      <PageFormContent className="grid gap-4 mt-4 p-0 bg-transparent border-none shadow-none">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Allocations</h2>
+          <CollapsibleSection
+            title={t("general_information") || "General Information"}
+            collapsedContent={
+              <div className="flex flex-wrap gap-4 text-sm">
+                <span><strong>{t("type")}:</strong> {formData.type === CashTransactionType.INCOME ? t("revenue_in") : t("expense_out")}</span>
+                <span><strong>{t("date")}:</strong> {formData.date ? format(new Date(formData.date), "dd MMM yyyy") : "-"}</span>
+                <span><strong>{t("cash_bank_account")}:</strong> {selectedCashAccount?.name || "-"}</span>
+                {selectedContact && <span><strong>{t("contact_optional")}:</strong> {selectedContact.name}</span>}
+              </div>
+            }
+          >
+            <div className="grid grid-cols-2 gap-4">
+              <CustomSelect
+                label={t("type")}
+                value={formData.type}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, type: val as CashTransactionType })
+                }
+                options={[
+                  { label: t("revenue_in"), value: CashTransactionType.INCOME },
+                  { label: t("expense_out"), value: CashTransactionType.EXPENSE },
+                ]}
+                disabled={readOnly}
+              />
+              <CustomInput
+                label={t("date")}
+                type="date"
+                value={
+                  formData.date instanceof Date
+                    ? formData.date.toISOString().split("T")[0]
+                    : formData.date
+                }
+                onChange={(e) =>
+                  setFormData({ ...formData, date: new Date(e.target.value) })
+                }
+                disabled={readOnly}
+              />
+              <div className="space-y-1">
+                <Label>{t("contact_optional")}</Label>
+                <SearchableSelect
+                  value={formData.contactId}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, contactId: val || undefined })
+                  }
+                  options={contacts.map((c) => ({
+                    label: c.name,
+                    value: c.id,
+                    icon: (
+                      <Avatar size="sm">
+                        <AvatarFallback className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                          {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    ),
+                  }))}
+                  placeholder={t("select_contact")}
+                  disabled={readOnly}
+                />
+              </div>
+              <CustomInput
+                label={t("reference")}
+                value={formData.reference || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, reference: e.target.value })
+                }
+                placeholder={t("optional_reference")}
+                disabled={readOnly}
+              />
+              <CustomSelect
+                label={t("cash_bank_account")}
+                value={formData.cashAccountId}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, cashAccountId: val })
+                }
+                options={cashAccounts.map((acc) => ({
+                  label: acc.name,
+                  value: acc.id,
+                }))}
+                placeholder={t("select_account")}
+                disabled={readOnly}
+              />
 
-            {!readOnly && (
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleAddAllocation}>
-                  <Plus className="mr-2 h-4 w-4" /> Add Line
+              <CustomInput
+                label={t("description")}
+                value={formData.description || ""}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                placeholder={t("transaction_description")}
+                disabled={readOnly}
+              />
+
+              <div className="col-span-2 grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label>{t("department")}</Label>
+                  <SearchableSelect
+                    value={formData.departmentId || ""}
+                    onValueChange={(val) => setFormData({ ...formData, departmentId: val || undefined })}
+                    options={departments?.map(d => ({ value: d.id, label: d.name })) || []}
+                    placeholder={t("select_department")}
+                    disabled={readOnly}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label>{t("project")}</Label>
+                  <SearchableSelect
+                    value={formData.projectId || ""}
+                    onValueChange={(val) => setFormData({ ...formData, projectId: val || undefined })}
+                    options={projects?.map(p => ({ value: p.id, label: p.name })) || []}
+                    placeholder={t("select_project")}
+                    disabled={readOnly}
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-2 flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={attachmentDialog.openDialog}
+                  disabled={readOnly}
+                >
+                  <Paperclip className="mr-2 h-4 w-4" />
+                  {attachmentDialog.attachments.length > 0
+                    ? `${attachmentDialog.attachments.length} ${attachmentDialog.attachments.length > 1 ? t("attachments") : t("attachment")}`
+                    : t("attach_file")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={noteDialog.openDialog}
+                  disabled={readOnly}
+                >
+                  <StickyNote className="mr-2 h-4 w-4" />
+                  {noteDialog.note ? t("edit_note") : t("add_note")}
                 </Button>
               </div>
-            )}
-          </div>
+            </div>
+          </CollapsibleSection>
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[30%]">{t("description")}</TableHead>
-                  <TableHead className="w-[40%]">{t("account")}</TableHead>
-                  <TableHead className="w-[25%]">{t("amount")}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {formData.allocations.map((alloc, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <CustomInput
-                        value={alloc.description || ""}
-                        onChange={(e) =>
-                          updateAllocation(index, "description", e.target.value)
-                        }
-                        placeholder={t("line_description")}
-                        disabled={readOnly}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <SearchableSelect
-                        options={glAccounts.map((acc) => ({
-                          label: `${acc.code} - ${acc.name}`,
-                          value: acc.id,
-                        }))}
-                        value={alloc.accountId}
-                        onValueChange={(val) =>
-                          updateAllocation(index, "accountId", val)
-                        }
-                        placeholder={t("select_gl_account")}
-                        disabled={readOnly}
-                      />
-                    </TableCell>
-
-                    <TableCell className="flex">
-                      <CurrencyInput
-                        value={alloc.amount}
-                        onChange={(val) => updateAllocation(index, "amount", val)}
-                        className="text-right"
-                        disabled={readOnly}
-                      />
-                      {!readOnly && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveAllocation(index)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {formData.allocations.length === 0 && (
+          {/* Allocations Table */}
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      className="text-center text-muted-foreground h-24"
-                    >
-                      {readOnly
-                        ? t("no_allocations_found")
-                        : t("no_allocations_add_line")}
-                    </TableCell>
+                    <TableHead className="w-[30%]">{t("description")}</TableHead>
+                    <TableHead className="w-[40%]">{t("account")}</TableHead>
+                    <TableHead className="w-[25%]">{t("amount")}</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          <div className="flex justify-between bg-muted/20 rounded-md p-2">
-            <div className="flex gap-2">
+                </TableHeader>
+                <TableBody>
+                  {formData.allocations.map((alloc, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <CustomInput
+                          value={alloc.description || ""}
+                          onChange={(e) =>
+                            updateAllocation(index, "description", e.target.value)
+                          }
+                          placeholder={t("line_description")}
+                          disabled={readOnly}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <SearchableSelect
+                          options={glAccounts.map((acc) => ({
+                            label: `${acc.code} - ${acc.name}`,
+                            value: acc.id,
+                          }))}
+                          value={alloc.accountId}
+                          onValueChange={(val) =>
+                            updateAllocation(index, "accountId", val)
+                          }
+                          placeholder={t("select_gl_account")}
+                          disabled={readOnly}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <CurrencyInput
+                          value={alloc.amount}
+                          onChange={(val) => updateAllocation(index, "amount", val)}
+                          className="text-right"
+                          disabled={readOnly}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {!readOnly && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRemoveAllocation(index)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {formData.allocations.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="text-center text-muted-foreground h-24"
+                      >
+                        {readOnly
+                          ? t("no_allocations_found")
+                          : t("no_allocations_add_line")}
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+            <CardFooter className="justify-between border-t p-4">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={attachmentDialog.openDialog}
-                disabled={readOnly} // For now disable in readOnly, ideally should be view only
+                onClick={handleAddAllocation}
+                disabled={readOnly}
               >
-                <Paperclip className="mr-2 h-4 w-4" />
-                {attachmentDialog.attachments.length > 0
-                  ? `${attachmentDialog.attachments.length} ${attachmentDialog.attachments.length > 1 ? t("attachments") : t("attachment")}`
-                  : t("attach_file")}
+                <Plus className="mr-2 h-4 w-4" /> {t("add_line") || "Add Line"}
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={noteDialog.openDialog}
-                disabled={readOnly} // For now disable in readOnly
-              >
-                <StickyNote className="mr-2 h-4 w-4" />
-                {noteDialog.note ? t("edit_note") : t("add_note")}
-              </Button>
-            </div>
-            <div className="flex items-center gap-4">
-              <span>Total:</span>
-              <span>{formatCurrency(totalAmount)}</span>
-            </div>
-          </div>
+              <div className="flex items-center gap-2 text-md">
+                <span>{t("total") || "Total"}:</span>
+                <span>{formatCurrency(totalAmount)}</span>
+              </div>
+            </CardFooter>
+          </Card>
         </div>
       </PageFormContent>
 
