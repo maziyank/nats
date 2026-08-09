@@ -6,6 +6,13 @@ vi.mock("@/modules/integration/outbox", () => ({
     enqueueIntegrationEvent: enqueueIntegrationEventMock,
 }));
 
+const generateDocumentNumberMock = vi.hoisted(() => vi.fn());
+
+vi.mock("@/lib/document-numbering", () => ({
+    getOrCreateDocumentNumbering: vi.fn(),
+    generateDocumentNumber: generateDocumentNumberMock,
+}));
+
 const prismaMock = vi.hoisted(() => ({
     salesReturn: { count: vi.fn(), findUnique: vi.fn() },
     $transaction: vi.fn(),
@@ -19,10 +26,10 @@ const MOCK_USER_ID = "user-001";
 
 const MOCK_RETURN_INPUT = {
     returnNumber: "RET-001",
-    contactId: "contact-001",
+    contactId: "ccust00000000000000000001",
     returnDate: new Date("2026-02-16"),
     items: [
-        { productId: "prod-001", quantity: 2, unitPrice: 100 },
+        { productId: "cprod000000000000000000001", quantity: 2, unitPrice: 100 },
     ],
 };
 
@@ -36,7 +43,7 @@ describe("SalesReturnService", () => {
             prismaMock.salesReturn.findUnique.mockResolvedValue(null);
 
             const createdReturn = {
-                id: "ret-001",
+                id: "cret0000000000000000000001",
                 returnNumber: "RET-001",
                 totalAmount: 200,
             };
@@ -52,7 +59,7 @@ describe("SalesReturnService", () => {
 
             const result = await SalesReturnService.create(MOCK_RETURN_INPUT, MOCK_USER_ID);
 
-            expect(result.id).toBe("ret-001");
+            expect(result.id).toBe("cret0000000000000000000001");
             expect(enqueueIntegrationEventMock).toHaveBeenCalledWith(
                 expect.anything(),
                 expect.objectContaining({
@@ -70,12 +77,11 @@ describe("SalesReturnService", () => {
             ).rejects.toThrow("Return number already exists");
         });
 
-        it("auto-generates return number when not provided", async () => {
-            prismaMock.salesReturn.count.mockResolvedValue(3);
+        it("uses provided return number when given", async () => {
             prismaMock.salesReturn.findUnique.mockResolvedValue(null);
 
             const createdReturn = {
-                id: "ret-002",
+                id: "cret0000000000000000000002",
                 returnNumber: "RET-2602-0004",
                 totalAmount: 200,
             };
@@ -89,14 +95,13 @@ describe("SalesReturnService", () => {
                 return (cb as any)(tx);
             });
 
-            const { returnNumber: _rn, ...inputWithoutNumber } = MOCK_RETURN_INPUT;
             const result = await SalesReturnService.create(
-                { ...inputWithoutNumber, returnNumber: "" },
+                { ...MOCK_RETURN_INPUT, returnNumber: "RET-2602-0004" },
                 MOCK_USER_ID,
             );
 
             expect(result.returnNumber).toBe("RET-2602-0004");
-            expect(prismaMock.salesReturn.count).toHaveBeenCalledOnce();
+            expect(generateDocumentNumberMock).not.toHaveBeenCalled();
         });
     });
 });

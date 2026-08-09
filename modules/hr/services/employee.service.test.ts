@@ -103,7 +103,7 @@ describe('EmployeeService', () => {
 
     describe('updateEmployee', () => {
         it('should update contact and employee detail', async () => {
-            const id = 'c-1';
+            const id = 'cemp0000000000000000000001';
             const data = {
                 name: 'Updated Name',
                 jobTitle: 'Senior Developer',

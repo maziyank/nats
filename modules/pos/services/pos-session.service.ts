@@ -6,7 +6,6 @@ import { requiredIdSchema } from "@/lib/validation/schemas";
 const SESSION_NUMBER_PREFIX = "SES";
 
 const openSessionSchema = z.object({
-    userId: requiredIdSchema,
     openingCash: z.number().nonnegative(),
     warehouseId: requiredIdSchema,
     departmentId: z.string().nullable().optional(),

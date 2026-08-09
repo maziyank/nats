@@ -53,27 +53,27 @@ describe("POS session actions — department tag integration", () => {
         it("passes departmentId through to POSSessionService.open", async () => {
             openMock.mockResolvedValue({ id: "session-1", sessionNumber: "SES-1" });
 
-            await openPOSSession(100, "wh-1", "dept-1");
+            await openPOSSession(100, "cwh0000000000000000000001", "cdept00000000000000000001");
 
-            expect(openMock).toHaveBeenCalledWith("user-1", 100, "wh-1", "dept-1");
+            expect(openMock).toHaveBeenCalledWith("user-1", 100, "cwh0000000000000000000001", "cdept00000000000000000001");
             expect(revalidatePathMock).toHaveBeenCalledWith("/pos");
         });
 
         it("passes undefined (not null) when no departmentId is supplied", async () => {
             openMock.mockResolvedValue({ id: "session-2", sessionNumber: "SES-2" });
 
-            await openPOSSession(50, "wh-1");
+            await openPOSSession(50, "cwh0000000000000000000001");
 
             // 4th positional arg is undefined — preserves prior warehouse-only behaviour.
-            expect(openMock).toHaveBeenCalledWith("user-1", 50, "wh-1", undefined);
+            expect(openMock).toHaveBeenCalledWith("user-1", 50, "cwh0000000000000000000001", undefined);
         });
 
         it("passes null through when explicitly given null", async () => {
             openMock.mockResolvedValue({ id: "session-3", sessionNumber: "SES-3" });
 
-            await openPOSSession(0, "wh-1", null);
+            await openPOSSession(0, "cwh0000000000000000000001", null);
 
-            expect(openMock).toHaveBeenCalledWith("user-1", 0, "wh-1", null);
+            expect(openMock).toHaveBeenCalledWith("user-1", 0, "cwh0000000000000000000001", null);
         });
 
         it("throws Unauthorized when the user lacks pos.access", async () => {
@@ -89,7 +89,7 @@ describe("POS session actions — department tag integration", () => {
             const created = { id: "session-4", sessionNumber: "SES-4", departmentId: "dept-1" };
             openMock.mockResolvedValue(created);
 
-            const result = await openPOSSession(100, "wh-1", "dept-1");
+            const result = await openPOSSession(100, "cwh0000000000000000000001", "cdept00000000000000000001");
             const deserialized = SuperJSON.deserialize(result);
 
             expect(deserialized).toMatchObject(created);

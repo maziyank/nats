@@ -14,6 +14,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
+// The actions module imports getSession, which pulls in next-intl navigation
+// (next/navigation) that vitest cannot resolve. Mock it to avoid loading it.
+vi.mock("@/lib/auth/auth", () => ({
+  getSession: vi.fn().mockResolvedValue({ userId: "user-1" }),
+}));
+
 describe("checkBudgetAvailability", () => {
   const date = new Date(2026, 0, 1); // Jan 1 2026
 

@@ -37,7 +37,7 @@ const MOCK_USER_ID = "user-001";
 
 const MOCK_INVOICE_INPUT = {
     invoiceNumber: "INV-001",
-    contactId: "contact-001",
+    contactId: "cvend00000000000000000001",
     invoiceDate: new Date("2026-02-16"),
     dueDate: new Date("2026-03-16"),
     globalDiscount: 0,
@@ -103,7 +103,7 @@ describe("PurchaseInvoiceService", () => {
             prismaMock.taxRate.findMany.mockResolvedValue([]);
 
             const createdInvoice = {
-                id: "inv-002",
+                id: "cinvc00000000000000000002",
                 invoiceNumber: "INV-002",
                 totalAmount: 200,
             };
@@ -132,7 +132,7 @@ describe("PurchaseInvoiceService", () => {
                     type: "PURCHASE_INVOICE_CREATED",
                     aggregateType: "PurchaseInvoice",
                     payload: expect.objectContaining({
-                        invoiceId: "inv-002",
+                        invoiceId: "cinvc00000000000000000002",
                         userId: MOCK_USER_ID,
                     }),
                 }),

@@ -20,13 +20,13 @@ import { PurchaseOrderService } from "./purchase-order.service";
 const MOCK_USER_ID = "user-001";
 
 const MOCK_ORDER_INPUT = {
-    contactId: "contact-001",
+    contactId: "cvend00000000000000000001",
     orderDate: new Date("2026-02-16"),
     expectedDate: new Date("2026-03-16"),
     notes: "Test order",
     items: [
-        { productId: "prod-001", quantity: 5, unitCost: 200 },
-        { productId: "prod-002", quantity: 3, unitCost: 150 },
+        { productId: "citm0000000000000000000001", quantity: 5, unitCost: 200 },
+        { productId: "citm0000000000000000000002", quantity: 3, unitCost: 150 },
     ],
 };
 
@@ -38,7 +38,7 @@ describe("PurchaseOrderService", () => {
     describe("create", () => {
         it("creates order with DRAFT status and calculated total", async () => {
             const createdOrder = {
-                id: "po-001",
+                id: "cpo0000000000000000000001",
                 orderNumber: "DRAFT-123",
                 totalAmount: 1450,
             };
@@ -58,13 +58,13 @@ describe("PurchaseOrderService", () => {
 
             const result = await PurchaseOrderService.create(MOCK_ORDER_INPUT, MOCK_USER_ID);
 
-            expect(result.id).toBe("po-001");
+            expect(result.id).toBe("cpo0000000000000000000001");
             expect(result.totalAmount).toBe(1450);
         });
 
         it("enqueues PURCHASE_ORDER_CREATED integration event", async () => {
             const createdOrder = {
-                id: "po-002",
+                id: "cpo0000000000000000000002",
                 orderNumber: "DRAFT-456",
                 totalAmount: 1450,
             };
@@ -90,7 +90,7 @@ describe("PurchaseOrderService", () => {
                     type: "PURCHASE_ORDER_CREATED",
                     aggregateType: "PurchaseOrder",
                     payload: expect.objectContaining({
-                        orderId: "po-002",
+                        orderId: "cpo0000000000000000000002",
                         userId: MOCK_USER_ID,
                     }),
                 }),

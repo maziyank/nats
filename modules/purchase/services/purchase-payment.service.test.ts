@@ -21,16 +21,20 @@ const prismaMock = vi.hoisted(() => ({
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 
+vi.mock("@/lib/document-numbering", () => ({
+    generateDocumentNumber: vi.fn().mockResolvedValue("PAY-OUT-2602-0001"),
+}));
+
 import { PurchasePaymentService } from "./purchase-payment.service";
 
 const MOCK_USER_ID = "user-001";
 
 const MOCK_PAYMENT_INPUT = {
-    contactId: "contact-001",
-    purchaseInvoiceId: "inv-001",
+    contactId: "cvend00000000000000000001",
+    purchaseInvoiceId: "cinvc00000000000000000001",
     paymentDate: new Date("2026-02-16"),
     amount: 500,
-    cashAccountId: "cash-001",
+    cashAccountId: "ccash0000000000000000000001",
     reference: "REF-001",
 };
 
@@ -42,15 +46,15 @@ describe("PurchasePaymentService", () => {
     describe("create", () => {
         it("creates payment and updates invoice status", async () => {
             prismaMock.purchaseInvoice.findUnique.mockResolvedValue({
-                id: "inv-001",
+                id: "cinvc00000000000000000001",
                 totalAmount: 1000,
                 payments: [{ amount: 300 }],
             });
-            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "cash-001" });
+            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "ccash0000000000000000000001" });
             prismaMock.purchasePayment.count.mockResolvedValue(0);
 
             const createdPayment = {
-                id: "pay-001",
+                id: "cpaym000000000000000000001",
                 paymentNumber: "PAY-OUT-2602-0001",
                 amount: 500,
             };
@@ -73,7 +77,7 @@ describe("PurchasePaymentService", () => {
 
             const result = await PurchasePaymentService.create(MOCK_PAYMENT_INPUT, MOCK_USER_ID);
 
-            expect(result.id).toBe("pay-001");
+            expect(result.id).toBe("cpaym000000000000000000001");
         });
 
         it("throws when invoice not found", async () => {
@@ -86,11 +90,11 @@ describe("PurchasePaymentService", () => {
 
         it("throws when amount exceeds remaining balance", async () => {
             prismaMock.purchaseInvoice.findUnique.mockResolvedValue({
-                id: "inv-001",
+                id: "cinvc00000000000000000001",
                 totalAmount: 500,
                 payments: [{ amount: 400 }],
             });
-            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "cash-001" });
+            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "ccash0000000000000000000001" });
 
             await expect(
                 PurchasePaymentService.create(
@@ -102,15 +106,15 @@ describe("PurchasePaymentService", () => {
 
         it("enqueues PURCHASE_PAYMENT_CREATED integration event", async () => {
             prismaMock.purchaseInvoice.findUnique.mockResolvedValue({
-                id: "inv-001",
+                id: "cinvc00000000000000000001",
                 totalAmount: 1000,
                 payments: [],
             });
-            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "cash-001" });
+            prismaMock.cashAccount.findUnique.mockResolvedValue({ id: "ccash0000000000000000000001" });
             prismaMock.purchasePayment.count.mockResolvedValue(0);
 
             const createdPayment = {
-                id: "pay-002",
+                id: "cpaym000000000000000000002",
                 paymentNumber: "PAY-OUT-2602-0001",
                 amount: 500,
             };
@@ -139,7 +143,7 @@ describe("PurchasePaymentService", () => {
                     type: "PURCHASE_PAYMENT_CREATED",
                     aggregateType: "PurchasePayment",
                     payload: expect.objectContaining({
-                        paymentId: "pay-002",
+                        paymentId: "cpaym000000000000000000002",
                         userId: MOCK_USER_ID,
                     }),
                 }),

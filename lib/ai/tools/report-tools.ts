@@ -546,10 +546,10 @@ export const runStandardReportTool: AITool = {
             : rowsToMarkdownTable(rows);
         }
         case "production_output": {
-          const data = await getProductionOutputReport({
-            startDate: new Date(start),
-            endDate: new Date(end),
-          } as any);
+          const data = await getProductionOutputReport(
+            new Date(start),
+            new Date(end),
+          );
           const rows = serializePrisma(
             Array.isArray(data) ? data : (data as any).entries || [data],
           ) as Record<string, unknown>[];
@@ -562,10 +562,10 @@ export const runStandardReportTool: AITool = {
             : rowsToMarkdownTable(rows);
         }
         case "material_consumption": {
-          const data = await getMaterialConsumptionReport({
-            startDate: new Date(start),
-            endDate: new Date(end),
-          } as any);
+          const data = await getMaterialConsumptionReport(
+            new Date(start),
+            new Date(end),
+          );
           const rows = serializePrisma(
             Array.isArray(data) ? data : (data as any).entries || [data],
           ) as Record<string, unknown>[];

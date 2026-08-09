@@ -21,12 +21,12 @@ const MOCK_USER_ID = "user-001";
 
 const MOCK_RETURN_INPUT = {
     returnNumber: "RET-001",
-    contactId: "contact-001",
+    contactId: "cvend00000000000000000001",
     returnDate: new Date("2026-02-16"),
     reason: "Defective items",
     items: [
-        { productId: "prod-001", quantity: 2, unitPrice: 100 },
-        { productId: "prod-002", quantity: 1, unitPrice: 150 },
+        { productId: "citm0000000000000000000001", quantity: 2, unitPrice: 100 },
+        { productId: "citm0000000000000000000002", quantity: 1, unitPrice: 150 },
     ],
 };
 

@@ -30,8 +30,12 @@ vi.mock('@/lib/prisma', () => ({
         salarySlip: {
             deleteMany: vi.fn(),
             create: vi.fn(),
+            createMany: vi.fn(),
             findMany: vi.fn(),
             updateMany: vi.fn(),
+        },
+        salarySlipItem: {
+            createMany: vi.fn(),
         },
         payrollRun: {
             create: vi.fn(),
@@ -101,17 +105,16 @@ describe('PayrollService', () => {
             }];
             vi.mocked(prisma.contact.findMany).mockResolvedValue(employees as any);
             vi.mocked(prisma.salaryComponent.findFirst).mockResolvedValue(null as any);
-            vi.mocked(prisma.salaryComponent.create).mockImplementation(async ({ data }: any) => ({
+            vi.mocked(prisma.salaryComponent.create).mockImplementation((({ data }: any) => ({
                 id: `auto-${data.name}`,
                 ...data,
-            }));
+            }) as any));
 
-            const createdSlip = { id: 'slip-1', netSalary: 5800 };
-            vi.mocked(prisma.salarySlip.create).mockResolvedValue(createdSlip as any);
+            vi.mocked(prisma.salarySlip.findMany).mockResolvedValue([] as any);
 
             const result = await PayrollService.runPayroll(periodId, { applyStatutory: false });
 
-            expect(prisma.salarySlip.create).toHaveBeenCalled();
+            expect(prisma.salarySlip.createMany).toHaveBeenCalled();
             expect(result.totalSlips).toBe(1);
         });
 
@@ -141,23 +144,25 @@ describe('PayrollService', () => {
                     employeeDetail: null,
                 },
             ] as any);
-            vi.mocked(prisma.salarySlip.create).mockResolvedValue({ id: 'slip-2' } as any);
+            vi.mocked(prisma.salarySlip.findMany).mockResolvedValue([{ id: 'slip-2', contactId: 'emp-1' }] as any);
 
             await PayrollService.runPayroll(periodId, { applyStatutory: false });
 
-            expect(prisma.salarySlip.create).toHaveBeenCalledWith(
+            expect(prisma.salarySlip.createMany).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    data: expect.objectContaining({
-                        grossSalary: 11000,
-                        items: {
-                            create: expect.arrayContaining([
-                                expect.objectContaining({
-                                    componentId: 'comp-bonus',
-                                    amount: 1000,
-                                }),
-                            ]),
-                        },
-                    }),
+                    data: expect.arrayContaining([
+                        expect.objectContaining({ grossSalary: 11000 }),
+                    ]),
+                })
+            );
+            expect(prisma.salarySlipItem.createMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.arrayContaining([
+                        expect.objectContaining({
+                            componentId: 'comp-bonus',
+                            amount: 1000,
+                        }),
+                    ]),
                 })
             );
         });
@@ -183,7 +188,7 @@ describe('PayrollService', () => {
                 where: { id: periodId },
                 data: { status: PayrollPeriodStatus.COMPLETED },
             });
-            expect(enqueueIntegrationEvent).toHaveBeenCalledTimes(2); // 1 for run, 1 for slip
+            expect(enqueueIntegrationEvent).toHaveBeenCalledTimes(1); // 1 run-level event (handlers fan out)
         });
     });
 

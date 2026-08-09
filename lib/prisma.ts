@@ -38,8 +38,8 @@ function isDecimalLike(value: unknown): boolean {
  * Decimals are converted to **strings** (not numbers) to avoid IEEE-754
  * precision loss. Prefer SuperJSON when round-tripping Decimals is required.
  */
-export function serializePrisma<T>(obj: T): T {
-  return serializeValue(obj) as T;
+export function serializePrisma(obj: unknown): any {
+  return serializeValue(obj);
 }
 
 function serializeValue(obj: unknown): unknown {

@@ -16,6 +16,10 @@ vi.mock('@/lib/accounting/default-account.service', () => ({
     getRequiredDefaultAccount: vi.fn(),
 }));
 
+vi.mock('@/lib/document-numbering', () => ({
+    generateDocumentNumber: vi.fn().mockResolvedValue('PAY-un-123'),
+}));
+
 describe('Payroll Integration Handlers', () => {
     let mockTx: any;
 
@@ -26,6 +30,9 @@ describe('Payroll Integration Handlers', () => {
                 findUnique: vi.fn(),
                 update: vi.fn(),
             },
+            salarySlip: {
+                findMany: vi.fn(),
+            },
         };
     });
 
@@ -33,7 +40,7 @@ describe('Payroll Integration Handlers', () => {
         it('should create and post journal entry for completed payroll run', async () => {
             // Setup data
             const payload = {
-                payrollRunId: 'run-123',
+                payrollRunId: 'cpayr000000000000000000001',
                 periodId: 'period-123',
                 totalAmount: '5000', // Net Pay
                 processedAt: new Date().toISOString(),
@@ -41,7 +48,7 @@ describe('Payroll Integration Handlers', () => {
             };
 
             const mockRun = {
-                id: 'run-123',
+                id: 'cpayr000000000000000000001',
                 periodId: 'period-123',
                 runDate: new Date(),
                 totalEarnings: 6000,
@@ -56,6 +63,19 @@ describe('Payroll Integration Handlers', () => {
 
             // Setup mocks
             mockTx.payrollRun.findUnique.mockResolvedValue(mockRun);
+            mockTx.salarySlip.findMany.mockResolvedValue([
+                {
+                    id: 'cslip000000000000000000001',
+                    periodId: payload.periodId,
+                    items: [
+                        {
+                            type: 'DEDUCTION',
+                            amount: 1000,
+                            component: { name: 'Other', accountId: null },
+                        },
+                    ],
+                },
+            ]);
             (DefaultAccountsInfo.getRequiredDefaultAccount as any)
                 .mockResolvedValueOnce(mockExpenseAccount) // SALARIES_EXPENSE
                 .mockResolvedValueOnce(mockLiabilityAccount); // PAYROLL_LIABILITY
@@ -114,7 +134,7 @@ describe('Payroll Integration Handlers', () => {
 
         it('should skip if payroll run already has journal entry', async () => {
             const payload = {
-                payrollRunId: 'run-123',
+                payrollRunId: 'cpayr000000000000000000001',
                 periodId: 'period-123',
                 totalAmount: '5000',
                 processedAt: new Date().toISOString(),
@@ -122,7 +142,7 @@ describe('Payroll Integration Handlers', () => {
             };
 
             mockTx.payrollRun.findUnique.mockResolvedValue({
-                id: 'run-123',
+                id: 'cpayr000000000000000000001',
                 journalEntryId: 'existing-je-id',
             });
 
@@ -133,7 +153,7 @@ describe('Payroll Integration Handlers', () => {
 
         it('should throw if payroll run not found', async () => {
             const payload = {
-                payrollRunId: 'run-999',
+                payrollRunId: 'cpayr000000000000000000002',
                 periodId: 'period-123',
                 totalAmount: '5000',
                 processedAt: new Date().toISOString(),

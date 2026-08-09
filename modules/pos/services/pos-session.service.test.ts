@@ -80,7 +80,7 @@ describe("POSSessionService", () => {
 
     describe("open", () => {
         const mockUserId = "user-1";
-        const mockWarehouseId = "wh-1";
+        const mockWarehouseId = "cwh0000000000000000000001";
 
         it("creates a session with a department tag when a valid departmentId is provided", async () => {
             prismaMock.department.findUnique.mockResolvedValue({
@@ -261,14 +261,14 @@ describe("POSSessionService", () => {
                 { amount: new Decimal(25) },
             ]);
             prismaMock.pOSSession.findUnique.mockResolvedValue({
-                id: "session-1",
+                id: "cses000000000000000000001",
                 openingCash: new Decimal(100),
                 warehouseId: "wh-1",
                 departmentId: "dept-1",
             });
             prismaMock.pOSSession.update.mockResolvedValue({});
 
-            await POSSessionService.close("session-1", 175, "Closing note");
+            await POSSessionService.close("cses000000000000000000001", 175, "Closing note");
 
             const updateCall = prismaMock.pOSSession.update.mock.calls[0][0];
             // The close path must NOT mutate warehouseId or departmentId.

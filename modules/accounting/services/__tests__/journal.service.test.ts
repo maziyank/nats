@@ -7,6 +7,10 @@ vi.mock("@/modules/integration/outbox", () => ({
   enqueueIntegrationEvent: enqueueIntegrationEventMock,
 }));
 
+vi.mock("@/lib/document-numbering", () => ({
+  generateDocumentNumber: vi.fn().mockResolvedValue("JE-20260217-0001"),
+}));
+
 const prismaMock = vi.hoisted(() => ({
   journalEntry: {
     count: vi.fn(),
@@ -37,7 +41,7 @@ vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 
 import { JournalService } from "../journal.service";
 
-const MOCK_USER_ID = "user-001";
+const MOCK_USER_ID = "cuser001id";
 
 describe("JournalService", () => {
   beforeEach(() => {
@@ -50,13 +54,13 @@ describe("JournalService", () => {
       description: "Test Entry",
       lines: [
         {
-          accountId: "acc-001",
+          accountId: "caccount001",
           debitAmount: 100,
           creditAmount: 0,
           description: "Debit Line",
         },
         {
-          accountId: "acc-002",
+          accountId: "caccount002",
           debitAmount: 0,
           creditAmount: 100,
           description: "Credit Line",
@@ -80,7 +84,7 @@ describe("JournalService", () => {
 
     it("creates journal entry within transaction", async () => {
       const createdEntry = {
-        id: "je-001",
+        id: "cjournal001",
         entryNumber: "JE-20260217-0001",
         ...input,
       };
@@ -109,14 +113,14 @@ describe("JournalService", () => {
         expect.anything(),
         expect.objectContaining({
           type: "JOURNAL_ENTRY_CREATED",
-          payload: expect.objectContaining({ journalEntryId: "je-001" }),
+          payload: expect.objectContaining({ journalEntryId: "cjournal001" }),
         }),
       );
     });
 
     it("uses provided tx if available", async () => {
       const createdEntry = {
-        id: "je-001",
+        id: "cjournal001",
         entryNumber: "Provided-JE",
         ...input,
       };
@@ -140,21 +144,21 @@ describe("JournalService", () => {
 
   describe("postJournalEntry", () => {
     const mockEntry = {
-      id: "je-001",
+      id: "cjournal001",
       status: "draft",
       userId: MOCK_USER_ID,
       entryNumber: "JE-001",
       lines: [
         {
           id: "line-1",
-          accountId: "acc-001",
+          accountId: "caccount001",
           debitAmount: new Decimal(100),
           creditAmount: null,
           account: { normalBalance: "debit", runningBalance: new Decimal(500) },
         },
         {
           id: "line-2",
-          accountId: "acc-002",
+          accountId: "caccount002",
           debitAmount: null,
           creditAmount: new Decimal(100),
           account: {
@@ -185,12 +189,12 @@ describe("JournalService", () => {
 
       enqueueIntegrationEventMock.mockResolvedValue({ id: "outbox-1" });
 
-      await JournalService.postJournalEntry("je-001");
+      await JournalService.postJournalEntry("cjournal001");
 
       // Status is updated to posted.
       expect(journalEntryUpdate).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: "je-001" },
+          where: { id: "cjournal001" },
           data: expect.objectContaining({ status: "posted" }),
         }),
       );
@@ -207,7 +211,7 @@ describe("JournalService", () => {
           topic: "ACCOUNTING",
           type: "JOURNAL_ENTRY_POSTED",
           aggregateType: "JOURNAL_ENTRY",
-          aggregateId: "je-001",
+          aggregateId: "cjournal001",
         }),
       );
     });
@@ -230,7 +234,7 @@ describe("JournalService", () => {
         return cb(tx);
       });
 
-      await JournalService.postJournalEntry("je-001");
+      await JournalService.postJournalEntry("cjournal001");
 
       expect(journalEntryUpdate).not.toHaveBeenCalled();
       expect(accountBalanceUpsert).not.toHaveBeenCalled();

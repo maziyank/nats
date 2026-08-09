@@ -56,6 +56,8 @@ const PURPOSE_LABELS: Record<DefaultAccountPurpose, string> = {
   EXCHANGE_GAIN_LOSS: "Exchange Gain/Loss",
   SALARIES_EXPENSE: "Salaries Expense",
   PAYROLL_LIABILITY: "Payroll Liability",
+  PAYROLL_TAX_PAYABLE: "Payroll Tax Payable",
+  BPJS_PAYABLE: "BPJS Payable",
   WIP_INVENTORY: "Work-in-Progress Inventory",
   PRODUCTION_OVERHEAD: "Production Overhead",
 }
@@ -80,6 +82,8 @@ const PURPOSE_DESCRIPTIONS: Record<DefaultAccountPurpose, string> = {
   EXCHANGE_GAIN_LOSS: "Tracks gains or losses resulting from fluctuations in exchange rates for foreign currency transactions.",
   SALARIES_EXPENSE: "Expense account for employee salaries.",
   PAYROLL_LIABILITY: "Liability account for payroll payable.",
+  PAYROLL_TAX_PAYABLE: "Liability account for payroll taxes owed to tax authorities.",
+  BPJS_PAYABLE: "Liability account for BPJS (social security) contributions payable.",
   WIP_INVENTORY: "Tracks the value of materials consumed in production that have not yet been converted to finished goods.",
   PRODUCTION_OVERHEAD: "Tracks overhead costs allocated to production (e.g., factory utilities, indirect labor).",
 }

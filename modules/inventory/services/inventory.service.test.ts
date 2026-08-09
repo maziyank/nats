@@ -49,9 +49,9 @@ describe("InventoryService", () => {
             const input: CreateInventoryMovementData = {
                 type: MovementType.IN,
                 items: [
-                    { productId: "prod-1", quantity: 10, unitCost: 100 }
+                    { productId: "cprod000000000000000000001", quantity: 10, unitCost: 100 }
                 ],
-                warehouseId: "wh-1",
+                warehouseId: "cwh0000000000000000000001",
                 transactionDate: mockDate,
             };
 
@@ -59,25 +59,25 @@ describe("InventoryService", () => {
                 id: "mov-1",
                 type: MovementType.IN,
                 transactionDate: mockDate,
-                toWarehouseId: "wh-1",
+                toWarehouseId: "cwh0000000000000000000001",
             };
             (prismaMock.inventoryMovement.create as any).mockResolvedValue(mockMovement);
 
             (prismaMock.product.findMany as any).mockResolvedValue([
-                { id: "prod-1", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
+                { id: "cprod000000000000000000001", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
             ]);
             (prismaMock.inventory.findMany as any).mockResolvedValue([
                 {
                     id: "inv-1",
-                    productId: "prod-1",
-                    warehouseId: "wh-1",
+                    productId: "cprod000000000000000000001",
+                    warehouseId: "cwh0000000000000000000001",
                     batchNumber: null,
                     quantity: 5,
                     unitCost: new Decimal(100),
                 },
             ]);
             (prismaMock.inventory.groupBy as any).mockResolvedValue([
-                { productId: "prod-1", _sum: { quantity: 5 } },
+                { productId: "cprod000000000000000000001", _sum: { quantity: 5 } },
             ]);
 
             const result = await InventoryService.createInventoryMovement(prismaMock, input);
@@ -85,7 +85,7 @@ describe("InventoryService", () => {
             expect(prismaMock.inventoryMovement.create).toHaveBeenCalledWith({
                 data: expect.objectContaining({
                     type: MovementType.IN,
-                    toWarehouseId: "wh-1",
+                    toWarehouseId: "cwh0000000000000000000001",
                     status: "COMPLETED",
                 }),
             });
@@ -94,7 +94,7 @@ describe("InventoryService", () => {
                 data: [
                     expect.objectContaining({
                         inventoryMovementId: "mov-1",
-                        productId: "prod-1",
+                        productId: "cprod000000000000000000001",
                         quantity: 10,
                         unitCost: 100,
                     }),
@@ -111,7 +111,7 @@ describe("InventoryService", () => {
 
             // Initial: 5 @ 100 = 500; Incoming: 10 @ 100 = 1000; Avg = 100
             expect(prismaMock.product.update).toHaveBeenCalledWith({
-                where: { id: "prod-1" },
+                where: { id: "cprod000000000000000000001" },
                 data: { averageCost: new Decimal(100) },
             });
 
@@ -128,9 +128,9 @@ describe("InventoryService", () => {
             const input: CreateInventoryMovementData = {
                 type: MovementType.OUT,
                 items: [
-                    { productId: "prod-1", quantity: 2 }
+                    { productId: "cprod000000000000000000001", quantity: 2 }
                 ],
-                warehouseId: "wh-1",
+                warehouseId: "cwh0000000000000000000001",
                 transactionDate: mockDate,
             };
 
@@ -138,25 +138,25 @@ describe("InventoryService", () => {
                 id: "mov-2",
                 type: MovementType.OUT,
                 transactionDate: mockDate,
-                fromWarehouseId: "wh-1",
+                fromWarehouseId: "cwh0000000000000000000001",
             };
             (prismaMock.inventoryMovement.create as any).mockResolvedValue(mockMovement);
 
             (prismaMock.product.findMany as any).mockResolvedValue([
-                { id: "prod-1", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
+                { id: "cprod000000000000000000001", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
             ]);
             (prismaMock.inventory.findMany as any).mockResolvedValue([
                 {
                     id: "inv-1",
-                    productId: "prod-1",
-                    warehouseId: "wh-1",
+                    productId: "cprod000000000000000000001",
+                    warehouseId: "cwh0000000000000000000001",
                     batchNumber: null,
                     quantity: 10,
                     unitCost: new Decimal(100),
                 },
             ]);
             (prismaMock.inventory.groupBy as any).mockResolvedValue([
-                { productId: "prod-1", _sum: { quantity: 10 } },
+                { productId: "cprod000000000000000000001", _sum: { quantity: 10 } },
             ]);
 
             await InventoryService.createInventoryMovement(prismaMock, input);
@@ -175,29 +175,29 @@ describe("InventoryService", () => {
             const input: CreateInventoryMovementData = {
                 type: MovementType.OUT,
                 items: [
-                    { productId: "prod-1", quantity: 20 }
+                    { productId: "cprod000000000000000000001", quantity: 20 }
                 ],
-                warehouseId: "wh-1",
+                warehouseId: "cwh0000000000000000000001",
             };
 
             const mockMovement = { id: "mov-3", type: MovementType.OUT };
             (prismaMock.inventoryMovement.create as any).mockResolvedValue(mockMovement);
 
             (prismaMock.product.findMany as any).mockResolvedValue([
-                { id: "prod-1", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
+                { id: "cprod000000000000000000001", name: "Product 1", sku: "SKU-1", averageCost: new Decimal(100) },
             ]);
             (prismaMock.inventory.findMany as any).mockResolvedValue([
                 {
                     id: "inv-1",
-                    productId: "prod-1",
-                    warehouseId: "wh-1",
+                    productId: "cprod000000000000000000001",
+                    warehouseId: "cwh0000000000000000000001",
                     batchNumber: null,
                     quantity: 10,
                     unitCost: new Decimal(100),
                 },
             ]);
             (prismaMock.inventory.groupBy as any).mockResolvedValue([
-                { productId: "prod-1", _sum: { quantity: 10 } },
+                { productId: "cprod000000000000000000001", _sum: { quantity: 10 } },
             ]);
 
             await expect(InventoryService.createInventoryMovement(prismaMock, input))

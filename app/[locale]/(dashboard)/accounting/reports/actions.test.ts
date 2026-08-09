@@ -35,6 +35,34 @@ const { prismaMock } = vi.hoisted(() => ({
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 
+// The report actions now source balances through the period-balance service.
+// Rebuild a balance map from the mocked journalEntryLine.groupBy rows so the
+// report logic is exercised with controlled balance data.
+vi.mock("@/modules/accounting/services/period-balance.service", () => ({
+  getPeriodBalances: async () => {
+    const rows = await prismaMock.journalEntryLine.groupBy({});
+    const map = new Map();
+    for (const r of rows) {
+      map.set(r.accountId, {
+        debit: Number(r._sum?.debitAmount ?? 0),
+        credit: Number(r._sum?.creditAmount ?? 0),
+      });
+    }
+    return map;
+  },
+  getCumulativeBalancesAsOf: async () => {
+    const rows = await prismaMock.journalEntryLine.groupBy({});
+    const map = new Map();
+    for (const r of rows) {
+      map.set(r.accountId, {
+        debit: Number(r._sum?.debitAmount ?? 0),
+        credit: Number(r._sum?.creditAmount ?? 0),
+      });
+    }
+    return map;
+  },
+}));
+
 describe("Financial Reports Actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -52,8 +80,8 @@ describe("Financial Reports Actions", () => {
       // Revenue: Credit 1000
       // Expense: Debit 600
       prismaMock.journalEntryLine.groupBy.mockResolvedValue([
-        { accountId: "1", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 1000 } } },
-        { accountId: "2", _sum: { debitAmount: { toNumber: () => 600 }, creditAmount: { toNumber: () => 0 } } },
+        { accountId: "1", _sum: { debitAmount: 0, creditAmount: 1000 } },
+        { accountId: "2", _sum: { debitAmount: 600, creditAmount: 0 } },
       ]);
 
       const result = await getProfitAndLoss("2023-01-01", "2023-12-31");
@@ -92,15 +120,15 @@ describe("Financial Reports Actions", () => {
         // Simplified: return all balances
         return Promise.resolve([
           // Assets: Debit 1000
-          { accountId: "a1", _sum: { debitAmount: { toNumber: () => 1000 }, creditAmount: { toNumber: () => 0 } } },
+          { accountId: "a1", _sum: { debitAmount: 1000, creditAmount: 0 } },
           // Liabilities: Credit 500
-          { accountId: "l1", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 500 } } },
+          { accountId: "l1", _sum: { debitAmount: 0, creditAmount: 500 } },
           // Equity: Credit 200
-          { accountId: "e1", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 200 } } },
+          { accountId: "e1", _sum: { debitAmount: 0, creditAmount: 200 } },
           // Revenue: Credit 400
-          { accountId: "r1", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 400 } } },
+          { accountId: "r1", _sum: { debitAmount: 0, creditAmount: 400 } },
           // Expense: Debit 100
-          { accountId: "x1", _sum: { debitAmount: { toNumber: () => 100 }, creditAmount: { toNumber: () => 0 } } },
+          { accountId: "x1", _sum: { debitAmount: 100, creditAmount: 0 } },
         ]);
       });
 
@@ -144,13 +172,13 @@ describe("Financial Reports Actions", () => {
         });
 
         prismaMock.journalEntryLine.groupBy.mockResolvedValue([
-            { accountId: "ca", _sum: { debitAmount: { toNumber: () => 200 }, creditAmount: { toNumber: () => 0 } } }, // Cash 200
-            { accountId: "fa", _sum: { debitAmount: { toNumber: () => 800 }, creditAmount: { toNumber: () => 0 } } }, // Equipment 800
-            { accountId: "cl", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 100 } } }, // AP 100
-            { accountId: "ll", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 400 } } }, // Loan 400
-            { accountId: "eq", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 500 } } }, // Equity 500
-            { accountId: "rev", _sum: { debitAmount: { toNumber: () => 0 }, creditAmount: { toNumber: () => 1000 } } }, // Rev 1000
-            { accountId: "cogs", _sum: { debitAmount: { toNumber: () => 600 }, creditAmount: { toNumber: () => 0 } } }, // COGS 600
+            { accountId: "ca", _sum: { debitAmount: 200, creditAmount: 0 } }, // Cash 200
+            { accountId: "fa", _sum: { debitAmount: 800, creditAmount: 0 } }, // Equipment 800
+            { accountId: "cl", _sum: { debitAmount: 0, creditAmount: 100 } }, // AP 100
+            { accountId: "ll", _sum: { debitAmount: 0, creditAmount: 400 } }, // Loan 400
+            { accountId: "eq", _sum: { debitAmount: 0, creditAmount: 500 } }, // Equity 500
+            { accountId: "rev", _sum: { debitAmount: 0, creditAmount: 1000 } }, // Rev 1000
+            { accountId: "cogs", _sum: { debitAmount: 600, creditAmount: 0 } }, // COGS 600
         ]);
 
         const result = await getFinancialRatios("2023-12-31");
