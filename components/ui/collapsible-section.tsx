@@ -30,19 +30,22 @@ export function CollapsibleSection({
           type="button"
           variant="ghost"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full justify-start p-4 h-auto font-medium hover:bg-transparent rounded-t-xl"
+          className="w-full justify-start p-2 h-auto font-medium hover:bg-transparent rounded-t-xl"
         >
           {isCollapsed ? (
             <ChevronRight className="mr-2 h-4 w-4" />
           ) : (
             <ChevronDown className="mr-2 h-4 w-4" />
           )}
-          <CardTitle>{title}</CardTitle>
+            {isCollapsed ? (
+              <CardTitle>{collapsedContent}</CardTitle>
+            ) : (
+              <CardTitle>
+                <div className="text-sm text-muted-foreground">{title}</div>
+              </CardTitle>
+            )} 
         </Button>
       </CardHeader>
-      {isCollapsed && collapsedContent && (
-        <CardContent className="pb-4 pt-0">{collapsedContent}</CardContent>
-      )}
       {!isCollapsed && <CardContent>{children}</CardContent>}
     </Card>
   );
