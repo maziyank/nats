@@ -58,7 +58,7 @@ import {
   PageFormTitle,
 } from "@/components/layout/page/form-layout";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent  } from "@/components/ui/card";
 
 interface PurchaseReturnFormProps {
   returnItem?: SuperJSONResult;
@@ -616,10 +616,7 @@ export function PurchaseReturnForm({
               </div>
             </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between py-3">
-                <CardTitle className="text-lg">{t("return_items")}</CardTitle>
-              </CardHeader>
+            <Card> 
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}

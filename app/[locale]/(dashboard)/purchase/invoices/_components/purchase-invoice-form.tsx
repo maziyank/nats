@@ -763,10 +763,7 @@ export function PurchaseInvoiceForm({
               </div>
             </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between py-3">
-                <CardTitle className="text-lg">{tCommon("products")}</CardTitle>
-              </CardHeader>
+            <Card> 
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}

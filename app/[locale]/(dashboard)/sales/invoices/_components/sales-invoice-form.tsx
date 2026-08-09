@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { CustomInput } from "@/components/ui/custom-input";
 import { CustomSelect } from "@/components/ui/custom-select";
 import { CustomTextarea } from "@/components/ui/custom-textarea";
 import { SelectItem } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -750,10 +749,7 @@ export function SalesInvoiceForm({
               </div>
             </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between py-3">
-                <CardTitle className="text-lg">{tCommon("products")}</CardTitle>
-              </CardHeader>
+            <Card> 
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}

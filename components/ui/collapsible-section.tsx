@@ -4,6 +4,7 @@ import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface CollapsibleSectionProps {
   title: string;
@@ -23,24 +24,26 @@ export function CollapsibleSection({
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
 
   return (
-    <div className={cn("border rounded-lg bg-card", className)}>
-      <Button
-        type="button"
-        variant="ghost"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="w-full justify-start p-2 h-auto font-medium hover:bg-muted bg-muted/50 rounded-none rounded-t-lg"
-      >
-        {isCollapsed ? (
-          <ChevronRight className="mr-2 h-4 w-4" />
-        ) : (
-          <ChevronDown className="mr-2 h-4 w-4" />
-        )}
-        {title}
-      </Button>
+    <Card className={cn("p-0", className)}>
+      <CardHeader className="p-0">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="w-full justify-start p-4 h-auto font-medium hover:bg-transparent rounded-t-xl"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="mr-2 h-4 w-4" />
+          ) : (
+            <ChevronDown className="mr-2 h-4 w-4" />
+          )}
+          <CardTitle>{title}</CardTitle>
+        </Button>
+      </CardHeader>
       {isCollapsed && collapsedContent && (
-        <div className="px-4 pb-3 pt-2">{collapsedContent}</div>
+        <CardContent className="pb-4 pt-0">{collapsedContent}</CardContent>
       )}
-      {!isCollapsed && <div className="px-4 pb-4 pt-2">{children}</div>}
-    </div>
+      {!isCollapsed && <CardContent>{children}</CardContent>}
+    </Card>
   );
 }

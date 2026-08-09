@@ -710,9 +710,6 @@ export function PurchaseOrderForm({
             </CollapsibleSection>
 
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{t("ordered_items")}</CardTitle>
-              </CardHeader>
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}

@@ -1,14 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  CardFooter
 } from "@/components/ui/card";
 import { CustomInput } from "@/components/ui/custom-input";
 import { CustomSelect } from "@/components/ui/custom-select";
@@ -704,10 +702,7 @@ export function SalesOrderForm({
               </div>
             </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{t("ordered_items")}</CardTitle>
-              </CardHeader>
+            <Card> 
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}

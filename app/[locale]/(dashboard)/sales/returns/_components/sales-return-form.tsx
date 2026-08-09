@@ -56,7 +56,7 @@ import {
   PageFormLayout,
   PageFormTitle,
 } from "@/components/layout/page/form-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
 import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { useTranslations } from "next-intl";
@@ -584,10 +584,7 @@ export function SalesReturnForm({
               </div>
             </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between py-3">
-                <CardTitle className="text-lg">{t("return_items")}</CardTitle>
-              </CardHeader>
+            <Card> 
               <CardContent className="p-0">
                 <DndContext
                   sensors={sensors}
