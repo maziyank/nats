@@ -51,6 +51,7 @@ import {
   DoorClosedIcon,
 } from "lucide-react";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import {
   createSalesOrder,
   updateSalesOrder,
@@ -553,165 +554,171 @@ export function SalesOrderForm({
       <form onSubmit={handleSubmit}>
         <PageFormContent className="grid gap-4 mt-4 p-0 bg-transparent border-none shadow-none">
           <div className="space-y-4">
-            <Card>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-2">
+            <CollapsibleSection
+              title={t("overview") || "Overview"}
+              collapsedContent={
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span><strong>{t("customer")}:</strong> {customers.find(c => c.id === formData.contactId)?.name || "-"}</span>
+                  <span><strong>{t("order_date")}:</strong> {formData.orderDate ? format(formData.orderDate, "dd MMM yyyy") : "-"}</span>
+                </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t("customer")}
+                    </label>
+                    <SearchableSelect
+                      value={formData.contactId}
+                      onValueChange={(val) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          contactId: val as string,
+                        }))
+                      }
+                      options={customers.map((c) => ({
+                        value: c.id,
+                        label: c.name,
+                        icon: (
+                          <Avatar size="sm">
+                            <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                              {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        ),
+                      }))}
+                      placeholder={t("placeholder_select_customer")}
+                      disabled={isReadOnly}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      type="date"
+                      label={t("order_date")}
+                      id="order_date"
+                      value={
+                        formData.orderDate
+                          ? format(formData.orderDate, "yyyy-MM-dd")
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          orderDate: e.target.value
+                            ? new Date(e.target.value)
+                            : new Date(),
+                        }))
+                      }
+                      disabled={isReadOnly}
+                    />
+                    <CustomInput
+                      type="date"
+                      label={t("expected_date")}
+                      id="expected_date"
+                      value={
+                        formData.expectedDate
+                          ? format(formData.expectedDate, "yyyy-MM-dd")
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          expectedDate: e.target.value
+                            ? new Date(e.target.value)
+                            : null,
+                        }))
+                      }
+                      disabled={isReadOnly}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        {t("customer")}
+                        {t("department")}
                       </label>
                       <SearchableSelect
-                        value={formData.contactId}
+                        value={formData.departmentId || ""}
                         onValueChange={(val) =>
                           setFormData((prev) => ({
                             ...prev,
-                            contactId: val as string,
+                            departmentId: val || null,
                           }))
                         }
-                        options={customers.map((c) => ({
-                          value: c.id,
-                          label: c.name,
-                          icon: (
-                            <Avatar size="sm">
-                              <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                                {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                          ),
+                        options={departments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
                         }))}
-                        placeholder={t("placeholder_select_customer")}
+                        placeholder={t("placeholder_select_department")}
                         disabled={isReadOnly}
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        type="date"
-                        label={t("order_date")}
-                        id="order_date"
-                        value={
-                          formData.orderDate
-                            ? format(formData.orderDate, "yyyy-MM-dd")
-                            : ""
-                        }
-                        onChange={(e) =>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("project")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.projectId || ""}
+                        onValueChange={(val) =>
                           setFormData((prev) => ({
                             ...prev,
-                            orderDate: e.target.value
-                              ? new Date(e.target.value)
-                              : new Date(),
+                            projectId: val || null,
                           }))
                         }
+                        options={projects.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                        }))}
+                        placeholder={t("placeholder_select_project")}
                         disabled={isReadOnly}
                       />
-                      <CustomInput
-                        type="date"
-                        label={t("expected_date")}
-                        id="expected_date"
-                        value={
-                          formData.expectedDate
-                            ? format(formData.expectedDate, "yyyy-MM-dd")
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            expectedDate: e.target.value
-                              ? new Date(e.target.value)
-                              : null,
-                          }))
-                        }
-                        disabled={isReadOnly}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("department")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.departmentId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              departmentId: val || null,
-                            }))
-                          }
-                          options={departments.map((d) => ({
-                            value: d.id,
-                            label: d.name,
-                          }))}
-                          placeholder={t("placeholder_select_department")}
-                          disabled={isReadOnly}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("project")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.projectId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              projectId: val || null,
-                            }))
-                          }
-                          options={projects.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))}
-                          placeholder={t("placeholder_select_project")}
-                          disabled={isReadOnly}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <CustomTextarea
-                    value={formData.notes || ""}
-                    label={t("notes")}
-                    className="resize-none h-[85%]"
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notes: e.target.value,
-                      }))
-                    }
-                    placeholder={t("placeholder_notes")}
-                    disabled={isReadOnly}
-                  />
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsAttachmentDialogOpen(true)}
-                      className="w-fit"
-                    >
-                      <Paperclip className="mr-2 h-4 w-4" />
-                      {tCommon("attachments")} ({attachments.length})
-                    </Button>
-                    <div className="flex flex-wrap gap-2">
-                      {attachments.map((file) => (
-                        <div
-                          key={file.id}
-                          className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
-                        >
-                          <a
-                            href={file.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="hover:underline"
-                          >
-                            {file.name}
-                          </a>
-                        </div>
-                      ))}
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                <CustomTextarea
+                  value={formData.notes || ""}
+                  label={t("notes")}
+                  className="resize-none h-[85%]"
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
+                  placeholder={t("placeholder_notes")}
+                  disabled={isReadOnly}
+                />
+                <div className="flex flex-col gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAttachmentDialogOpen(true)}
+                    className="w-fit"
+                  >
+                    <Paperclip className="mr-2 h-4 w-4" />
+                    {tCommon("attachments")} ({attachments.length})
+                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    {attachments.map((file) => (
+                      <div
+                        key={file.id}
+                        className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
+                      >
+                        <a
+                          href={file.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                        >
+                          {file.name}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CollapsibleSection>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">

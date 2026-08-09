@@ -58,6 +58,7 @@ import {
 } from "@/components/layout/page/form-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { useTranslations } from "next-intl";
 
 interface SalesReturnFormProps {
@@ -347,234 +348,241 @@ export function SalesReturnForm({
       <PageFormContent className="grid gap-3 mt-3 p-0 bg-transparent border-none shadow-none">
         <form onSubmit={handleSubmit} className="space-y-3 w-full">
           <div className="space-y-3">
-            <Card>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("return_number")}
-                        value={formData.returnNumber}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            returnNumber: e.target.value,
-                          })
-                        }
-                        placeholder={t("placeholder_auto_generate")}
-                        disabled={readonly}
-                      />
-                      <div>
-                        <label className="text-sm font-medium">
-                          {t("customer")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.contactId}
-                          onValueChange={(val: any) => handleContactChange(val)}
-                          options={customers.map((c) => ({
-                            label: c.name,
-                            value: c.id,
-                            icon: (
-                              <Avatar size="sm">
-                                <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                                  {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ),
-                          }))}
-                          disabled={readonly}
-                          placeholder={t("placeholder_select_customer")}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomSelect
-                        label={t("sales_order_optional")}
-                        value={formData.salesOrderId || ""}
-                        onValueChange={(val: any) =>
-                          handleSalesOrderChange(val)
-                        }
-                        options={filteredSalesOrders.map((so) => ({
-                          label: so.orderNumber,
-                          value: so.id,
+            <CollapsibleSection
+              title={t("overview") || "Overview"}
+              collapsedContent={
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span><strong>{t("return_number")}:</strong> {formData.returnNumber || "-"}</span>
+                  <span><strong>{t("customer")}:</strong> {customers.find(c => c.id === formData.contactId)?.name || "-"}</span>
+                  <span><strong>{t("return_date")}:</strong> {formData.returnDate ? new Date(formData.returnDate).toLocaleDateString("id-ID") : "-"}</span>
+                </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("return_number")}
+                      value={formData.returnNumber}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          returnNumber: e.target.value,
+                        })
+                      }
+                      placeholder={t("placeholder_auto_generate")}
+                      disabled={readonly}
+                    />
+                    <div>
+                      <label className="text-sm font-medium">
+                        {t("customer")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.contactId}
+                        onValueChange={(val: any) => handleContactChange(val)}
+                        options={customers.map((c) => ({
+                          label: c.name,
+                          value: c.id,
+                          icon: (
+                            <Avatar size="sm">
+                              <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ),
                         }))}
-                        disabled={readonly || !formData.contactId}
-                        placeholder={t("placeholder_select_so")}
-                      />
-
-                      <CustomSelect
-                        label={t("sales_invoice")}
-                        value={formData.salesInvoiceId || ""}
-                        onValueChange={(val: any) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            salesInvoiceId: val,
-                          }))
-                        }
-                        options={filteredSalesInvoices.map((si) => ({
-                          label: si.invoiceNumber,
-                          value: si.id,
-                        }))}
-                        disabled={readonly || !formData.contactId}
-                        placeholder={t("placeholder_select_invoice")}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("return_date")}
-                        type="date"
-                        value={
-                          formData.returnDate instanceof Date
-                            ? formData.returnDate.toISOString().split("T")[0]
-                            : formData.returnDate
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            returnDate: new Date(e.target.value),
-                          }))
-                        }
                         disabled={readonly}
+                        placeholder={t("placeholder_select_customer")}
                       />
-
-                      <div className="flex items-end gap-2">
-                        <div className="flex-1">
-                          <CustomSelect
-                            label={t("status")}
-                            value={formData.status || "DRAFT"}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onValueChange={(val: any) =>
-                              setFormData((prev) => ({ ...prev, status: val }))
-                            }
-                            options={[
-                              { label: t("status_draft"), value: "DRAFT" },
-                              {
-                                label: t("status_approved"),
-                                value: "APPROVED",
-                              },
-                              {
-                                label: t("status_completed"),
-                                value: "COMPLETED",
-                              },
-                              {
-                                label: t("status_cancelled"),
-                                value: "CANCELLED",
-                              },
-                            ]}
-                            disabled={
-                              readonly ||
-                              returnItem?.status === "COMPLETED" ||
-                              returnItem?.status === "CANCELLED"
-                            }
-                          />
-                        </div>
-                        {returnItem && (
-                          <div className="pb-1">
-                            <StatusHistoryDialog
-                              events={[
-                                {
-                                  event: "Created",
-                                  at: returnItem.createdAt,
-                                  byName: returnItem.createdBy?.name,
-                                },
-                                {
-                                  event: "Last Updated",
-                                  at: returnItem.updatedAt,
-                                  byName: returnItem.updatedBy?.name,
-                                },
-                                {
-                                  event: "Approved",
-                                  at: returnItem.approvedAt,
-                                  byName: returnItem.approvedBy?.name,
-                                },
-                                {
-                                  event: "Completed",
-                                  at: returnItem.completedAt,
-                                  byName: returnItem.completedBy?.name,
-                                },
-                                {
-                                  event: "Cancelled",
-                                  at: returnItem.cancelledAt,
-                                  byName: returnItem.cancelledBy?.name,
-                                },
-                              ]}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("department")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.departmentId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              departmentId: val || null,
-                            }))
-                          }
-                          options={departments.map((d) => ({
-                            value: d.id,
-                            label: d.name,
-                          }))}
-                          placeholder={t("placeholder_select_department")}
-                          disabled={readonly}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("project")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.projectId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              projectId: val || null,
-                            }))
-                          }
-                          options={projects.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))}
-                          placeholder={t("placeholder_select_project")}
-                          disabled={readonly}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsAttachmentDialogOpen(true)}
-                        className="w-fit"
-                      >
-                        <Paperclip className="mr-2 h-4 w-4" />
-                        {tCommon("attachments")} ({attachments.length})
-                      </Button>
                     </div>
                   </div>
 
-                  <CustomTextarea
-                    value={formData.notes || ""}
-                    label={t("notes")}
-                    className="resize-none h-[77%]"
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                    placeholder={t("placeholder_notes")}
-                    disabled={readonly}
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomSelect
+                      label={t("sales_order_optional")}
+                      value={formData.salesOrderId || ""}
+                      onValueChange={(val: any) =>
+                        handleSalesOrderChange(val)
+                      }
+                      options={filteredSalesOrders.map((so) => ({
+                        label: so.orderNumber,
+                        value: so.id,
+                      }))}
+                      disabled={readonly || !formData.contactId}
+                      placeholder={t("placeholder_select_so")}
+                    />
+
+                    <CustomSelect
+                      label={t("sales_invoice")}
+                      value={formData.salesInvoiceId || ""}
+                      onValueChange={(val: any) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          salesInvoiceId: val,
+                        }))
+                      }
+                      options={filteredSalesInvoices.map((si) => ({
+                        label: si.invoiceNumber,
+                        value: si.id,
+                      }))}
+                      disabled={readonly || !formData.contactId}
+                      placeholder={t("placeholder_select_invoice")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("return_date")}
+                      type="date"
+                      value={
+                        formData.returnDate instanceof Date
+                          ? formData.returnDate.toISOString().split("T")[0]
+                          : formData.returnDate
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          returnDate: new Date(e.target.value),
+                        }))
+                      }
+                      disabled={readonly}
+                    />
+
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1">
+                        <CustomSelect
+                          label={t("status")}
+                          value={formData.status || "DRAFT"}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          onValueChange={(val: any) =>
+                            setFormData((prev) => ({ ...prev, status: val }))
+                          }
+                          options={[
+                            { label: t("status_draft"), value: "DRAFT" },
+                            {
+                              label: t("status_approved"),
+                              value: "APPROVED",
+                            },
+                            {
+                              label: t("status_completed"),
+                              value: "COMPLETED",
+                            },
+                            {
+                              label: t("status_cancelled"),
+                              value: "CANCELLED",
+                            },
+                          ]}
+                          disabled={
+                            readonly ||
+                            returnItem?.status === "COMPLETED" ||
+                            returnItem?.status === "CANCELLED"
+                          }
+                        />
+                      </div>
+                      {returnItem && (
+                        <div className="pb-1">
+                          <StatusHistoryDialog
+                            events={[
+                              {
+                                event: "Created",
+                                at: returnItem.createdAt,
+                                byName: returnItem.createdBy?.name,
+                              },
+                              {
+                                event: "Last Updated",
+                                at: returnItem.updatedAt,
+                                byName: returnItem.updatedBy?.name,
+                              },
+                              {
+                                event: "Approved",
+                                at: returnItem.approvedAt,
+                                byName: returnItem.approvedBy?.name,
+                              },
+                              {
+                                event: "Completed",
+                                at: returnItem.completedAt,
+                                byName: returnItem.completedBy?.name,
+                              },
+                              {
+                                event: "Cancelled",
+                                at: returnItem.cancelledAt,
+                                byName: returnItem.cancelledBy?.name,
+                              },
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("department")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.departmentId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            departmentId: val || null,
+                          }))
+                        }
+                        options={departments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
+                        }))}
+                        placeholder={t("placeholder_select_department")}
+                        disabled={readonly}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("project")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.projectId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            projectId: val || null,
+                          }))
+                        }
+                        options={projects.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                        }))}
+                        placeholder={t("placeholder_select_project")}
+                        disabled={readonly}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAttachmentDialogOpen(true)}
+                      className="w-fit"
+                    >
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      {tCommon("attachments")} ({attachments.length})
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <CustomTextarea
+                  value={formData.notes || ""}
+                  label={t("notes")}
+                  className="resize-none h-[77%]"
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder={t("placeholder_notes")}
+                  disabled={readonly}
+                />
+              </div>
+            </CollapsibleSection>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between py-3">

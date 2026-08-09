@@ -57,6 +57,7 @@ import {
   PageFormLayout,
   PageFormTitle,
 } from "@/components/layout/page/form-layout";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PurchaseReturnFormProps {
@@ -362,252 +363,258 @@ export function PurchaseReturnForm({
       <PageFormContent className="grid gap-3 mt-3 p-0 bg-transparent border-none shadow-none">
         <form onSubmit={handleSubmit} className="space-y-3 w-full">
           <div className="space-y-3">
-            <Card>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("return_number")}
-                        value={formData.returnNumber}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            returnNumber: e.target.value,
-                          })
-                        }
-                        placeholder={t("placeholder_auto_generate")}
-                        disabled={readonly}
-                        required
-                      />
-                      <div>
-                        <label className="text-sm font-medium">
-                          {t("vendor")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.contactId}
-                          onValueChange={(val: any) => handleContactChange(val)}
-                          options={vendors.map((v) => ({
-                            label: v.name,
-                            value: v.id,
-                            icon: (
-                              <Avatar size="sm">
-                                <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
-                                  {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ),
-                          }))}
-                          disabled={readonly}
-                          placeholder={t("placeholder_select_vendor")}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomSelect
-                        label={t("purchase_order_optional")}
-                        value={formData.purchaseOrderId || ""}
-                        onValueChange={(val: any) =>
-                          handlePurchaseOrderChange(val)
-                        }
-                        options={filteredPurchaseOrders.map((po) => ({
-                          label: po.orderNumber,
-                          value: po.id,
+            <CollapsibleSection
+              title={t("overview") || "Overview"}
+              collapsedContent={
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  <span>{t("return_number")}: {formData.returnNumber || "-"}</span>
+                  <span>{t("vendor")}: {vendors.find((v) => v.id === formData.contactId)?.name || "-"}</span>
+                </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("return_number")}
+                      value={formData.returnNumber}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          returnNumber: e.target.value,
+                        })
+                      }
+                      placeholder={t("placeholder_auto_generate")}
+                      disabled={readonly}
+                      required
+                    />
+                    <div>
+                      <label className="text-sm font-medium">
+                        {t("vendor")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.contactId}
+                        onValueChange={(val: any) => handleContactChange(val)}
+                        options={vendors.map((v) => ({
+                          label: v.name,
+                          value: v.id,
+                          icon: (
+                            <Avatar size="sm">
+                              <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                                {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ),
                         }))}
-                        disabled={readonly || !formData.contactId}
-                        placeholder={t("placeholder_select_purchase_order")}
-                      />
-
-                      <CustomSelect
-                        label={t("purchase_invoice_optional")}
-                        value={formData.purchaseInvoiceId || ""}
-                        onValueChange={(val: any) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            purchaseInvoiceId: val,
-                          }))
-                        }
-                        options={filteredPurchaseInvoices.map((pi) => ({
-                          label: pi.invoiceNumber,
-                          value: pi.id,
-                        }))}
-                        disabled={readonly || !formData.contactId}
-                        placeholder={t("placeholder_select_invoice")}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("return_date")}
-                        type="date"
-                        value={
-                          formData.returnDate instanceof Date
-                            ? formData.returnDate.toISOString().split("T")[0]
-                            : formData.returnDate
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            returnDate: new Date(e.target.value),
-                          }))
-                        }
                         disabled={readonly}
+                        placeholder={t("placeholder_select_vendor")}
                       />
-
-                      <div className="flex items-end gap-2">
-                        <div className="flex-1">
-                          <CustomSelect
-                            label={t("status")}
-                            value={formData.status || "DRAFT"}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onValueChange={(val: any) =>
-                              setFormData((prev) => ({ ...prev, status: val }))
-                            }
-                            options={[
-                              { label: t("status_draft"), value: "DRAFT" },
-                              {
-                                label: t("status_approved"),
-                                value: "APPROVED",
-                              },
-                              {
-                                label: t("status_completed"),
-                                value: "COMPLETED",
-                              },
-                              {
-                                label: t("status_cancelled"),
-                                value: "CANCELLED",
-                              },
-                            ]}
-                            disabled={
-                              readonly ||
-                              returnItem?.status === "COMPLETED" ||
-                              returnItem?.status === "CANCELLED"
-                            }
-                          />
-                        </div>
-                        {returnItem && (
-                          <div className="pb-1">
-                            <StatusHistoryDialog
-                              events={[
-                                {
-                                  event: "Created",
-                                  at: returnItem.createdAt,
-                                  byName: returnItem.createdBy?.name,
-                                },
-                                {
-                                  event: "Last Updated",
-                                  at: returnItem.updatedAt,
-                                  byName: returnItem.updatedBy?.name,
-                                },
-                                {
-                                  event: "Approved",
-                                  at: returnItem.approvedAt,
-                                  byName: returnItem.approvedBy?.name,
-                                },
-                                {
-                                  event: "Completed",
-                                  at: returnItem.completedAt,
-                                  byName: returnItem.completedBy?.name,
-                                },
-                                {
-                                  event: "Cancelled",
-                                  at: returnItem.cancelledAt,
-                                  byName: returnItem.cancelledBy?.name,
-                                },
-                              ]}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("department")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.departmentId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              departmentId: val || null,
-                            }))
-                          }
-                          options={departments.map((d) => ({
-                            value: d.id,
-                            label: d.name,
-                          }))}
-                          placeholder={t("placeholder_select_department")}
-                          disabled={readonly}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("project")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.projectId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              projectId: val || null,
-                            }))
-                          }
-                          options={projects.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))}
-                          placeholder={t("placeholder_select_project")}
-                          disabled={readonly}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsAttachmentDialogOpen(true)}
-                        className="w-fit"
-                      >
-                        <Paperclip className="mr-2 h-4 w-4" />
-                        {tCommon("attachments")} ({attachments.length})
-                      </Button>
-                      <div className="flex flex-wrap gap-2">
-                        {attachments.map((file) => (
-                          <div
-                            key={file.id}
-                            className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
-                          >
-                            <a
-                              href={file.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline"
-                            >
-                              {file.name}
-                            </a>
-                          </div>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
-                  <CustomTextarea
-                    value={formData.notes || ""}
-                    label={t("notes")}
-                    className="resize-none h-[77%]"
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                    placeholder={t("placeholder_notes")}
-                    disabled={readonly}
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomSelect
+                      label={t("purchase_order_optional")}
+                      value={formData.purchaseOrderId || ""}
+                      onValueChange={(val: any) =>
+                        handlePurchaseOrderChange(val)
+                      }
+                      options={filteredPurchaseOrders.map((po) => ({
+                        label: po.orderNumber,
+                        value: po.id,
+                      }))}
+                      disabled={readonly || !formData.contactId}
+                      placeholder={t("placeholder_select_purchase_order")}
+                    />
+
+                    <CustomSelect
+                      label={t("purchase_invoice_optional")}
+                      value={formData.purchaseInvoiceId || ""}
+                      onValueChange={(val: any) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          purchaseInvoiceId: val,
+                        }))
+                      }
+                      options={filteredPurchaseInvoices.map((pi) => ({
+                        label: pi.invoiceNumber,
+                        value: pi.id,
+                      }))}
+                      disabled={readonly || !formData.contactId}
+                      placeholder={t("placeholder_select_invoice")}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("return_date")}
+                      type="date"
+                      value={
+                        formData.returnDate instanceof Date
+                          ? formData.returnDate.toISOString().split("T")[0]
+                          : formData.returnDate
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          returnDate: new Date(e.target.value),
+                        }))
+                      }
+                      disabled={readonly}
+                    />
+
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1">
+                        <CustomSelect
+                          label={t("status")}
+                          value={formData.status || "DRAFT"}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          onValueChange={(val: any) =>
+                            setFormData((prev) => ({ ...prev, status: val }))
+                          }
+                          options={[
+                            { label: t("status_draft"), value: "DRAFT" },
+                            {
+                              label: t("status_approved"),
+                              value: "APPROVED",
+                            },
+                            {
+                              label: t("status_completed"),
+                              value: "COMPLETED",
+                            },
+                            {
+                              label: t("status_cancelled"),
+                              value: "CANCELLED",
+                            },
+                          ]}
+                          disabled={
+                            readonly ||
+                            returnItem?.status === "COMPLETED" ||
+                            returnItem?.status === "CANCELLED"
+                          }
+                        />
+                      </div>
+                      {returnItem && (
+                        <div className="pb-1">
+                          <StatusHistoryDialog
+                            events={[
+                              {
+                                event: "Created",
+                                at: returnItem.createdAt,
+                                byName: returnItem.createdBy?.name,
+                              },
+                              {
+                                event: "Last Updated",
+                                at: returnItem.updatedAt,
+                                byName: returnItem.updatedBy?.name,
+                              },
+                              {
+                                event: "Approved",
+                                at: returnItem.approvedAt,
+                                byName: returnItem.approvedBy?.name,
+                              },
+                              {
+                                event: "Completed",
+                                at: returnItem.completedAt,
+                                byName: returnItem.completedBy?.name,
+                              },
+                              {
+                                event: "Cancelled",
+                                at: returnItem.cancelledAt,
+                                byName: returnItem.cancelledBy?.name,
+                              },
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("department")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.departmentId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            departmentId: val || null,
+                          }))
+                        }
+                        options={departments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
+                        }))}
+                        placeholder={t("placeholder_select_department")}
+                        disabled={readonly}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("project")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.projectId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            projectId: val || null,
+                          }))
+                        }
+                        options={projects.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                        }))}
+                        placeholder={t("placeholder_select_project")}
+                        disabled={readonly}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAttachmentDialogOpen(true)}
+                      className="w-fit"
+                    >
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      {tCommon("attachments")} ({attachments.length})
+                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      {attachments.map((file) => (
+                        <div
+                          key={file.id}
+                          className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
+                        >
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                          >
+                            {file.name}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <CustomTextarea
+                  value={formData.notes || ""}
+                  label={t("notes")}
+                  className="resize-none h-[77%]"
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
+                  placeholder={t("placeholder_notes")}
+                  disabled={readonly}
+                />
+              </div>
+            </CollapsibleSection>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between py-3">

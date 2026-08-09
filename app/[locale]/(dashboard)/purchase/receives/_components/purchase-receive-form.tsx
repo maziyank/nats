@@ -60,6 +60,7 @@ import {
 } from "@/components/layout/page/form-layout";
 import { useTranslations } from "next-intl";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 
 interface ProductForSelect {
   id: string;
@@ -364,203 +365,209 @@ export function PurchaseReceiveForm({
 
         <PageFormContent className="grid gap-3 mt-3 p-0 bg-transparent border-none shadow-none">
           <div className="space-y-3">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("receive_number")}
-                        value={
-                          receive?.receiveNumber ||
-                          t("placeholder_auto_generate")
-                        }
-                        disabled={true}
-                      />
-                      <div>
-                        <label className="text-sm font-medium">
-                          {t("vendor")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.contactId}
-                          onValueChange={(val) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              contactId: val || "",
-                              purchaseOrderId: undefined,
-                            }));
-                          }}
-                          options={vendors.map((v) => ({
-                            label: v.name,
-                            value: v.id,
-                            icon: (
-                              <Avatar size="sm">
-                                <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
-                                  {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ),
-                          }))}
-                          placeholder={t("placeholder_select_vendor")}
-                          disabled={readonly || !!formData.purchaseOrderId}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomSelect
-                        label={t("purchase_order_optional")}
-                        value={formData.purchaseOrderId || ""}
-                        onValueChange={(val) => handlePurchaseOrderChange(val)}
-                        options={filteredPurchaseOrders.map((po) => ({
-                          label: po.orderNumber,
-                          value: po.id,
-                        }))}
-                        placeholder={t("placeholder_select_purchase_order")}
-                        disabled={readonly || !formData.contactId}
-                      />
-
-                      <CustomInput
-                        label={tCommon("date")}
-                        type="date"
-                        value={
-                          formData.receiveDate
-                            ? formData.receiveDate.toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
+            <CollapsibleSection
+              title={t("overview") || "Overview"}
+              collapsedContent={
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  <span>{t("receive_number")}: {receive?.receiveNumber || "-"}</span>
+                  <span>{t("vendor")}: {vendors.find((v) => v.id === formData.contactId)?.name || "-"}</span>
+                </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("receive_number")}
+                      value={
+                        receive?.receiveNumber ||
+                        t("placeholder_auto_generate")
+                      }
+                      disabled={true}
+                    />
+                    <div>
+                      <label className="text-sm font-medium">
+                        {t("vendor")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.contactId}
+                        onValueChange={(val) => {
                           setFormData((prev) => ({
                             ...prev,
-                            receiveDate: e.target.value
-                              ? new Date(e.target.value)
-                              : new Date(),
-                          }))
-                        }
-                        disabled={readonly}
-                        required
+                            contactId: val || "",
+                            purchaseOrderId: undefined,
+                          }));
+                        }}
+                        options={vendors.map((v) => ({
+                          label: v.name,
+                          value: v.id,
+                          icon: (
+                            <Avatar size="sm">
+                              <AvatarFallback className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                                {v.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ),
+                        }))}
+                        placeholder={t("placeholder_select_vendor")}
+                        disabled={readonly || !!formData.purchaseOrderId}
                       />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("department")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.departmentId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              departmentId: val || null,
-                            }))
-                          }
-                          options={departments.map((d) => ({
-                            value: d.id,
-                            label: d.name,
-                          }))}
-                          placeholder={t("placeholder_select_department")}
-                          disabled={readonly}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("project")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.projectId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              projectId: val || null,
-                            }))
-                          }
-                          options={projects.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))}
-                          placeholder={t("placeholder_select_project")}
-                          disabled={readonly}
-                        />
-                      </div>
-                    </div>
-
-                    {isEditing && (
-                      <div className="grid grid-cols-2 gap-2 items-end">
-                        <CustomSelect
-                          label={t("status")}
-                          value={status}
-                          onValueChange={(val) =>
-                            setStatus(
-                              val as "DRAFT" | "COMPLETED" | "CANCELLED",
-                            )
-                          }
-                          options={[
-                            { value: "DRAFT", label: "Draft" },
-                            { value: "COMPLETED", label: "Completed" },
-                            { value: "CANCELLED", label: "Cancelled" },
-                          ]}
-                          disabled={readonly || receive.status === "COMPLETED"}
-                        />
-                        {receive && (
-                          <div className="pb-1">
-                            <StatusHistoryDialog
-                              events={[
-                                {
-                                  event: "Created",
-                                  at: receive.createdAt,
-                                  byName: receive.createdBy?.name,
-                                },
-                                {
-                                  event: "Last Updated",
-                                  at: receive.updatedAt,
-                                  byName: receive.updatedBy?.name,
-                                },
-                                {
-                                  event: "Completed",
-                                  at: receive.completedAt,
-                                  byName: receive.completedBy?.name,
-                                },
-                                {
-                                  event: "Cancelled",
-                                  at: receive.cancelledAt,
-                                  byName: receive.cancelledBy?.name,
-                                },
-                              ]}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsAttachmentDialogOpen(true)}
-                        className="w-fit"
-                      >
-                        <Paperclip className="mr-2 h-4 w-4" />
-                        {tCommon("attachments")} ({attachments.length})
-                      </Button>
                     </div>
                   </div>
 
-                  <CustomTextarea
-                    value={formData.notes || ""}
-                    label={t("notes")}
-                    className="resize-none h-[80%]"
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notes: e.target.value,
-                      }))
-                    }
-                    placeholder={t("placeholder_notes")}
-                    disabled={readonly}
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomSelect
+                      label={t("purchase_order_optional")}
+                      value={formData.purchaseOrderId || ""}
+                      onValueChange={(val) => handlePurchaseOrderChange(val)}
+                      options={filteredPurchaseOrders.map((po) => ({
+                        label: po.orderNumber,
+                        value: po.id,
+                      }))}
+                      placeholder={t("placeholder_select_purchase_order")}
+                      disabled={readonly || !formData.contactId}
+                    />
+
+                    <CustomInput
+                      label={tCommon("date")}
+                      type="date"
+                      value={
+                        formData.receiveDate
+                          ? formData.receiveDate.toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          receiveDate: e.target.value
+                            ? new Date(e.target.value)
+                            : new Date(),
+                        }))
+                      }
+                      disabled={readonly}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("department")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.departmentId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            departmentId: val || null,
+                          }))
+                        }
+                        options={departments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
+                        }))}
+                        placeholder={t("placeholder_select_department")}
+                        disabled={readonly}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("project")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.projectId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            projectId: val || null,
+                          }))
+                        }
+                        options={projects.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                        }))}
+                        placeholder={t("placeholder_select_project")}
+                        disabled={readonly}
+                      />
+                    </div>
+                  </div>
+
+                  {isEditing && (
+                    <div className="grid grid-cols-2 gap-2 items-end">
+                      <CustomSelect
+                        label={t("status")}
+                        value={status}
+                        onValueChange={(val) =>
+                          setStatus(
+                            val as "DRAFT" | "COMPLETED" | "CANCELLED",
+                          )
+                        }
+                        options={[
+                          { value: "DRAFT", label: "Draft" },
+                          { value: "COMPLETED", label: "Completed" },
+                          { value: "CANCELLED", label: "Cancelled" },
+                        ]}
+                        disabled={readonly || receive.status === "COMPLETED"}
+                      />
+                      {receive && (
+                        <div className="pb-1">
+                          <StatusHistoryDialog
+                            events={[
+                              {
+                                event: "Created",
+                                at: receive.createdAt,
+                                byName: receive.createdBy?.name,
+                              },
+                              {
+                                event: "Last Updated",
+                                at: receive.updatedAt,
+                                byName: receive.updatedBy?.name,
+                              },
+                              {
+                                event: "Completed",
+                                at: receive.completedAt,
+                                byName: receive.completedBy?.name,
+                              },
+                              {
+                                event: "Cancelled",
+                                at: receive.cancelledAt,
+                                byName: receive.cancelledBy?.name,
+                              },
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAttachmentDialogOpen(true)}
+                      className="w-fit"
+                    >
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      {tCommon("attachments")} ({attachments.length})
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+
+                <CustomTextarea
+                  value={formData.notes || ""}
+                  label={t("notes")}
+                  className="resize-none h-[80%]"
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
+                  placeholder={t("placeholder_notes")}
+                  disabled={readonly}
+                />
+              </div>
+            </CollapsibleSection>
 
             <Card>
               <CardContent className="p-0">

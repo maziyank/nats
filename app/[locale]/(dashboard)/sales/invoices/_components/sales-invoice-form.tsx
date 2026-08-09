@@ -34,6 +34,7 @@ import {
 } from "@dnd-kit/sortable";
 import { Loader2, Trash2, PlusIcon } from "lucide-react";
 import { StatusHistoryDialog } from "@/components/ui/status-history-dialog";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import {
   createSalesInvoice,
   updateSalesInvoice,
@@ -487,260 +488,267 @@ export function SalesInvoiceForm({
         </PageFormHeader>
         <PageFormContent className="grid gap-3 mt-3 p-0 bg-transparent border-none shadow-none">
           <div className="space-y-3">
-            <Card>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-2">
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomSelect
-                        label={t("sales_order_optional")}
-                        value={formData.salesOrderId || "none"}
-                        onValueChange={(val) =>
-                          handleSalesOrderChange(val === "none" ? "" : val)
-                        }
-                        placeholder="Select Sales Order"
-                        disabled={readonly}
-                      >
-                        <SelectItem value="none">None</SelectItem>
-                        {filteredSalesOrders.map((so) => (
-                          <SelectItem key={so.id} value={so.id}>
-                            <div className="flex items-center">
-                              <span>{so.orderNumber}</span>
-                              <span className="text-muted-foreground ml-2">
-                                ({so.contact.name})
-                              </span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </CustomSelect>
-
-                      <CustomInput
-                        label={t("invoice_number")}
-                        value={formData.invoiceNumber}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            invoiceNumber: e.target.value,
-                          }))
-                        }
-                        placeholder="Leave empty to auto-generate"
-                        disabled={readonly}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <CustomInput
-                        label={t("invoice_date")}
-                        type="date"
-                        value={
-                          formData.invoiceDate
-                            ? format(formData.invoiceDate, "yyyy-MM-dd")
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            invoiceDate: e.target.value
-                              ? new Date(e.target.value)
-                              : new Date(),
-                          }))
-                        }
-                        disabled={readonly}
-                      />
-
-                      <CustomInput
-                        label={t("due_date")}
-                        type="date"
-                        value={
-                          formData.dueDate
-                            ? format(formData.dueDate, "yyyy-MM-dd")
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            dueDate: e.target.value
-                              ? new Date(e.target.value)
-                              : new Date(),
-                          }))
-                        }
-                        disabled={readonly}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("customer")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.contactId}
-                          onValueChange={(val) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              contactId: val as string,
-                              salesOrderId: undefined,
-                            }));
-                          }}
-                          options={customers.map((c) => ({
-                            value: c.id,
-                            label: c.name,
-                            icon: (
-                              <Avatar size="sm">
-                                <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                                  {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
-                                </AvatarFallback>
-                              </Avatar>
-                            ),
-                          }))}
-                          placeholder="Select Customer"
-                          disabled={readonly || !!formData.salesOrderId}
-                        />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("department")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.departmentId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              departmentId: val || null,
-                            }))
-                          }
-                          options={departments.map((d) => ({
-                            value: d.id,
-                            label: d.name,
-                          }))}
-                          placeholder={t("placeholder_select_department")}
-                          disabled={readonly}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">
-                          {t("project")}
-                        </label>
-                        <SearchableSelect
-                          value={formData.projectId || ""}
-                          onValueChange={(val) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              projectId: val || null,
-                            }))
-                          }
-                          options={projects.map((p) => ({
-                            value: p.id,
-                            label: p.name,
-                          }))}
-                          placeholder={t("placeholder_select_project")}
-                          disabled={readonly}
-                        />
-                      </div>
-                    </div>
-
-                    {isEditing && (
-                      <div className="flex items-end gap-2">
-                        <div className="flex-1">
-                          <CustomSelect
-                            value={formData.status}
-                            label={t("status")}
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            onValueChange={(val: any) =>
-                              setFormData((prev) => ({ ...prev, status: val }))
-                            }
-                            disabled={
-                              readonly ||
-                              invoice.status === "PAID" ||
-                              invoice.status === "CANCELLED"
-                            }
-                          >
-                            <SelectItem value="DRAFT">Draft</SelectItem>
-                            <SelectItem value="ISSUED">Issued</SelectItem>
-                            <SelectItem value="PAID">Paid</SelectItem>
-                            <SelectItem value="PARTIALLY_PAID">
-                              Partially Paid
-                            </SelectItem>
-                            <SelectItem value="CANCELLED">Cancelled</SelectItem>
-                          </CustomSelect>
-                        </div>
-                        {invoice && (
-                          <div className="pb-1">
-                            <StatusHistoryDialog
-                              events={[
-                                {
-                                  event: "Created",
-                                  at: invoice.createdAt,
-                                  byName: invoice.createdBy?.name,
-                                },
-                                {
-                                  event: "Last Updated",
-                                  at: invoice.updatedAt,
-                                  byName: invoice.updatedBy?.name,
-                                },
-                                {
-                                  event: "Issued",
-                                  at: invoice.issuedAt,
-                                  byName: invoice.issuedBy?.name,
-                                },
-                                {
-                                  event: "Cancelled",
-                                  at: invoice.cancelledAt,
-                                  byName: invoice.cancelledBy?.name,
-                                },
-                              ]}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  <CustomTextarea
-                    value={formData.notes || ""}
-                    label={t("notes")}
-                    className="resize-none h-[85%]"
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        notes: e.target.value,
-                      }))
-                    }
-                    placeholder="Add notes here..."
-                    disabled={readonly}
-                  />
+            <CollapsibleSection
+              title={t("overview") || "Overview"}
+              collapsedContent={
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span><strong>{t("invoice_number")}:</strong> {formData.invoiceNumber || "-"}</span>
+                  <span><strong>{t("customer")}:</strong> {customers.find(c => c.id === formData.contactId)?.name || "-"}</span>
+                  <span><strong>{t("invoice_date")}:</strong> {formData.invoiceDate ? format(formData.invoiceDate, "dd MMM yyyy") : "-"}</span>
                 </div>
+              }
+            >
+              <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsAttachmentDialogOpen(true)}
-                    className="w-fit"
-                  >
-                    <Paperclip className="mr-2 h-4 w-4" />
-                    Attachments ({attachments.length})
-                  </Button>
-                  <div className="flex flex-wrap gap-2">
-                    {attachments.map((file) => (
-                      <div
-                        key={file.id}
-                        className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
-                      >
-                        <a
-                          href={file.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="hover:underline"
-                        >
-                          {file.name}
-                        </a>
-                      </div>
-                    ))}
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomSelect
+                      label={t("sales_order_optional")}
+                      value={formData.salesOrderId || "none"}
+                      onValueChange={(val) =>
+                        handleSalesOrderChange(val === "none" ? "" : val)
+                      }
+                      placeholder="Select Sales Order"
+                      disabled={readonly}
+                    >
+                      <SelectItem value="none">None</SelectItem>
+                      {filteredSalesOrders.map((so) => (
+                        <SelectItem key={so.id} value={so.id}>
+                          <div className="flex items-center">
+                            <span>{so.orderNumber}</span>
+                            <span className="text-muted-foreground ml-2">
+                              ({so.contact.name})
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </CustomSelect>
+
+                    <CustomInput
+                      label={t("invoice_number")}
+                      value={formData.invoiceNumber}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          invoiceNumber: e.target.value,
+                        }))
+                      }
+                      placeholder="Leave empty to auto-generate"
+                      disabled={readonly}
+                    />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomInput
+                      label={t("invoice_date")}
+                      type="date"
+                      value={
+                        formData.invoiceDate
+                          ? format(formData.invoiceDate, "yyyy-MM-dd")
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          invoiceDate: e.target.value
+                            ? new Date(e.target.value)
+                            : new Date(),
+                        }))
+                      }
+                      disabled={readonly}
+                    />
+
+                    <CustomInput
+                      label={t("due_date")}
+                      type="date"
+                      value={
+                        formData.dueDate
+                          ? format(formData.dueDate, "yyyy-MM-dd")
+                          : ""
+                      }
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          dueDate: e.target.value
+                            ? new Date(e.target.value)
+                            : new Date(),
+                        }))
+                      }
+                      disabled={readonly}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("customer")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.contactId}
+                        onValueChange={(val) => {
+                          setFormData((prev) => ({
+                            ...prev,
+                            contactId: val as string,
+                            salesOrderId: undefined,
+                          }));
+                        }}
+                        options={customers.map((c) => ({
+                          value: c.id,
+                          label: c.name,
+                          icon: (
+                            <Avatar size="sm">
+                              <AvatarFallback className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                                {c.name.split(" ").map((w) => w[0]).filter(Boolean).slice(0, 2).join("").toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                          ),
+                        }))}
+                        placeholder="Select Customer"
+                        disabled={readonly || !!formData.salesOrderId}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("department")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.departmentId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            departmentId: val || null,
+                          }))
+                        }
+                        options={departments.map((d) => ({
+                          value: d.id,
+                          label: d.name,
+                        }))}
+                        placeholder={t("placeholder_select_department")}
+                        disabled={readonly}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {t("project")}
+                      </label>
+                      <SearchableSelect
+                        value={formData.projectId || ""}
+                        onValueChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            projectId: val || null,
+                          }))
+                        }
+                        options={projects.map((p) => ({
+                          value: p.id,
+                          label: p.name,
+                        }))}
+                        placeholder={t("placeholder_select_project")}
+                        disabled={readonly}
+                      />
+                    </div>
+                  </div>
+
+                  {isEditing && (
+                    <div className="flex items-end gap-2">
+                      <div className="flex-1">
+                        <CustomSelect
+                          value={formData.status}
+                          label={t("status")}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          onValueChange={(val: any) =>
+                            setFormData((prev) => ({ ...prev, status: val }))
+                          }
+                          disabled={
+                            readonly ||
+                            invoice.status === "PAID" ||
+                            invoice.status === "CANCELLED"
+                          }
+                        >
+                          <SelectItem value="DRAFT">Draft</SelectItem>
+                          <SelectItem value="ISSUED">Issued</SelectItem>
+                          <SelectItem value="PAID">Paid</SelectItem>
+                          <SelectItem value="PARTIALLY_PAID">
+                            Partially Paid
+                          </SelectItem>
+                          <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                        </CustomSelect>
+                      </div>
+                      {invoice && (
+                        <div className="pb-1">
+                          <StatusHistoryDialog
+                            events={[
+                              {
+                                event: "Created",
+                                at: invoice.createdAt,
+                                byName: invoice.createdBy?.name,
+                              },
+                              {
+                                event: "Last Updated",
+                                at: invoice.updatedAt,
+                                byName: invoice.updatedBy?.name,
+                              },
+                              {
+                                event: "Issued",
+                                at: invoice.issuedAt,
+                                byName: invoice.issuedBy?.name,
+                              },
+                              {
+                                event: "Cancelled",
+                                at: invoice.cancelledAt,
+                                byName: invoice.cancelledBy?.name,
+                              },
+                            ]}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
+
+                <CustomTextarea
+                  value={formData.notes || ""}
+                  label={t("notes")}
+                  className="resize-none h-[85%]"
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      notes: e.target.value,
+                    }))
+                  }
+                  placeholder="Add notes here..."
+                  disabled={readonly}
+                />
+              </div>
+              <div className="flex flex-col gap-2 mt-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAttachmentDialogOpen(true)}
+                  className="w-fit"
+                >
+                  <Paperclip className="mr-2 h-4 w-4" />
+                  Attachments ({attachments.length})
+                </Button>
+                <div className="flex flex-wrap gap-2">
+                  {attachments.map((file) => (
+                    <div
+                      key={file.id}
+                      className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
+                    >
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {file.name}
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </CollapsibleSection>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between py-3">

@@ -26,6 +26,7 @@ import {
   PageFormTitle,
 } from "@/components/layout/page/form-layout";
 import { useTranslations } from "next-intl";
+import { CollapsibleSection } from "@/components/ui/collapsible-section";
 import {
   PurchaseInvoice,
   Contact,
@@ -251,212 +252,225 @@ export function PurchasePaymentForm({
             )}
           </PageFormActions>
         </PageFormHeader>
-        <PageFormContent className="grid gap-6 md:grid-cols-2 pt-6 mt-4">
-          <CustomSelect
-            label={t("invoice")}
-            value={formData.purchaseInvoiceId}
-            onValueChange={(val) =>
-              setFormData((prev) => ({ ...prev, purchaseInvoiceId: val }))
+        <PageFormContent className="grid gap-6 pt-6 mt-4">
+          <CollapsibleSection
+            title={t("overview") || "Overview"}
+            collapsedContent={
+              <div className="flex gap-4 text-sm text-muted-foreground">
+                <span>{t("payment_number")}: {formData.paymentNumber || "-"}</span>
+                <span>{t("amount")}: {formatCurrency(formData.amount)}</span>
+                <span>{t("payment_date")}: {dateStr || "-"}</span>
+              </div>
             }
-            placeholder={t("placeholder_select_invoice")}
-            disabled={readonly || !!initialData}
           >
-            {initialData && readonly && initialData.purchaseInvoice ? (
-              <SelectItem value={initialData.purchaseInvoice.id}>
-                {initialData.purchaseInvoice.invoiceNumber} -{" "}
-                {initialData.contact?.name}
-              </SelectItem>
-            ) : (
-              invoicesData?.map((invoice) => {
-                const totalPaid = invoice.payments.reduce(
-                  (sum: number, p: any) => sum + Number(p.amount),
-                  0,
-                );
-                const remaining = Number(invoice.totalAmount) - totalPaid;
-                return (
-                  <SelectItem key={invoice.id} value={invoice.id}>
-                    {invoice.invoiceNumber} - {invoice.contact.name} (Due:{" "}
-                    {formatCurrency(remaining)})
-                  </SelectItem>
-                );
-              })
-            )}
-          </CustomSelect>
-
-          <CustomInput
-            label={t("payment_number")}
-            value={formData.paymentNumber}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                paymentNumber: e.target.value,
-              }))
-            }
-            placeholder={t("placeholder_auto_generate")}
-            disabled={readonly || !!initialData}
-          />
-
-          <CustomInput
-            label={t("payment_date")}
-            type="date"
-            value={dateStr}
-            onChange={(e) => setDateStr(e.target.value)}
-            disabled={readonly}
-            required
-          />
-
-          <CustomSelect
-            label={t("deposit_from")}
-            value={formData.cashAccountId}
-            onValueChange={(val) =>
-              setFormData((prev) => ({ ...prev, cashAccountId: val }))
-            }
-            placeholder={t("placeholder_select_account")}
-            disabled={readonly}
-          >
-            {readonly && initialData?.cashAccount ? (
-              <SelectItem value={initialData.cashAccount.id}>
-                {initialData.cashAccount.name}
-              </SelectItem>
-            ) : (
-              cashAccountsData?.map((account) => (
-                <SelectItem key={account.id} value={account.id}>
-                  {account.name} ({account.accountNumber})
-                </SelectItem>
-              ))
-            )}
-          </CustomSelect>
-
-          <CustomInput
-            label={t("amount")}
-            type="number"
-            step="0.01"
-            value={formData.amount}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                amount: Number(e.target.value),
-              }))
-            }
-            placeholder="0.00"
-            disabled={readonly}
-            min={0}
-          />
-
-          <CustomInput
-            label={t("reference")}
-            value={formData.reference || ""}
-            onChange={(e) =>
-              setFormData((prev) => ({
-                ...prev,
-                reference: e.target.value,
-              }))
-            }
-            placeholder={t("placeholder_reference")}
-            disabled={readonly}
-          />
-
-          <div className="md:col-span-2 grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t("department")}</label>
-              <SearchableSelect
-                value={formData.departmentId || ""}
+            <div className="grid gap-6 md:grid-cols-2">
+              <CustomSelect
+                label={t("invoice")}
+                value={formData.purchaseInvoiceId}
                 onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, purchaseInvoiceId: val }))
+                }
+                placeholder={t("placeholder_select_invoice")}
+                disabled={readonly || !!initialData}
+              >
+                {initialData && readonly && initialData.purchaseInvoice ? (
+                  <SelectItem value={initialData.purchaseInvoice.id}>
+                    {initialData.purchaseInvoice.invoiceNumber} -{" "}
+                    {initialData.contact?.name}
+                  </SelectItem>
+                ) : (
+                  invoicesData?.map((invoice) => {
+                    const totalPaid = invoice.payments.reduce(
+                      (sum: number, p: any) => sum + Number(p.amount),
+                      0,
+                    );
+                    const remaining = Number(invoice.totalAmount) - totalPaid;
+                    return (
+                      <SelectItem key={invoice.id} value={invoice.id}>
+                        {invoice.invoiceNumber} - {invoice.contact.name} (Due:{" "}
+                        {formatCurrency(remaining)})
+                      </SelectItem>
+                    );
+                  })
+                )}
+              </CustomSelect>
+
+              <CustomInput
+                label={t("payment_number")}
+                value={formData.paymentNumber}
+                onChange={(e) =>
                   setFormData((prev) => ({
                     ...prev,
-                    departmentId: val || null,
+                    paymentNumber: e.target.value,
                   }))
                 }
-                options={departments.map((d) => ({
-                  value: d.id,
-                  label: d.name,
-                }))}
-                placeholder={t("placeholder_select_department")}
-                disabled={readonly}
+                placeholder={t("placeholder_auto_generate")}
+                disabled={readonly || !!initialData}
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">{t("project")}</label>
-              <SearchableSelect
-                value={formData.projectId || ""}
+
+              <CustomInput
+                label={t("payment_date")}
+                type="date"
+                value={dateStr}
+                onChange={(e) => setDateStr(e.target.value)}
+                disabled={readonly}
+                required
+              />
+
+              <CustomSelect
+                label={t("deposit_from")}
+                value={formData.cashAccountId}
                 onValueChange={(val) =>
-                  setFormData((prev) => ({ ...prev, projectId: val || null }))
+                  setFormData((prev) => ({ ...prev, cashAccountId: val }))
                 }
-                options={projects.map((p) => ({
-                  value: p.id,
-                  label: p.name,
-                }))}
-                placeholder={t("placeholder_select_project")}
+                placeholder={t("placeholder_select_account")}
+                disabled={readonly}
+              >
+                {readonly && initialData?.cashAccount ? (
+                  <SelectItem value={initialData.cashAccount.id}>
+                    {initialData.cashAccount.name}
+                  </SelectItem>
+                ) : (
+                  cashAccountsData?.map((account) => (
+                    <SelectItem key={account.id} value={account.id}>
+                      {account.name} ({account.accountNumber})
+                    </SelectItem>
+                  ))
+                )}
+              </CustomSelect>
+
+              <CustomInput
+                label={t("amount")}
+                type="number"
+                step="0.01"
+                value={formData.amount}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    amount: Number(e.target.value),
+                  }))
+                }
+                placeholder="0.00"
+                disabled={readonly}
+                min={0}
+              />
+
+              <CustomInput
+                label={t("reference")}
+                value={formData.reference || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    reference: e.target.value,
+                  }))
+                }
+                placeholder={t("placeholder_reference")}
                 disabled={readonly}
               />
-            </div>
-          </div>
 
-          <div className="md:col-span-2">
-            <CustomTextarea
-              label={t("notes")}
-              value={formData.notes || ""}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, notes: e.target.value }))
-              }
-              placeholder={t("placeholder_notes")}
-              disabled={readonly}
-            />
-          </div>
+              <div className="md:col-span-2 grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("department")}</label>
+                  <SearchableSelect
+                    value={formData.departmentId || ""}
+                    onValueChange={(val) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        departmentId: val || null,
+                      }))
+                    }
+                    options={departments.map((d) => ({
+                      value: d.id,
+                      label: d.name,
+                    }))}
+                    placeholder={t("placeholder_select_department")}
+                    disabled={readonly}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t("project")}</label>
+                  <SearchableSelect
+                    value={formData.projectId || ""}
+                    onValueChange={(val) =>
+                      setFormData((prev) => ({ ...prev, projectId: val || null }))
+                    }
+                    options={projects.map((p) => ({
+                      value: p.id,
+                      label: p.name,
+                    }))}
+                    placeholder={t("placeholder_select_project")}
+                    disabled={readonly}
+                  />
+                </div>
+              </div>
 
-          <div className="md:col-span-2">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium">
-                {tCommon("attachments")}
-              </label>
-              {!readonly && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setAttachmentDialogOpen(true)}
-                >
-                  <Paperclip className="mr-2 h-4 w-4" />
-                  {tCommon("add_files")}
-                </Button>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {attachments.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
-                >
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                  >
-                    {file.name}
-                  </a>
+              <div className="md:col-span-2">
+                <CustomTextarea
+                  label={t("notes")}
+                  value={formData.notes || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, notes: e.target.value }))
+                  }
+                  placeholder={t("placeholder_notes")}
+                  disabled={readonly}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium">
+                    {tCommon("attachments")}
+                  </label>
                   {!readonly && (
-                    <button
+                    <Button
                       type="button"
-                      onClick={() =>
-                        setAttachments((prev) =>
-                          prev.filter((a) => a.id !== file.id),
-                        )
-                      }
-                      className="ml-2 text-muted-foreground hover:text-foreground"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAttachmentDialogOpen(true)}
                     >
-                      ×
-                    </button>
+                      <Paperclip className="mr-2 h-4 w-4" />
+                      {tCommon("add_files")}
+                    </Button>
                   )}
                 </div>
-              ))}
-              {attachments.length === 0 && (
-                <span className="text-sm text-muted-foreground">
-                  {tCommon("no_attachments")}
-                </span>
-              )}
+                <div className="flex flex-wrap gap-2">
+                  {attachments.map((file) => (
+                    <div
+                      key={file.id}
+                      className="flex items-center gap-2 rounded-md border bg-muted px-3 py-1 text-sm"
+                    >
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline"
+                      >
+                        {file.name}
+                      </a>
+                      {!readonly && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setAttachments((prev) =>
+                              prev.filter((a) => a.id !== file.id),
+                            )
+                          }
+                          className="ml-2 text-muted-foreground hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {attachments.length === 0 && (
+                    <span className="text-sm text-muted-foreground">
+                      {tCommon("no_attachments")}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          </CollapsibleSection>
         </PageFormContent>
       </form>
       <AttachmentDialog
