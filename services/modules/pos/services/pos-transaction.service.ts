@@ -6,7 +6,7 @@ import {
   enqueueIntegrationEventOnce,
   maybeProcessIntegrationOutboxEvent,
 } from "@/services/modules/integration/outbox";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
 import { z } from "zod";
 import {

@@ -15,16 +15,16 @@ NATS is a Next.js-based ERP system designed to handle various business functions
 
 ## Screenshots
 
-![1776302209274](image/README/1776302209274.png)
+![1776302209274](doc/assets/images/dashboard.jpg)
 _Main Dashboard View_
 
-![1776302243874](image/README/1776302243874.png)
+![1776302243874](doc/assets/images/accounting.jpg)
 _Accounting Module_
 
-![1776302322989](image/README/1776302322989.png)
+![1776302322989](doc/assets/images/reports.jpg)
 _Financial Report_
 
-![1776302374473](image/README/1776302374473.png)
+![1776302374473](doc/assets/images/pos.jpg)
 _Point of Sale (POS)_
 
 ## Installation Guide

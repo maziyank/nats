@@ -21,7 +21,7 @@ import {
   Check,
 } from "lucide-react";
 import Image from "next/image";
-import type { SkuSearchMetadata, SkuSearchResult } from "@/services/lib/sku-search";
+import type { SkuSearchMetadata, SkuSearchResult } from "@/services/modules/inventory/services/sku-search.service";
 
 interface SkuSearchDialogProps {
   open: boolean;

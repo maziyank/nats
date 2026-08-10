@@ -8,7 +8,7 @@ import {
     RECOMMENDED_DEFAULT_ACCOUNT_MAPPINGS,
     DEFAULT_UNITS,
     DEFAULT_CATEGORIES,
-} from "@/services/lib/setup/chart-of-accounts-template";
+} from "@/services/modules/accounting/services/chart-of-accounts-template";
 import { DefaultAccountPurpose } from "@/prisma/generated/prisma/client";
 
 export type SetupStatus = {

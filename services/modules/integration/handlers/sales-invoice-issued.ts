@@ -1,9 +1,9 @@
 import { Decimal } from "decimal.js";
-import { getRequiredDefaultAccount } from "@/services/lib/accounting/default-account.service";
+import { getRequiredDefaultAccount } from "@/services/modules/accounting/services/default-account.service";
 import { JournalService } from "@/services/modules/accounting/services/journal.service";
 import { salesInvoiceIssuedPayloadSchema } from "@/services/modules/integration/events";
 import type { Prisma } from "@/prisma/generated/prisma/client";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
 
 type Tx = Prisma.TransactionClient;

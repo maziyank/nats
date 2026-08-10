@@ -2,7 +2,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { handlePayrollRunCompleted } from './payroll.handlers';
 import { JournalService } from '@/services/modules/accounting/services/journal.service';
-import * as DefaultAccountsInfo from '@/services/lib/accounting/default-account.service';
+import * as DefaultAccountsInfo from '@/services/modules/accounting/services/default-account.service';
 
 // Mock dependencies
 vi.mock('@/modules/accounting/services/journal.service', () => ({

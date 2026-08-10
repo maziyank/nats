@@ -2,7 +2,7 @@ import { prisma } from "@/services/lib/prisma";
 import { enqueueIntegrationEvent } from "@/services/modules/integration/outbox";
 import { PurchaseOrderInput } from "@/app/[locale]/(dashboard)/purchase/orders/types";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { purchaseOrderSchema } from "@/services/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;

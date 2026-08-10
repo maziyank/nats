@@ -1,7 +1,7 @@
 import { prisma } from "@/services/lib/prisma";
 import { enqueueIntegrationEvent } from "@/services/modules/integration/outbox";
 import { SalesInvoiceInput } from "@/app/[locale]/(dashboard)/sales/invoices/types";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
 import { salesInvoiceSchema, requiredIdSchema } from "@/services/lib/validation/schemas";
 

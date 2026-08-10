@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, CheckCircle2, Warehouse, Package, Ruler } from "lucide-react";
 import { saveInitialWarehouse } from "../actions";
 import { useToast } from "@/hooks/use-toast";
-import { DEFAULT_UNITS, DEFAULT_CATEGORIES } from "@/services/lib/setup/chart-of-accounts-template";
+import { DEFAULT_UNITS, DEFAULT_CATEGORIES } from "@/services/modules/accounting/services/chart-of-accounts-template";
 
 interface StepWarehouseProps {
     onComplete: () => void;

@@ -1,2 +1,2 @@
 /** @deprecated Prefer `@/lib/sku-search` directory imports. */
-export * from "./sku-search/index";
+export * from "../utils/sku-search/index";

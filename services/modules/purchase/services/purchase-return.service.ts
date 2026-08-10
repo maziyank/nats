@@ -1,7 +1,7 @@
 import { prisma } from "@/services/lib/prisma";
 import { enqueueIntegrationEvent } from "@/services/modules/integration/outbox";
 import { PurchaseReturnInput } from "@/app/[locale]/(dashboard)/purchase/returns/types";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { purchaseReturnSchema } from "@/services/lib/validation/schemas";
 
 const INITIAL_DRAFT_STATUS = "DRAFT" as const;

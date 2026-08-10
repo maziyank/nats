@@ -1,7 +1,7 @@
 import { prisma } from "@/services/lib/prisma";
 import { enqueueIntegrationEvent } from "@/services/modules/integration/outbox";
 import { SalesOrderInput } from "@/app/[locale]/(dashboard)/sales/orders/types";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
 import { SalesOrderStatus } from "@/prisma/generated/prisma/client";
 import { z } from "zod";

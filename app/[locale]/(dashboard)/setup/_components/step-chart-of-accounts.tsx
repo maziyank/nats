@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, BookOpen, Briefcase } from "lucide-react";
 import { seedChartOfAccounts } from "../actions";
 import { useToast } from "@/hooks/use-toast";
-import { AVAILABLE_TEMPLATES } from "@/services/lib/setup/chart-of-accounts-template";
+import { AVAILABLE_TEMPLATES } from "@/services/modules/accounting/services/chart-of-accounts-template";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import {

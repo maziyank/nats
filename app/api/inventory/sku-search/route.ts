@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { z } from "zod";
-import { searchProductBySku } from "@/services/lib/sku-search";
+import { searchProductBySku } from "@/services/modules/inventory/services/sku-search.service";
 
 const skuSearchParamsSchema = z.object({
   sku: z.string().min(1),

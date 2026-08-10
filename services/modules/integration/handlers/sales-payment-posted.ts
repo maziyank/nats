@@ -1,5 +1,5 @@
 import { Decimal } from "decimal.js";
-import { getRequiredDefaultAccount } from "@/services/lib/accounting/default-account.service";
+import { getRequiredDefaultAccount } from "@/services/modules/accounting/services/default-account.service";
 import { JournalService } from "@/services/modules/accounting/services/journal.service";
 import { CashTransactionType } from "@/prisma/generated/prisma/client";
 import { salesPaymentPostedPayloadSchema } from "@/services/modules/integration/events";

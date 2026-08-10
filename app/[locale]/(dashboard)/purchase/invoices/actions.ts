@@ -12,7 +12,7 @@ import { PurchaseInvoiceInput } from "./types";
 import { getPurchaseOrder } from "../orders/actions";
 import { getSession } from "@/services/lib/auth/auth";
 import { hasPermission } from "@/services/lib/permissions/utils";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import {
   enqueueIntegrationEventOnce,
   maybeProcessIntegrationOutboxEvent,

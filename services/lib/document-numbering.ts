@@ -1,6 +1,6 @@
 import { prisma } from "@/services/lib/prisma";
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { formatSequence } from "@/services/lib/utils/format-sequence";
+import { formatSequence } from "@/services/lib/format-sequence";
 
 /**
  * Ensures a document numbering format exists for an entity type or creates the default.

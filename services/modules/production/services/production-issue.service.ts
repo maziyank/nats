@@ -2,7 +2,7 @@ import { prisma } from "@/services/lib/prisma";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
 import { InventoryService } from "@/services/modules/inventory/services/inventory.service";
 import { JournalService } from "@/services/modules/accounting/services/journal.service";
-import { getRequiredDefaultAccount } from "@/services/lib/accounting/default-account.service";
+import { getRequiredDefaultAccount } from "@/services/modules/accounting/services/default-account.service";
 
 export interface ProductionIssueInput {
     productionOrderId: string;

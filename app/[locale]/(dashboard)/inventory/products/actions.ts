@@ -252,7 +252,7 @@ export const deleteProduct = authorizedAction(
 import {
   searchProductBySku,
   type SkuSearchResult,
-} from "@/services/lib/sku-search";
+} from "@/services/modules/inventory/services/sku-search.service";
 
 export async function searchSku(
   sku: string,

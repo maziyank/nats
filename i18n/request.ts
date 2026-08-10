@@ -40,7 +40,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
         locale = routing.defaultLocale;
     }
 
-    const localeMessages = (await import(`../messages/${locale}.json`)).default;
+    const localeMessages = (await import(`./translations/${locale}.json`)).default;
 
     // Use English as fallback for any keys missing in the selected locale
     if (locale === routing.defaultLocale) {
@@ -50,7 +50,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
         };
     }
 
-    const enMessages = (await import(`../messages/en.json`)).default;
+    const enMessages = (await import(`./translations/en.json`)).default;
 
     return {
         locale,

@@ -2,7 +2,7 @@ import { prisma } from "@/services/lib/prisma";
 import { enqueueIntegrationEvent } from "@/services/modules/integration/outbox";
 import { SalesReturnInput } from "@/app/[locale]/(dashboard)/sales/returns/types";
 import { generateDocumentNumber } from "@/services/lib/document-numbering";
-import { CalculationService } from "@/services/lib/utils/calculation-service";
+import { CalculationService } from "@/services/lib/calculation-service";
 import { z } from "zod";
 import { requiredIdSchema, dateSchema } from "@/services/lib/validation/schemas";
 
