@@ -521,7 +521,6 @@ export function PurchaseOrderForm({
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={() => setIsReportPreviewOpen(true)}
               >
                 <PrinterIcon className="mr-2 h-4 w-4" />
@@ -540,7 +539,6 @@ export function PurchaseOrderForm({
           <Button
             type="button"
             variant="outline"
-            size="sm"
             onClick={() => router.back()}
           >
             <ArrowLeftSquare className="mr-2 h-4 w-4" />

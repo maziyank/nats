@@ -345,7 +345,6 @@ export function PurchaseReturnForm({
             <Button
               type="button"
               variant="outline"
-              size="sm"
               onClick={() => {
                 if (window.history.length > 1) {
                   router.back();

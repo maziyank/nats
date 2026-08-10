@@ -239,7 +239,7 @@ export function ProductionReceiptForm({
                             </Button>
                         </>
                     )}
-                    <Button type="button" variant="outline" size="sm" onClick={() => router.back()}>
+                    <Button type="button" variant="outline" onClick={() => router.back()}>
                         <ArrowLeftSquare className="mr-2 h-4 w-4" />
                         {tCommon("back")}
                     </Button>

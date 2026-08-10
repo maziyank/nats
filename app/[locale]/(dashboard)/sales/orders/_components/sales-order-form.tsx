@@ -493,7 +493,6 @@ export function SalesOrderForm({
               <Button
                 type="button"
                 variant="outline"
-                size="sm"
                 onClick={() => setIsReportPreviewOpen(true)}
               >
                 <PrinterIcon className="mr-2 h-4 w-4" />
@@ -512,7 +511,6 @@ export function SalesOrderForm({
           <Button
             type="button"
             variant="outline"
-            size="sm"
             onClick={() => {
               if (window.history.length > 1) {
                 router.back();

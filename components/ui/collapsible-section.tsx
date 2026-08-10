@@ -30,7 +30,7 @@ export function CollapsibleSection({
           type="button"
           variant="ghost"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-full justify-start p-2 h-auto font-medium hover:bg-transparent rounded-t-xl"
+          className={cn("w-full justify-start p-2 h-auto font-medium hover:bg-transparent rounded-t-xl")}
         >
           {isCollapsed ? (
             <ChevronRight className="mr-2 h-4 w-4" />
