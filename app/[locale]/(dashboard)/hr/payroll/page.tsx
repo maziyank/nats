@@ -20,7 +20,7 @@ import {
     PageListContent,
 } from "@/components/layout/page/list-layout";
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { PayrollPeriod, PayrollPeriodStatus } from "@/prisma/generated/prisma/client";
 import { getTranslations } from "next-intl/server";
 

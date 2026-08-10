@@ -1,5 +1,5 @@
 import { ReportAccountLine } from "../actions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { TableRow, TableCell } from "@/components/ui/table";
 

@@ -1,8 +1,8 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { compare, hash } from "bcryptjs";
-import { createSession, deleteSession } from "@/lib/auth/auth";
+import { createSession, deleteSession } from "@/services/lib/auth/auth";
 import { redirect } from "next/navigation";
 
 export async function login(prevState: unknown, formData: FormData) {

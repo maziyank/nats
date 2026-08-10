@@ -1,14 +1,14 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import {
   CalculatedAccount,
   TrialBalanceItem,
   TrialBalanceResult,
 } from "../types";
 
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getCumulativeBalancesAsOf } from "@/modules/accounting/services/period-balance.service";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getCumulativeBalancesAsOf } from "@/services/modules/accounting/services/period-balance.service";
 
 /**
  * Fetch Trial Balance report.

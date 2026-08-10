@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { CustomInput } from "@/components/ui/custom-input"
 import { Loader2, PrinterIcon } from "lucide-react"
 import { useFormatCurrency } from "@/hooks/use-format-currency"
-import { cn } from "@/lib/utils"
+import { cn } from "@/services/lib/utils"
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 export default function TaxSummaryPage() {
   const formatCurrency = useFormatCurrency()

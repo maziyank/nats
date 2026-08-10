@@ -19,7 +19,7 @@ import { createPayrollPeriod } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
 import {
     Popover,

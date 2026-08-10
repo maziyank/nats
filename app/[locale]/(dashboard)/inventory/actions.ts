@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 export async function getInventoryDashboardMetrics() {
   const session = await getSession();

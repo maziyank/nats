@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, FileSpreadsheet, FileText, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { ExportFormat } from "@/lib/export";
+import type { ExportFormat } from "@/services/lib/export";
 
 export type ReportExportButtonProps = {
   onExportCsv: () => void | Promise<void>;

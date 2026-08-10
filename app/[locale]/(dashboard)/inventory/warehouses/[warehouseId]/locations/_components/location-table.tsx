@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { useConfirm } from "@/hooks/use-confirm";
 import { DataTable, Column } from "@/components/ui/data-table";
 import { LocationDialog } from "./location-dialog";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 interface LocationTableProps {

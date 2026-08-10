@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useFormatDate } from "@/hooks/use-format-date";
 import { ExportButton } from "../_components/export-button";
 import { useReportExport } from "@/hooks/use-report-export";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 export default function FinancialRatiosPage() {
   const formatDate = useFormatDate();

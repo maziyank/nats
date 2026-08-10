@@ -48,7 +48,7 @@ import { createBatchMovement } from "../actions";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { SortableTableRow } from "@/components/ui/sortable-row";
-import { generateId } from "@/lib/utils";
+import { generateId } from "@/services/lib/utils";
 
 interface BatchMovementFormProps {
   products: (Omit<

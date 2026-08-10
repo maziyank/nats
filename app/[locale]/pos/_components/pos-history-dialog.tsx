@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getPOSSessionTransactions } from '../actions';
-import { SuperJSON } from '@/lib/superjson';
+import { SuperJSON } from '@/services/lib/superjson';
 import {
   Dialog,
   DialogContent,

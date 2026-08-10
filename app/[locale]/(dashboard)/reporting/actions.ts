@@ -1,10 +1,10 @@
 "use server";
 
-import { serverRegistry } from "@/lib/reporting/server-registry";
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/auth";
-import { SuperJSON } from "@/lib/superjson";
-import { ReportFormat } from "@/lib/reporting/types";
+import { serverRegistry } from "@/services/lib/reporting/server-registry";
+import { prisma } from "@/services/lib/prisma";
+import { getSession } from "@/services/lib/auth/auth";
+import { SuperJSON } from "@/services/lib/superjson";
+import { ReportFormat } from "@/services/lib/reporting/types";
 import { getTranslations } from "next-intl/server";
 
 export async function getReportData(code: string, input: any) {

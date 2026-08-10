@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { EmployeeForm } from "../_components/employee-form";
 
 import { getEmployee } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 export default async function EmployeeDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const session = await getSession();

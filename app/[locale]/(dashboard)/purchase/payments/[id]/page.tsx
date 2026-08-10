@@ -4,7 +4,7 @@ import { getPurchasePayment } from "../actions";
 import { PurchasePaymentForm } from "../_components/purchase-payment-form";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { PurchasePaymentWithDetails } from "../types";
 import { getDepartments, getProjects } from "@/app/[locale]/(dashboard)/accounting/journal-entries/actions";
 

@@ -1,5 +1,5 @@
 import { checkBudgetAvailability } from "./actions";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // Mocking Prisma

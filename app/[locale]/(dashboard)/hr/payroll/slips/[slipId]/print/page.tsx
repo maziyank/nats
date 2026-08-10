@@ -1,10 +1,10 @@
 export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { getSalarySlip } from "../../../actions";
 import { PayslipPrint } from "./_components/payslip-print";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 interface PageProps {
     params: Promise<{ slipId: string }>;

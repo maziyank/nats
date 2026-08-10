@@ -15,7 +15,7 @@ import { Search, RotateCcw, Trash2, User } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getHeldOrders, resumeOrder, deleteHeldOrder } from "../actions";
 import { POSCartItem } from "../types";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { formatDistanceToNow } from "date-fns";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { useToast } from "@/hooks/use-toast";

@@ -1,5 +1,5 @@
 import { useCompanyProfile } from "@/components/providers/session-provider";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/services/lib/utils";
 import { useCallback } from "react";
 
 export function useFormatDate() {

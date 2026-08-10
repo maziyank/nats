@@ -1,14 +1,14 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { prisma } from "@/services/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { revalidatePath } from "next/cache";
 import {
     AVAILABLE_TEMPLATES,
     RECOMMENDED_DEFAULT_ACCOUNT_MAPPINGS,
     DEFAULT_UNITS,
     DEFAULT_CATEGORIES,
-} from "@/lib/setup/chart-of-accounts-template";
+} from "@/services/lib/setup/chart-of-accounts-template";
 import { DefaultAccountPurpose } from "@/prisma/generated/prisma/client";
 
 export type SetupStatus = {

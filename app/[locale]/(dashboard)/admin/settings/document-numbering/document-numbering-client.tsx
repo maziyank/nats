@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
-import { formatSequence } from "@/lib/utils/format-sequence";
+import { formatSequence } from "@/services/lib/utils/format-sequence";
 import { DocumentNumberingForm } from "./document-numbering-form";
 
 interface DocumentNumberingClientProps {

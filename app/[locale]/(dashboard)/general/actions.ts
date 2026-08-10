@@ -1,12 +1,12 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { departmentSchema, projectSchema } from "./schemas";
 import { z } from "zod";
 import { getTranslations } from "next-intl/server";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 // --- Departments ---
 

@@ -1,23 +1,23 @@
 "use server";
 
-import { InventoryService } from "@/modules/inventory/services/inventory.service";
+import { InventoryService } from "@/services/modules/inventory/services/inventory.service";
 
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import {
   purchaseReturnSchema,
   requiredIdSchema,
-} from "@/lib/validation/schemas";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+} from "@/services/lib/validation/schemas";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { PurchaseReturnInput } from "./types";
 import { getPurchaseOrder } from "../orders/actions";
 import { getPurchaseInvoice } from "../invoices/actions";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { PurchaseReturnService } from "@/modules/purchase/services/purchase-return.service";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { PurchaseReturnService } from "@/services/modules/purchase/services/purchase-return.service";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 export { getPurchaseOrder, getPurchaseInvoice };
 

@@ -24,7 +24,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 export default function AssetDisposalReportPage() {
   const t = useTranslations("Assets");

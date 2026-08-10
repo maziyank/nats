@@ -26,11 +26,11 @@ import {
 } from "@/components/ui/table";
 import { getHrDashboardStats } from "../employees/actions";
 import { getPayrollCostByDepartment } from "../payroll/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 type DashboardStats = {
     totalEmployees: number;

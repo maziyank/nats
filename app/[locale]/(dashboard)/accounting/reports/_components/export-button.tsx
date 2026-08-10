@@ -11,7 +11,7 @@ import { Download, Printer, FileText, FileSpreadsheet, Loader2 } from "lucide-re
 import { ReportPreviewDialog } from "@/app/[locale]/(dashboard)/reporting/_components/report-preview-dialog";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { downloadCsvClient, buildCsv, type ExportFormat } from "@/lib/export";
+import { downloadCsvClient, buildCsv, type ExportFormat } from "@/services/lib/export";
 
 interface ExportButtonProps {
   onExportCSV?: () => void;

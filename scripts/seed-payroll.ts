@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/services/lib/prisma';
 import { SalaryComponentType, PayrollPeriodStatus } from '@/prisma/generated/prisma/client';
 
 async function main() {

@@ -6,13 +6,13 @@
 "use server";
 
 import { z } from "zod";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { AccountType } from "@/prisma/generated/prisma/enums";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { requiredIdSchema } from "@/lib/validation/schemas";
-import { AccountService } from "@/modules/accounting/services/account.service";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
+import { AccountService } from "@/services/modules/accounting/services/account.service";
 
 const createAccountSchema = z.object({
   code: z.string().min(1, "Account code is required"),

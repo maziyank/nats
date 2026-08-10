@@ -15,7 +15,7 @@ import React from "react";
 import { ModeToggle } from "@/components/layout/others/mode-toggle";
 import { ThemeCustomizer } from "@/components/layout/others/theme-customizer";
 import { useTranslations } from "next-intl";
-import { toTitleCase } from "@/lib/utils";
+import { toTitleCase } from "@/services/lib/utils";
 import { GlobalSearch } from "./global-search";
 
 // ...

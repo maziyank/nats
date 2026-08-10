@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 export function PageFormLayout({
   className,

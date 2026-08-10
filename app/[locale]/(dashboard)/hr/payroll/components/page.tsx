@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { CreateComponentDialog } from "./_components/create-component-dialog";
 import { PageListActions, PageListContent, PageListHeader, PageListLayout, PageListTitle } from "@/components/layout/page/list-layout";
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { SalaryComponent } from "@/prisma/generated/prisma/client";
 

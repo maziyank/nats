@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/services/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { getSession } from "@/lib/auth/auth";
-import { SuperJSON } from "@/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { SuperJSON } from "@/services/lib/superjson";
 import {
   Table,
   TableBody,

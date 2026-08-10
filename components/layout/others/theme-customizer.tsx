@@ -16,7 +16,7 @@ import {
   useThemeColor,
   ThemeColor,
 } from "@/components/layout/others/theme-color-provider";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 export function ThemeCustomizer() {
   const { themeColor, setThemeColor } = useThemeColor();

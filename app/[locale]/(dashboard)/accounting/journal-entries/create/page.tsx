@@ -10,11 +10,11 @@ import { getContacts } from "@/app/[locale]/(dashboard)/general/contacts/actions
 import { getDepartments, getProjects } from "@/app/[locale]/(dashboard)/general/actions";
 import { EntryStatus } from "@/prisma/generated/prisma/browser";
 import { CreateJournalEntryData } from "../../types";
-import { generateId } from "@/lib/utils";
+import { generateId } from "@/services/lib/utils";
 import { useAlert } from "@/hooks";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Decimal } from "decimal.js";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 export default function CreateJournalEntryPage() {
   const router = useRouter();

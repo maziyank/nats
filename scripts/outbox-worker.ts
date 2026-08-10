@@ -1,4 +1,4 @@
-import { runOutboxWorker } from "@/modules/integration/worker";
+import { runOutboxWorker } from "@/services/modules/integration/worker";
 
 async function main() {
   const limitPerBatch = process.env.OUTBOX_LIMIT_PER_BATCH

@@ -12,7 +12,7 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,

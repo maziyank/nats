@@ -1,6 +1,6 @@
 "use server";
 
-import { prisma, serializePrisma } from "@/lib/prisma";
+import { prisma, serializePrisma } from "@/services/lib/prisma";
 import {
     SalesInvoiceStatus,
     PurchaseInvoiceStatus,

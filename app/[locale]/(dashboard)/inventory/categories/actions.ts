@@ -1,12 +1,12 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const categoryDataSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -63,7 +63,7 @@ export async function getCategories(
   };
 }
 
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 
 export const createCategory = authorizedAction(
   "categories.create",

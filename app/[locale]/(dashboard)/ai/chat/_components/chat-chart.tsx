@@ -27,9 +27,9 @@ import {
   parseChartSpec,
   resolveSeries,
   tryParseChartSpec,
-} from "@/lib/ai/chart-spec";
+} from "@/services/lib/ai/chart-spec";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 type ChatChartProps = {
   /** Raw JSON string from a ```chart fence, or a pre-parsed spec */

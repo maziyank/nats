@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decrypt } from "@/lib/auth/auth";
+import { decrypt } from "@/services/lib/auth/auth";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 

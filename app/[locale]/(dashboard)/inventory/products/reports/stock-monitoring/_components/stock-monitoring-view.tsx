@@ -31,14 +31,14 @@ import {
   useQuery,
   keepPreviousData,
 } from "@tanstack/react-query";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 function StatCard({
   label,

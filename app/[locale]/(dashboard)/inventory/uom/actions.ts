@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { prisma } from "@/services/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const unitDataSchema = z.object({
   name: z.string().min(1, "Name is required"),

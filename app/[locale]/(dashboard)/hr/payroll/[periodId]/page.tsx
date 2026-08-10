@@ -1,5 +1,5 @@
 import { getPayrollPeriod, getPayrollReadiness } from "../actions";
-import { verifySession } from "@/lib/auth/auth";
+import { verifySession } from "@/services/lib/auth/auth";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -44,7 +44,7 @@ const SLIP_STATUS_VARIANTS: Record<string, string> = {
     CANCELLED: "bg-red-100 text-red-700",
 };
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { PayrollPeriod, PayrollRun, SalarySlip, Contact } from "@/prisma/generated/prisma/client";
 

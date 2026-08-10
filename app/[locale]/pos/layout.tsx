@@ -1,5 +1,5 @@
-import { verifySession } from "@/lib/auth/auth";
-import { prisma } from "@/lib/prisma";
+import { verifySession } from "@/services/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { POSClickSound } from "./_components/pos-click-sound";
 

@@ -1,7 +1,7 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { ReportContext } from "@/lib/reporting/types";
+import { ReportContext } from "@/services/lib/reporting/types";
 import { fetchBudgetTrackingData } from "./data";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/services/lib/utils";
 
 const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 10, fontFamily: "Helvetica" },

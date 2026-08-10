@@ -1,7 +1,7 @@
 import React from 'react';
 import { Page, Text, View, Document } from '@react-pdf/renderer';
-import { ReportContext } from '@/lib/reporting/types';
-import { formatDate } from '@/lib/utils';
+import { ReportContext } from '@/services/lib/reporting/types';
+import { formatDate } from '@/services/lib/utils';
 import { styles } from './styles';
 import { FinancialRatios } from '../actions';
 

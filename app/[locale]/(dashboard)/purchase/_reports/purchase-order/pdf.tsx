@@ -1,8 +1,8 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
-import { ReportContext } from '@/lib/reporting/types';
+import { ReportContext } from '@/services/lib/reporting/types';
 import { PurchaseOrderReportData } from './data';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/services/lib/utils';
 
 const styles = StyleSheet.create({
   page: { flexDirection: 'column', backgroundColor: '#FFFFFF', padding: 30, fontSize: 10, fontFamily: 'Helvetica' },

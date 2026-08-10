@@ -10,7 +10,7 @@ import { Plus, AlertCircle, RefreshCcw } from "lucide-react";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { ProductImage } from "./product-image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { useTranslations } from "next-intl";
 
 interface ProductGridProps {

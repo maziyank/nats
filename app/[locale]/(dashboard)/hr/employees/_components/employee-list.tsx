@@ -28,7 +28,7 @@ import {
 } from "@/components/layout/page/list-layout";
 import { Column, DataTable } from "@/components/ui/data-table";
 import { getEmployees } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { Contact, EmployeeDetail, Department } from "@/prisma/generated/prisma/client";
 import { useDebounce } from "@/hooks/use-debounce";

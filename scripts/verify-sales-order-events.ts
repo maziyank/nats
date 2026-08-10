@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 
 async function main() {
     console.log("Verifying Sales Order Events in Outbox...");

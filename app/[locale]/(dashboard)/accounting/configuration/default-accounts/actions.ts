@@ -1,11 +1,11 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/services/lib/prisma"
 import { DefaultAccountPurpose } from "@/prisma/generated/prisma/client"
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache"
-import { authorizedAction } from "@/lib/permissions/protected-action"
-import { getSession } from "@/lib/auth/auth"
-import { hasPermission } from "@/lib/permissions/utils"
+import { authorizedAction } from "@/services/lib/permissions/protected-action"
+import { getSession } from "@/services/lib/auth/auth"
+import { hasPermission } from "@/services/lib/permissions/utils"
 
 export type DefaultAccountWithAccount = {
   id: string

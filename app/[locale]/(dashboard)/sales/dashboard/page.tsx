@@ -15,7 +15,7 @@ import {
   getOutstandingSummary,
   getOverdueInvoices,
 } from "./actions";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 
 export default async function SalesDashboardPage() {
   const queryClient = new QueryClient();

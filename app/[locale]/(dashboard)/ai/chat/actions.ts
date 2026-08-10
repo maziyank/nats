@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { verifySession } from "@/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { verifySession } from "@/services/lib/auth/auth";
 import { revalidatePath } from "next/cache";
 
 export async function getChatSessions() {

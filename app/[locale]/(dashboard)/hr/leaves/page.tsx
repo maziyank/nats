@@ -47,7 +47,7 @@ import {
     reviewLeaveRequest,
 } from "./actions";
 import { getEmployeeOptions } from "../employees/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { LeaveType, LeaveRequestStatus } from "@/prisma/generated/prisma/browser";
 import { useToast } from "@/hooks/use-toast";

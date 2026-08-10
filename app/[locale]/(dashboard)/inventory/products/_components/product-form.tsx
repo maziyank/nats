@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 import { PriceHistory } from "./price-history";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAlert } from "@/hooks/use-alert";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { ProductFormState } from "./form-types";
 import { GeneralSection } from "./form-sections/general-section";
 import { PricingSection } from "./form-sections/pricing-section";

@@ -8,7 +8,7 @@ import {
   EXPORT_LIMITS,
   type ExportColumn,
   type ExportFormat,
-} from "@/lib/export";
+} from "@/services/lib/export";
 
 export type UseReportExportOptions<T> = {
   /**

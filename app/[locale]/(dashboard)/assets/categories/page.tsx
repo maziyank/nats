@@ -15,7 +15,7 @@ import { Plus, Loader2, ArrowLeft, Search } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getAssetCategories } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { AssetCategory, Account } from "@/prisma/generated/prisma/browser";
 import {
   PageListActions,

@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useQuery } from "@tanstack/react-query";
 import { getAssetCategories } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { AssetCategory } from "@/prisma/generated/prisma/browser";
 import { AssetForm } from "../_components/asset-form";
 import { Loader2 } from "lucide-react";

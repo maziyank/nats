@@ -28,7 +28,7 @@ import { AttachmentDialog } from "@/components/ui/attachment-dialog";
 import { useEffect } from "react";
 import { Prisma } from "@/prisma/generated/prisma/browser";
 import { useAttachmentDialog } from "@/hooks/use-attachment-dialog";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 interface CashTransferDialogProps {
   open: boolean;

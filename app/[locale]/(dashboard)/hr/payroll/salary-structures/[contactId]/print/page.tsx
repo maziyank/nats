@@ -1,11 +1,11 @@
 export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { ContactType } from "@/prisma/generated/prisma/client";
 import { getSalaryStructure } from "../../../actions";
 import { SalarySlip } from "./_components/salary-slip";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 interface PageProps {

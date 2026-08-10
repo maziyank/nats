@@ -46,7 +46,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getAttendanceRecords, upsertAttendance, importAttendanceCsv } from "./actions";
 import { getEmployeeOptions } from "../employees/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { AttendanceStatus } from "@/prisma/generated/prisma/browser";
 import { useToast } from "@/hooks/use-toast";

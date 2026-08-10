@@ -1,20 +1,20 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { SuperJSON } from "@/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { SuperJSON } from "@/services/lib/superjson";
 import type { ActionResponse } from "@/types/actions";
-import { POSTransactionService } from "@/modules/pos/services/pos-transaction.service";
-import { POSSessionService } from "@/modules/pos/services/pos-session.service";
-import { HeldOrderService } from "@/modules/pos/services/held-order.service";
+import { POSTransactionService } from "@/services/modules/pos/services/pos-transaction.service";
+import { POSSessionService } from "@/services/modules/pos/services/pos-session.service";
+import { HeldOrderService } from "@/services/modules/pos/services/held-order.service";
 import { POSCartItem } from "./types";
 import { z } from "zod";
 import {
   requiredIdSchema,
   nonNegativeDecimalSchema,
-} from "@/lib/validation/schemas";
+} from "@/services/lib/validation/schemas";
 
 // --- POS validation schemas ---
 const posTransactionItemSchema = z.object({

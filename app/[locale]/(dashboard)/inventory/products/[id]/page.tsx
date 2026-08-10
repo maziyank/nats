@@ -5,7 +5,7 @@ import { getUnits } from "../../uom/actions";
 import { getTaxRates } from "@/app/[locale]/(dashboard)/accounting/configuration/taxes/actions";
 import { ProductForm } from "../_components/product-form";
 import { notFound } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { ProductFormData } from "../../types";
 import { Protect } from "@/components/ui/protect";
 

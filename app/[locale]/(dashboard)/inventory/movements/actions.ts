@@ -1,15 +1,15 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { MovementType } from "@/prisma/generated/prisma/enums";
 import { revalidatePath } from "next/cache";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { SuperJSON } from "@/lib/superjson";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { SuperJSON } from "@/services/lib/superjson";
 
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const rejectMovementSchema = z.object({
   movementId: requiredIdSchema,
@@ -173,8 +173,8 @@ export async function getMovements(
   };
 }
 
-import { inventoryMovementSchema } from "@/lib/validation/schemas";
-import { InventoryService } from "@/modules/inventory/services/inventory.service";
+import { inventoryMovementSchema } from "@/services/lib/validation/schemas";
+import { InventoryService } from "@/services/modules/inventory/services/inventory.service";
 
 export const createBatchMovement = authorizedAction(
   "inventory_movements.create",

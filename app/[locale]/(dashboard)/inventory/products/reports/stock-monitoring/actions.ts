@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { SuperJSON } from "@/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { SuperJSON } from "@/services/lib/superjson";
 
 const IN_TYPES = ["IN", "PRODUCTION_IN"] as const;
 const OUT_TYPES = ["OUT", "PRODUCTION_OUT"] as const;

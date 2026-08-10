@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { getDocumentNumberingSettings } from "./actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import type { DocumentNumbering } from "@/prisma/generated/prisma/client";
 import { DocumentNumberingClient } from "./document-numbering-client";
 import { PageListContent, PageListHeader, PageListLayout, PageListTitle } from "@/components/layout/page/list-layout";

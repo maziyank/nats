@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { hash } from "bcryptjs";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
-import { sendActivationEmail } from "@/lib/mail";
+import { sendActivationEmail } from "@/services/lib/mail";
 
 export async function registerUserAndTenant(prevState: unknown, formData: FormData) {
     const fullName = formData.get("fullName") as string;

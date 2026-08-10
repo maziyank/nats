@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TeamSwitcher } from "@/components/layout/others/team-switcher";
 import { NavUser } from "@/components/layout/sidebar/nav-user";
-import { getNavigationBySection } from "@/modules/plugins";
+import { getNavigationBySection } from "@/services/modules/plugins";
 
 // Removed static sample data since it will be passed via props
 

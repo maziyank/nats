@@ -1,18 +1,18 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
 import { revalidatePath } from "next/cache";
 import { Prisma, SalesInvoiceStatus } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { SalesPaymentInput } from "./types";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 import {
   enqueueIntegrationEventOnce,
   maybeProcessIntegrationOutboxEvent,
-} from "@/modules/integration/outbox";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+} from "@/services/modules/integration/outbox";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 type PostSalesPaymentResult = {
   processed: boolean;
@@ -146,8 +146,8 @@ export async function getCashAccounts() {
   return SuperJSON.serialize(accounts);
 }
 
-import { salesPaymentSchema } from "@/lib/validation/schemas";
-import { SalesPaymentService } from "@/modules/sales/services/sales-payment.service";
+import { salesPaymentSchema } from "@/services/lib/validation/schemas";
+import { SalesPaymentService } from "@/services/modules/sales/services/sales-payment.service";
 
 export const createSalesPayment = authorizedAction(
   "sales.payments",

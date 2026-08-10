@@ -16,7 +16,7 @@ import {
 } from "@/components/layout/page/list-layout";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { DataTable, Column } from "@/components/ui/data-table";
 import {

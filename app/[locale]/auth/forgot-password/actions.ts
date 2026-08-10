@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { sendResetPasswordEmail } from "@/lib/mail";
+import { prisma } from "@/services/lib/prisma";
+import { sendResetPasswordEmail } from "@/services/lib/mail";
 import { randomBytes } from "crypto";
 import { headers } from "next/headers";
 

@@ -10,7 +10,7 @@ import { ContactType } from "@/prisma/generated/prisma/enums";
 import { PurchaseReturnForm } from "../../_components/purchase-return-form";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { PurchaseReturnWithDetails } from "../../types";
 
 export const metadata: Metadata = {

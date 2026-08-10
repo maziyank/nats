@@ -24,7 +24,7 @@ import {
   deleteChatSession,
   renameChatSession,
 } from "../actions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import {
   Dialog,
   DialogContent,

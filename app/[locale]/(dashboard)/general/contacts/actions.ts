@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import {
   CreateContactInput,
   UpdateContactInput,
@@ -9,8 +9,8 @@ import {
   Contact,
 } from "../types";
 import { Prisma, ContactType } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { SuperJSON } from "@/lib/superjson";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { SuperJSON } from "@/services/lib/superjson";
 import { getTranslations } from "next-intl/server";
 
 export async function getContact(id: string) {

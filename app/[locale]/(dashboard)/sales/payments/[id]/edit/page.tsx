@@ -4,7 +4,7 @@ import { getSalesPayment } from "../../actions";
 import { SalesPaymentForm } from "../../_components/sales-payment-form";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SalesPaymentWithDetails } from "../../types";
 import { getDepartments, getProjects } from "@/app/[locale]/(dashboard)/accounting/journal-entries/actions";
 

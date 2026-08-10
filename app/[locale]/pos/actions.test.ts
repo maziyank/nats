@@ -39,7 +39,7 @@ import {
     getOpenPOSSession,
     getPOSSessions,
 } from "./actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 describe("POS session actions — department tag integration", () => {
     beforeEach(() => {

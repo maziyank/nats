@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getSession } from "@/lib/auth/auth";
-import { getAIService } from "@/lib/ai/service";
-import { getAIConfig } from "@/lib/ai/config";
-import { getToolsForUser } from "@/lib/ai/tool-registry";
-import { toAIUserContext } from "@/lib/ai/context";
-import { prisma } from "@/lib/prisma";
-import { AIChatMessage } from "@/lib/ai/types";
+import { getSession } from "@/services/lib/auth/auth";
+import { getAIService } from "@/services/lib/ai/service";
+import { getAIConfig } from "@/services/lib/ai/config";
+import { getToolsForUser } from "@/services/lib/ai/tool-registry";
+import { toAIUserContext } from "@/services/lib/ai/context";
+import { prisma } from "@/services/lib/prisma";
+import { AIChatMessage } from "@/services/lib/ai/types";
 
 const chatBodySchema = z.object({
   messages: z.array(

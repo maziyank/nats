@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { getRole, updateRolePermissions } from "../actions";
 import { Loader2, Save } from "lucide-react";
-import { register } from "@/lib/permissions/registry";
+import { register } from "@/services/lib/permissions/registry";
 import { useRouter } from "next/navigation";
 import {
   Card,

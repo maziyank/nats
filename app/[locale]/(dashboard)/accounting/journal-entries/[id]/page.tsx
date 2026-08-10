@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getJournalEntry } from "../actions";
 import { JournalEntryDetails } from "../_components/journal-entry-details";
 import { Loader2 } from "lucide-react";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { JournalEntryWithDetails } from "../../types";
 
 export default function JournalEntryDetailsPage() {

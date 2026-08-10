@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 
 function getIntEnv(name: string, fallback: number) {
   const raw = process.env[name];

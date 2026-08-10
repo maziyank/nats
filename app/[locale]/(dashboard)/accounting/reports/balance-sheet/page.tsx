@@ -8,7 +8,7 @@ import { CustomInput } from "@/components/ui/custom-input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AccountTreeRow } from "../_components/account-tree-row";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { useFormatCurrency } from "@/hooks/use-format-currency";
 import { useFormatDate } from "@/hooks/use-format-date";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,8 +17,8 @@ import { useQuery } from "@tanstack/react-query";
 import { ExportButton } from "../_components/export-button";
 import { ReportAccountLine } from "../actions";
 import { useReportExport } from "@/hooks/use-report-export";
-import type { ExportColumn } from "@/lib/export";
-import { flattenTreeRows } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
+import { flattenTreeRows } from "@/services/lib/export";
 
 import {
   Table,

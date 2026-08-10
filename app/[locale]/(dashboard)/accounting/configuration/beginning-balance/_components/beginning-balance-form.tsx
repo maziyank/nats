@@ -22,10 +22,10 @@ import {
 } from "@/components/layout/page/form-layout";
 import { Save, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/services/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { BeginningBalanceItem, getBeginningBalances, BeginningBalanceInput, saveBeginningBalances } from "../actions";
 
 import { useTranslations } from "next-intl";

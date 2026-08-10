@@ -6,7 +6,7 @@ import { Printer, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { SalaryComponentType } from "@/prisma/generated/prisma/browser";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import {
     Contact,

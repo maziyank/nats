@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 interface RoleData {
   name: string;

@@ -8,7 +8,7 @@ import { Protect } from "@/components/ui/protect";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Warehouse } from "@/prisma/generated/prisma/browser";
 import { SuperJSONResult } from "superjson";
 

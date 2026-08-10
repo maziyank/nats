@@ -22,10 +22,10 @@ import {
 import { Loader2, Plus, Trash2, SaveIcon, ArrowLeftSquare } from "lucide-react";
 import { createBOM, updateBOM } from "../actions";
 import { BillOfMaterialInput } from "../types";
-import { generateId } from "@/lib/utils";
+import { generateId } from "@/services/lib/utils";
 import { useAlert } from "@/hooks/use-alert";
 import { SuperJSONResult } from "superjson";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { Switch } from "@/components/ui/switch";

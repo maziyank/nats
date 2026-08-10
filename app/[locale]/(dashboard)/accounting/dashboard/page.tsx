@@ -12,7 +12,7 @@ import {
   getExpenseBreakdown,
   getRecentTransactions,
 } from "./actions";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 
 export default async function AccountingDashboardPage() {
   const queryClient = new QueryClient();

@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { useState, useMemo, useEffect, useRef } from "react";
 import {
   closePOSSession,
@@ -49,7 +49,7 @@ import {
 import { ShoppingCart } from "lucide-react";
 
 import { SuperJSONResult } from "superjson";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { HeldOrdersDialog } from "./held-orders-dialog";
 import { POSHistoryDialog } from "./pos-history-dialog";
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";

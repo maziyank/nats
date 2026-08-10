@@ -1,13 +1,13 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import {
   CashAccountFormData,
   CashTransferFormData,
   UpdateCashAccountFormData,
 } from "./types";
 import { revalidatePath } from "next/cache";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import {
   CashAccountType,
   EntryStatus,
@@ -18,20 +18,20 @@ import {
   JournalEntry,
   Prisma,
 } from "@/prisma/generated/prisma/client";
-import { saveFile } from "@/lib/file-service";
-import { verifySession } from "@/lib/auth/auth";
+import { saveFile } from "@/services/lib/file-service";
+import { verifySession } from "@/services/lib/auth/auth";
 import { SuperJSONResult } from "superjson";
-import { cashTransferSchema } from "@/lib/validation/schemas";
+import { cashTransferSchema } from "@/services/lib/validation/schemas";
 import {
   maybeProcessIntegrationOutboxEvent,
-} from "@/modules/integration/outbox";
+} from "@/services/modules/integration/outbox";
 import type { ActionResponse } from "@/types/actions";
-import { CashAccountService } from "@/modules/cash-bank/services/cash-account.service";
-import { CashTransferService } from "@/modules/cash-bank/services/cash-transfer.service";
-import { CashAccountSyncService } from "@/modules/cash-bank/services/cash-account-sync.service";
+import { CashAccountService } from "@/services/modules/cash-bank/services/cash-account.service";
+import { CashTransferService } from "@/services/modules/cash-bank/services/cash-transfer.service";
+import { CashAccountSyncService } from "@/services/modules/cash-bank/services/cash-account-sync.service";
 import { Decimal } from "decimal.js";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 const CASH_GL_CODE_PREFIX = "111";
 

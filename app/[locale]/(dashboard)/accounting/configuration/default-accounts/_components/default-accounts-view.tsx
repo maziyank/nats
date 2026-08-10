@@ -15,7 +15,7 @@ import { DefaultAccountPurpose } from "@/prisma/generated/prisma/client"
 import { useToast } from "@/hooks/use-toast"
 import { ArrowLeftIcon, Loader2, LockIcon, Save, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { usePermission } from "@/lib/permissions/use-permission"
+import { usePermission } from "@/services/lib/permissions/use-permission"
 import { useConfirm } from "@/hooks/use-confirm"
 import { useRouter } from "next/navigation"
 import {

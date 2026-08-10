@@ -14,7 +14,7 @@ import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getDueDepreciationSchedules, postDepreciationRun } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Asset, AssetCategory, DepreciationSchedule } from "@/prisma/generated/prisma/browser";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
 import { Checkbox } from "@/components/ui/checkbox";

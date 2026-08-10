@@ -1,7 +1,7 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { getBudgetVariance } from "@/app/[locale]/(dashboard)/budgeting/actions";
 import { ActionResponse } from "@/types/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 export async function fetchBudgetTrackingData(input: { fiscalYear?: number }) {

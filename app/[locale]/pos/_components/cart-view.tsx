@@ -22,7 +22,7 @@ import { DiscountDialog } from "./discount-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useQueryClient } from "@tanstack/react-query";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { ProductImage } from "./product-image";
 import { ReportPreviewDialog } from "@/app/[locale]/(dashboard)/reporting/_components/report-preview-dialog";
 import { useRouter } from "next/navigation";

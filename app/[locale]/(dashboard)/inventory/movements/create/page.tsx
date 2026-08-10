@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "../../products/actions";
 import { getWarehouses } from "../../warehouses/actions";
 import { BatchMovementForm } from "../_components/batch-movement-form";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Product, Warehouse } from "@/prisma/generated/prisma/browser";
 import { SuperJSONResult } from "superjson";
 

@@ -1,14 +1,14 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { prisma } from "@/services/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { LocationType } from "@/prisma/generated/prisma/client";
 import { revalidatePath } from "next/cache";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const locationDataSchema = z.object({
   name: z.string().min(1, "Name is required"),

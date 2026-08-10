@@ -1,21 +1,21 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
 import { revalidatePath } from "next/cache";
 import { Prisma, SalesInvoiceStatus } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { SalesInvoiceInput } from "./types";
 import { getSalesOrder } from "../orders/actions";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { CalculationService } from "@/lib/utils/calculation-service";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { CalculationService } from "@/services/lib/utils/calculation-service";
 import {
   enqueueIntegrationEventOnce,
   maybeProcessIntegrationOutboxEvent,
-} from "@/modules/integration/outbox";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+} from "@/services/modules/integration/outbox";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 type PostSalesInvoiceResult = {
   processed: boolean;
@@ -168,8 +168,8 @@ export async function getSalesOrdersForSelect() {
   return SuperJSON.serialize(orders);
 }
 
-import { salesInvoiceSchema } from "@/lib/validation/schemas";
-import { SalesInvoiceService } from "@/modules/sales/services/sales-invoice.service";
+import { salesInvoiceSchema } from "@/services/lib/validation/schemas";
+import { SalesInvoiceService } from "@/services/modules/sales/services/sales-invoice.service";
 
 export const createSalesInvoice = authorizedAction(
   "sales.create",

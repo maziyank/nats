@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { runOutboxWorker } from "@/modules/integration/worker";
+import { runOutboxWorker } from "@/services/modules/integration/worker";
 
 const workerParamsSchema = z
   .object({

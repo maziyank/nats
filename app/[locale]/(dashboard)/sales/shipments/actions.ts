@@ -1,18 +1,18 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { SalesShipmentInput } from "./types";
 import { getSalesOrder } from "../orders/actions";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { JournalService } from "@/modules/accounting/services/journal.service";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { JournalService } from "@/services/modules/accounting/services/journal.service";
 import { Decimal } from "decimal.js";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
 const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, "Must be non-negative");
@@ -195,10 +195,10 @@ export async function getSalesOrdersForSelect() {
   return SuperJSON.serialize(orders);
 }
 
-import { SalesShipmentService } from "@/modules/sales/services/sales-shipment.service";
+import { SalesShipmentService } from "@/services/modules/sales/services/sales-shipment.service";
 
-import { InventoryService } from "@/modules/inventory/services/inventory.service";
-import { getRequiredDefaultAccount } from "@/lib/accounting/default-account.service";
+import { InventoryService } from "@/services/modules/inventory/services/inventory.service";
+import { getRequiredDefaultAccount } from "@/services/lib/accounting/default-account.service";
 
 export const createSalesShipment = authorizedAction(
   "sales.create",

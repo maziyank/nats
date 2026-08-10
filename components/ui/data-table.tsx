@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { CustomPagination } from "@/components/ui/custom-pagination";
 import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 export interface Column<T> {
   header: React.ReactNode;

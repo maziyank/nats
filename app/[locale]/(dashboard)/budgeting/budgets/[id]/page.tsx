@@ -3,14 +3,14 @@ export const dynamic = "force-dynamic";
 import { getBudgetById, getBudgetVariance } from "@/app/[locale]/(dashboard)/budgeting/actions";
 import { BudgetItemsTable } from "@/app/[locale]/(dashboard)/budgeting/_components/budget-items-table";
 import { BudgetActions } from "@/app/[locale]/(dashboard)/budgeting/_components/budget-actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { getSession } from "@/lib/auth/auth";
+import { getSession } from "@/services/lib/auth/auth";
 import { notFound } from "next/navigation";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { prisma } from "@/lib/prisma";
+import { formatCurrency, formatDate } from "@/services/lib/utils";
+import { prisma } from "@/services/lib/prisma";
 import {
   PageListLayout,
   PageListHeader,

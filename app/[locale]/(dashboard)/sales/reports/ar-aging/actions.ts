@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { SalesInvoiceStatus } from "@/prisma/generated/prisma/client";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 // Aging buckets (in days): 0-30, 31-60, 61-90, 90+
 const BUCKET_1 = 30;

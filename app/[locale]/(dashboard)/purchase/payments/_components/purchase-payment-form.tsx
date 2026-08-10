@@ -15,7 +15,7 @@ import {
   getCashAccounts,
   createPurchasePayment,
 } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { format } from "date-fns";
 import { Loader2, Paperclip } from "lucide-react";
 import {

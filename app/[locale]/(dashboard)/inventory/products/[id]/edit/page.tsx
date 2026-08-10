@@ -6,7 +6,7 @@ import { getTaxRates } from "@/app/[locale]/(dashboard)/accounting/configuration
 import { ProductForm } from "../../_components/product-form";
 import { Protect } from "@/components/ui/protect";
 import { notFound } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { ProductFormData } from "../../../types";
 
 export default async function EditProductPage({

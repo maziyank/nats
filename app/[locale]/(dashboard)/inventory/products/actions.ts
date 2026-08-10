@@ -1,15 +1,15 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import { revalidatePath } from "next/cache";
 import { ProductFormData, ProductInput } from "../types";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const categoryDataSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -177,7 +177,7 @@ export async function getProductsByIds(ids: string[]) {
   return SuperJSON.serialize(products);
 }
 
-import { ProductService, productInputSchema } from "@/modules/inventory/services/product.service";
+import { ProductService, productInputSchema } from "@/services/modules/inventory/services/product.service";
 
 export const createProduct = authorizedAction(
   "products.create",
@@ -252,7 +252,7 @@ export const deleteProduct = authorizedAction(
 import {
   searchProductBySku,
   type SkuSearchResult,
-} from "@/lib/sku-search";
+} from "@/services/lib/sku-search";
 
 export async function searchSku(
   sku: string,

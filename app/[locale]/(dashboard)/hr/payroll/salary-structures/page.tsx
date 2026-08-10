@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { SalaryStructureHistory } from "./[contactId]/_components/salary-structure-history";
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 import { Contact, SalaryStructure } from "@/prisma/generated/prisma/client";

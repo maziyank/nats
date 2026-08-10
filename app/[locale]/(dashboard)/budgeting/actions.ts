@@ -1,13 +1,13 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import {
   budgetSchema,
 } from "./schemas";
 import { z } from "zod";
-import { getSession } from "@/lib/auth/auth";
-import { SuperJSON } from "@/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { SuperJSON } from "@/services/lib/superjson";
 import type { ActionResponse } from "@/types/actions";
 import type { SuperJSONResult } from "superjson";
 

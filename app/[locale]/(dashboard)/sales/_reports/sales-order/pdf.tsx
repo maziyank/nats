@@ -1,7 +1,7 @@
 import { Page, Text, View, Document, StyleSheet, Image, Font } from '@react-pdf/renderer';
-import { ReportContext } from '@/lib/reporting/types';
+import { ReportContext } from '@/services/lib/reporting/types';
 import { SalesOrderReportData } from './data';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { formatCurrency, formatDate } from '@/services/lib/utils';
 
 // Create styles
 const styles = StyleSheet.create({

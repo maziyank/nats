@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import {
   getCumulativeBalancesAsOf,
   getPeriodBalances,
-} from "@/modules/accounting/services/period-balance.service";
+} from "@/services/modules/accounting/services/period-balance.service";
 import { Account, ContactType } from "@/prisma/generated/prisma/client";
 import { AccountType } from "@/prisma/generated/prisma/enums";
 import { cache } from "react";
@@ -292,8 +292,8 @@ async function logReportGeneration(
   }
 }
 
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 
 /**
  * Generate Profit & Loss (Income Statement) report.

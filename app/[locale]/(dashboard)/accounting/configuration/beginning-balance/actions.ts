@@ -1,15 +1,15 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 import { revalidatePath } from "next/cache";
-import { generateDocumentNumber } from "@/lib/document-numbering";
+import { generateDocumentNumber } from "@/services/lib/document-numbering";
 import {
   nonNegativeDecimalSchema,
   requiredIdSchema,
-} from "@/lib/validation/schemas";
+} from "@/services/lib/validation/schemas";
 
 export type BeginningBalanceItem = {
   accountId: string;

@@ -5,7 +5,7 @@ import { IndividualPricingTable } from "./_components/individual-pricing-table";
 import { GlobalDiscountManager } from "./_components/global-discount-manager";
 import { Protect } from "@/components/ui/protect";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { PricingProductWithDetails } from "./types";
 export const dynamic = "force-dynamic";
 

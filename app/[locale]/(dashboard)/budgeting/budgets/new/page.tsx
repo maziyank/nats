@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 import { getDepartments, getProjects } from "@/app/[locale]/(dashboard)/general/actions";
 import { getAccounts } from "@/app/[locale]/(dashboard)/budgeting/actions";
 import { BudgetForm } from "@/app/[locale]/(dashboard)/budgeting/_components/budget-form";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 export default async function NewBudgetPage() {
   const [departments, projects, accountsResult] = await Promise.all([

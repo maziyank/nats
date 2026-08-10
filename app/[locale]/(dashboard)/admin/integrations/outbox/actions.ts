@@ -1,15 +1,15 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { auditLogQuerySchema } from "@/lib/validation/schemas";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { auditLogQuerySchema } from "@/services/lib/validation/schemas";
 import {
   dispatchPendingIntegrationEvents,
   processIntegrationOutboxEvent,
-} from "@/modules/integration/outbox";
+} from "@/services/modules/integration/outbox";
 import type { Prisma } from "@/prisma/generated/prisma/client";
 
 function getIntEnv(name: string, fallback: number) {

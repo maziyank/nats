@@ -1,11 +1,11 @@
 export const dynamic = "force-dynamic";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { TransactionForm } from "../_components/transaction-form";
 import { getCashTransaction } from "../actions";
 import { notFound } from "next/navigation";
 import { CashTransactionFormData } from "../types";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Decimal } from "decimal.js";
 import { getDepartments, getProjects } from "@/app/[locale]/(dashboard)/general/actions";
 

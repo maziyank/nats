@@ -1,17 +1,17 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma, SalesOrderStatus } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 import { SalesOrderInput } from "./types";
-import { SuperJSON } from "@/lib/superjson";
-import { hasPermission } from "@/lib/permissions/utils";
-import { SalesOrderService } from "@/modules/sales/services/sales-order.service";
-import { generateDocumentNumber } from "@/lib/document-numbering";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+import { SuperJSON } from "@/services/lib/superjson";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { SalesOrderService } from "@/services/modules/sales/services/sales-order.service";
+import { generateDocumentNumber } from "@/services/lib/document-numbering";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 const decimalSchema = z.union([z.number(), z.string()]).transform((val) => Number(val));
 const nonNegativeDecimalSchema = decimalSchema.refine((val) => val >= 0, "Must be non-negative");

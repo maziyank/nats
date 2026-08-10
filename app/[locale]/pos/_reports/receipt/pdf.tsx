@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
-import { ReportContext } from "@/lib/reporting/types";
+import { ReportContext } from "@/services/lib/reporting/types";
 import { POSReceiptData } from "./data";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/services/lib/utils";
 
 // 80mm thermal paper width is approx 226 points (80mm * 2.83)
 // 58mm thermal paper width is approx 164 points

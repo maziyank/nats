@@ -9,7 +9,7 @@ import { Protect } from "@/components/ui/protect";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Plus, Check, X } from "lucide-react";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import {
   PageListActions,
   PageListContent,
@@ -31,7 +31,7 @@ import {
   Warehouse,
 } from "@/prisma/generated/prisma/browser";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useAlert } from "@/hooks/use-alert";

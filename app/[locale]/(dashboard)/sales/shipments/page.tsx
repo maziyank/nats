@@ -17,7 +17,7 @@ import {
 import { SalesShipmentFilters } from "./_components/sales-shipment-filters";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { SalesShipmentWithDetails } from "./types";
 import { DataTable, Column } from "@/components/ui/data-table";

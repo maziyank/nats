@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MovementActions } from "./_components/movement-actions";
-import { cn } from "@/lib/utils";
-import { SuperJSON } from "@/lib/superjson";
+import { cn } from "@/services/lib/utils";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Prisma } from "@/prisma/generated/prisma/browser";
 import { useQuery } from "@tanstack/react-query";
 import { useFormatCurrency } from "@/hooks/use-format-currency";

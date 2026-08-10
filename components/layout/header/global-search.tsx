@@ -13,8 +13,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { getNavigationBySection } from "@/modules/plugins";
-import { NavItem, NavSectionKey } from "@/modules/plugins/types";
+import { getNavigationBySection } from "@/services/modules/plugins";
+import { NavItem, NavSectionKey } from "@/services/modules/plugins/types";
 
 export function GlobalSearch() {
   const [open, setOpen] = React.useState(false);

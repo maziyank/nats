@@ -36,7 +36,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 type WarehouseWithInventory = Warehouse & {

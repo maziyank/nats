@@ -1,5 +1,5 @@
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { PaginatedResult } from "@/lib/pagination";
+import { PaginatedResult } from "@/services/lib/pagination";
 import { Decimal } from "decimal.js";
 import { EntryStatus } from "@/prisma/generated/prisma/enums";
 

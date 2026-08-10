@@ -11,7 +11,7 @@ import { ReportPreview } from "./report-preview";
 import { Maximize2, Minimize2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 interface ReportPreviewDialogProps {
   isOpen: boolean;

@@ -1,8 +1,8 @@
 "use server";
 
-import { verifySession } from "@/lib/auth/auth";
-import { prisma } from "@/lib/prisma";
-import { serializePrisma } from "@/lib/prisma";
+import { verifySession } from "@/services/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { serializePrisma } from "@/services/lib/prisma";
 
 export async function getSubscriptionData() {
     const session = await verifySession();

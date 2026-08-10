@@ -1,25 +1,25 @@
 "use server";
 
-import { InventoryService } from "@/modules/inventory/services/inventory.service";
-import { getRequiredDefaultAccount } from "@/lib/accounting/default-account.service";
+import { InventoryService } from "@/services/modules/inventory/services/inventory.service";
+import { getRequiredDefaultAccount } from "@/services/lib/accounting/default-account.service";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma, ContactType } from "@/prisma/generated/prisma/client";
 import {
   purchaseReceiveSchema,
   requiredIdSchema,
-} from "@/lib/validation/schemas";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+} from "@/services/lib/validation/schemas";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { PurchaseReceiveInput } from "./types";
 import { getPurchaseOrder } from "../orders/actions";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { JournalService } from "@/modules/accounting/services/journal.service";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { JournalService } from "@/services/modules/accounting/services/journal.service";
 import { Decimal } from "decimal.js";
-import { PurchaseReceiveService } from "@/modules/purchase/services/purchase-receive.service";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+import { PurchaseReceiveService } from "@/services/modules/purchase/services/purchase-receive.service";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 export { getPurchaseOrder };
 

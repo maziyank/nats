@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { createSession } from "@/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { createSession } from "@/services/lib/auth/auth";
 import { Button } from "@/components/ui/button";
 import { XCircle, CheckCircle2, GalleryVerticalEnd } from "lucide-react";
 import Link from "next/link";

@@ -1,6 +1,6 @@
 "use client";
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

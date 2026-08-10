@@ -1,17 +1,17 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { EmployeeService } from '@/modules/hr/services/employee.service';
-import { CreateEmployeeDTO, UpdateEmployeeDTO } from '@/modules/hr/types';
+import { EmployeeService } from '@/services/modules/hr/services/employee.service';
+import { CreateEmployeeDTO, UpdateEmployeeDTO } from '@/services/modules/hr/types';
 import type { ActionResponse } from '@/types/actions';
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import type { SuperJSONResult } from "superjson";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
-import { prisma } from "@/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { prisma } from "@/services/lib/prisma";
 import { z } from "zod";
-import { requiredIdSchema, dateSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema, dateSchema } from "@/services/lib/validation/schemas";
 import { EmploymentStatus, Gender, MaritalStatus, TaxFilingStatus } from "@/prisma/generated/prisma/client";
 
 const createEmployeeSchema = z.object({

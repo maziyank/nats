@@ -5,7 +5,7 @@ import {
   QueryClient,
   dehydrate,
 } from "@tanstack/react-query";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { redirect } from "next/navigation";
 import { getMainDashboardStats } from "./actions";
 import { DashboardView } from "./_components/dashboard-view";

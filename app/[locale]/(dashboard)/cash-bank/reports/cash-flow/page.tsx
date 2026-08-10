@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/chart";
 import { useReportExport } from "@/hooks/use-report-export";
 import { ReportExportButton } from "@/components/ui/report-export-button";
-import type { ExportColumn } from "@/lib/export";
+import type { ExportColumn } from "@/services/lib/export";
 
 const chartConfig = {
   cashIn: { label: "Cash In", color: "var(--color-chart-1)" },

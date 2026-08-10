@@ -1,5 +1,5 @@
 import { useCompanyProfile } from "@/components/providers/session-provider";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/services/lib/utils";
 import { useCallback } from "react";
 import { Decimal } from "decimal.js";
 

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 export interface CustomInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

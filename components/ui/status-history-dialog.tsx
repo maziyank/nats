@@ -17,7 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/services/lib/utils";
 
 export type StatusHistoryEvent = {
   event: string;

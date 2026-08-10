@@ -5,7 +5,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Protect } from "@/components/ui/protect";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

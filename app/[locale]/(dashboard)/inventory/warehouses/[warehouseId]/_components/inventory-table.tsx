@@ -13,7 +13,7 @@ import { Category, Prisma } from "@/prisma/generated/prisma/browser";
 import { DataTable, Column } from "@/components/ui/data-table";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { getWarehouseInventory } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 type InventoryWithProduct = Prisma.InventoryGetPayload<{

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Page, Text, View, Document } from '@react-pdf/renderer';
-import { ReportContext } from '@/lib/reporting/types';
+import { ReportContext } from '@/services/lib/reporting/types';
 import { BalanceSheetReport, ReportAccountLine } from '../actions';
-import { formatDate } from '@/lib/utils';
+import { formatDate } from '@/services/lib/utils';
 import { styles } from './styles';
 
 const AccountRow = ({ node, level = 0, showComparative }: { node: ReportAccountLine, level?: number, showComparative?: boolean }) => {

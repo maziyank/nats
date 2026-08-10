@@ -18,11 +18,11 @@ import {
     cancelProductionOrder,
 } from "../actions";
 import { ProductionOrderInput } from "../types";
-import { generateId } from "@/lib/utils";
+import { generateId } from "@/services/lib/utils";
 import { useAlert } from "@/hooks/use-alert";
 import { useConfirm } from "@/hooks/use-confirm";
 import { SuperJSONResult } from "superjson";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";

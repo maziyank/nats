@@ -1,6 +1,6 @@
 "use server"
 
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/services/lib/prisma"
 import { TaxRate } from "@/prisma/generated/prisma/client"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"

@@ -1,18 +1,18 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { CashTransactionFormData } from "./types";
 import { revalidatePath } from "next/cache";
-import { verifySession } from "@/lib/auth/auth";
-import { SuperJSON } from "@/lib/superjson";
+import { verifySession } from "@/services/lib/auth/auth";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import {
   maybeProcessIntegrationOutboxEvent,
-} from "@/modules/integration/outbox";
+} from "@/services/modules/integration/outbox";
 import type { ActionResponse } from "@/types/actions";
-import { CashTransactionService } from "@/modules/cash-bank/services/cash-transaction.service";
-import { cashTransactionSchema } from "@/lib/validation/schemas";
+import { CashTransactionService } from "@/services/modules/cash-bank/services/cash-transaction.service";
+import { cashTransactionSchema } from "@/services/lib/validation/schemas";
 
 type CashTransactionOutboxResult = {
   transactionId: string;

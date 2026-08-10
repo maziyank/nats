@@ -59,14 +59,14 @@ import {
 } from "../actions";
 import { SalesOrderInput, SalesOrderWithDetails } from "../types";
 import { format } from "date-fns";
-import { cn, generateId } from "@/lib/utils";
+import { cn, generateId } from "@/services/lib/utils";
 import { SortableTableRow } from "@/components/ui/sortable-row";
 import { getContacts } from "@/app/[locale]/(dashboard)/general/contacts/actions";
 import { getProducts } from "@/app/[locale]/(dashboard)/inventory/products/actions";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useAlert } from "@/hooks/use-alert";
 import { SuperJSONResult } from "superjson";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { ProductWithDetails } from "@/app/[locale]/(dashboard)/inventory/types";
 import { TaxRate } from "@/prisma/generated/prisma/client";
 import { useFormatCurrency } from "@/hooks";

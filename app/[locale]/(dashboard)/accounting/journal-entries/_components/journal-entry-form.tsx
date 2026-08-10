@@ -49,7 +49,7 @@ import { AttachmentDialog } from "@/components/ui/attachment-dialog";
 import { NoteDialog } from "@/components/ui/note-dialog";
 import { SortableTableRow } from "@/components/ui/sortable-row";
 import { MentionsList } from "./mentions-list";
-import { generateId } from "@/lib/utils";
+import { generateId } from "@/services/lib/utils";
 import { Decimal } from "decimal.js";
 import {
   PageFormLayout,

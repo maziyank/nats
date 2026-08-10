@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { getSession } from "@/lib/auth/auth";
-import { generateExportFile } from "@/lib/export/generate";
-import type { ExportColumn, ExportFormat } from "@/lib/export/types";
-import { EXPORT_LIMITS } from "@/lib/export/types";
+import { getSession } from "@/services/lib/auth/auth";
+import { generateExportFile } from "@/services/lib/export/generate";
+import type { ExportColumn, ExportFormat } from "@/services/lib/export/types";
+import { EXPORT_LIMITS } from "@/services/lib/export/types";
 
 type ExportBody = {
   rows?: Record<string, unknown>[];

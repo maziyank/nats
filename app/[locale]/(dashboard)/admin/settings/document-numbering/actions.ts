@@ -1,11 +1,11 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { SuperJSON } from "@/lib/superjson";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { SuperJSON } from "@/services/lib/superjson";
 import { z } from "zod";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 const documentNumberingValueSchema = z.object({
     prefix: z.string(),

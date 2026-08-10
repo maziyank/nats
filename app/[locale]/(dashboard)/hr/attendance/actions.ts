@@ -1,19 +1,19 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { AttendanceService } from '@/modules/hr/services/attendance.service';
+import { AttendanceService } from '@/services/modules/hr/services/attendance.service';
 import {
     CreateAttendanceDTO,
     ImportAttendanceRowDTO,
-} from '@/modules/hr/types';
+} from '@/services/modules/hr/types';
 import type { ActionResponse } from '@/types/actions';
-import { SuperJSON } from '@/lib/superjson';
-import { authorizedAction } from '@/lib/permissions/protected-action';
-import { getSession } from '@/lib/auth/auth';
-import { hasPermission } from "@/lib/permissions/utils";
+import { SuperJSON } from '@/services/lib/superjson';
+import { authorizedAction } from '@/services/lib/permissions/protected-action';
+import { getSession } from '@/services/lib/auth/auth';
+import { hasPermission } from "@/services/lib/permissions/utils";
 import { AttendanceStatus } from '@/prisma/generated/prisma/client';
 import { z } from 'zod';
-import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+import { requiredIdSchema, dateSchema } from '@/services/lib/validation/schemas';
 
 const upsertAttendanceSchema = z.object({
     employeeDetailId: requiredIdSchema,

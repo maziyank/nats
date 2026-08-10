@@ -28,7 +28,7 @@ import {
 } from "@/components/layout/page/form-layout";
 import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { generateId, formatCurrency } from "@/lib/utils";
+import { generateId, formatCurrency } from "@/services/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 
@@ -62,7 +62,7 @@ interface BudgetFormData {
   items: BudgetItemData[];
 }
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { useMemo } from "react";
 

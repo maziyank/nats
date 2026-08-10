@@ -14,7 +14,7 @@ import { Plus, Search, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { getAssets } from "./actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Asset, AssetCategory } from "@/prisma/generated/prisma/browser";
 import { useState } from "react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";

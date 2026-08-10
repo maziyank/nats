@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { User, Bot } from "lucide-react";

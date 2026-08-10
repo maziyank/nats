@@ -1,20 +1,20 @@
 "use server";
 
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { SuperJSON } from "@/lib/superjson";
-import { AssetService } from "@/modules/fixed-assets/services/asset.service";
-import { DepreciationService } from "@/modules/fixed-assets/services/depreciation.service";
-import { CategoryService } from "@/modules/fixed-assets/services/category.service";
+import { prisma } from "@/services/lib/prisma";
+import { SuperJSON } from "@/services/lib/superjson";
+import { AssetService } from "@/services/modules/fixed-assets/services/asset.service";
+import { DepreciationService } from "@/services/modules/fixed-assets/services/depreciation.service";
+import { CategoryService } from "@/services/modules/fixed-assets/services/category.service";
 import { AssetStatus, DepreciationMethod } from "@/prisma/generated/prisma/client";
 import { Decimal } from "decimal.js";
 import { revalidatePath } from "next/cache";
-import { getSession } from "@/lib/auth/auth";
+import { getSession } from "@/services/lib/auth/auth";
 import {
   dateSchema,
   nonNegativeDecimalSchema,
   requiredIdSchema,
-} from "@/lib/validation/schemas";
+} from "@/services/lib/validation/schemas";
 
 // --- Types ---
 export type AssetFormData = {

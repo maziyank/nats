@@ -1,14 +1,14 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 import { ProductionOrderInput } from "./types";
-import { SuperJSON } from "@/lib/superjson";
-import { hasPermission } from "@/lib/permissions/utils";
-import { ProductionOrderService } from "@/modules/production/services/production-order.service";
+import { SuperJSON } from "@/services/lib/superjson";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { ProductionOrderService } from "@/services/modules/production/services/production-order.service";
 
 export async function getProductionOrders(
     page: number = 1,

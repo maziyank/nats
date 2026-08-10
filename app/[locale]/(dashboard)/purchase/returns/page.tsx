@@ -17,7 +17,7 @@ import {
 import { PurchaseReturnFilters } from "./_components/purchase-return-filters";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { PurchaseReturnWithDetails } from "./types";
 import { DataTable, Column } from "@/components/ui/data-table";

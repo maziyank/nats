@@ -1,7 +1,7 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { prisma } from "@/services/lib/prisma";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 import { startOfMonth, endOfMonth, subMonths, format } from "date-fns";
 
 /**

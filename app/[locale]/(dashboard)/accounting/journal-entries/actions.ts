@@ -1,14 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 import { CreateJournalEntryData } from "../types";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
-import { createJournalEntrySchema } from "@/lib/validation/schemas";
-import { JournalService } from "@/modules/accounting/services/journal.service";
-import { prisma } from "@/lib/prisma";
+import { createJournalEntrySchema } from "@/services/lib/validation/schemas";
+import { JournalService } from "@/services/modules/accounting/services/journal.service";
+import { prisma } from "@/services/lib/prisma";
 
 /**
  * Fetch journal entries with pagination and filtering.

@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { clientRegistry } from "@/lib/reporting/client-registry";
+import { clientRegistry } from "@/services/lib/reporting/client-registry";
 import { getReportData } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Loader2 } from "lucide-react";
-import { ReportContext } from "@/lib/reporting/types";
+import { ReportContext } from "@/services/lib/reporting/types";
 
 // Dynamically import PDFViewer to avoid SSR issues
 const PDFViewer = dynamic(
@@ -21,7 +21,7 @@ const PDFViewer = dynamic(
   }
 );
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/services/lib/utils";
 
 interface ReportPreviewProps {
   code: string;

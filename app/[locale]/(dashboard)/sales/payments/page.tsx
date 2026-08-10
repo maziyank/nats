@@ -28,7 +28,7 @@ import {
 import { SalesPaymentFilters } from "./_components/sales-payment-filters";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { SalesPaymentWithDetails } from "./types";
 import { Badge } from "@/components/ui/badge";

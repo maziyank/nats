@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { PurchaseOrderStatus, PurchaseInvoiceStatus } from "@/prisma/generated/prisma/client";
 import { startOfMonth, subMonths, format, endOfMonth } from "date-fns";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 export async function getDashboardSummary() {
   const session = await getSession();

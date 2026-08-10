@@ -1,8 +1,8 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { saveFileToDisk, deleteFileFromDisk } from "@/lib/file-service";
-import { getSession } from "@/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { saveFileToDisk, deleteFileFromDisk } from "@/services/lib/file-service";
+import { getSession } from "@/services/lib/auth/auth";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 

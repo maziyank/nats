@@ -20,9 +20,9 @@ import {
 } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
 import { getHrDashboardStats } from "../employees/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
-import { usePermission } from "@/lib/permissions/use-permission";
+import { usePermission } from "@/services/lib/permissions/use-permission";
 
 type DashboardStats = {
   totalEmployees: number;

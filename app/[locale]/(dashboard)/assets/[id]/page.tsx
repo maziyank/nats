@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { getAsset, activateAsset } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Asset, AssetCategory, DepreciationSchedule, AssetDisposal } from "@/prisma/generated/prisma/browser";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
 import { Loader2, ArrowLeft, CheckCircle } from "lucide-react";

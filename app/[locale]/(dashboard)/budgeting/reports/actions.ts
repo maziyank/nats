@@ -1,9 +1,9 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
-import { getSession } from "@/lib/auth/auth";
+import { prisma } from "@/services/lib/prisma";
+import { getSession } from "@/services/lib/auth/auth";
 import { getBudgetVariance } from "../actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 // ---------------------------------------------------------------------------
 // Shared helpers

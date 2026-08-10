@@ -21,7 +21,7 @@ export async function seedHR() {
 
   try {
     const { StatutoryService } = await import(
-      "../../modules/payroll/services/statutory.service"
+      "../../services/modules/payroll/services/statutory.service"
     );
     await StatutoryService.seedDefaults();
     console.log("Aturan statutory payroll (PPh 21, BPJS) disiapkan.");

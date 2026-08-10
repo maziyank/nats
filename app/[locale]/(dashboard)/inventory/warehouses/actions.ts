@@ -1,10 +1,10 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { SuperJSON } from "@/lib/superjson";
-import { getSession } from "@/lib/auth/auth";
-import { hasPermission } from "@/lib/permissions/utils";
+import { SuperJSON } from "@/services/lib/superjson";
+import { getSession } from "@/services/lib/auth/auth";
+import { hasPermission } from "@/services/lib/permissions/utils";
 
 export async function getWarehouses(page: number = 1, limit: number = 10) {
   const session = await getSession();
@@ -41,10 +41,10 @@ export async function getWarehouses(page: number = 1, limit: number = 10) {
   };
 }
 
-import { authorizedAction } from "@/lib/permissions/protected-action";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
 
-import { WarehouseService, warehouseDataSchema } from "@/modules/inventory/services/warehouse.service";
-import { requiredIdSchema } from "@/lib/validation/schemas";
+import { WarehouseService, warehouseDataSchema } from "@/services/modules/inventory/services/warehouse.service";
+import { requiredIdSchema } from "@/services/lib/validation/schemas";
 
 export const createWarehouse = authorizedAction(
   "warehouses.create",

@@ -27,7 +27,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Account } from "@/prisma/generated/prisma/browser";
 import { useQuery } from "@tanstack/react-query";
 import { getAccounts } from "@/app/[locale]/(dashboard)/accounting/accounts/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 
 interface DisposeAssetDialogProps {
   assetId: string;

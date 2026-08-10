@@ -21,7 +21,7 @@ import {
 } from "@/components/layout/page/list-layout";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import Link from "next/link";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import { useRouter } from "next/navigation";
 

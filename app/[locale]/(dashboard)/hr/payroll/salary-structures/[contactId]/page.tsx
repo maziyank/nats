@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { notFound } from "next/navigation";
 import { getSalaryStructure } from "../../actions";
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import {
     PageFormLayout,
     PageFormHeader,
@@ -16,7 +16,7 @@ import { SalaryStructureEditor } from "./_components/salary-structure-editor";
 import { SalaryStructureHistory } from "./_components/salary-structure-history";
 import { ContactType } from "@/prisma/generated/prisma/client";
 
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 
 interface PageProps {

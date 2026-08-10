@@ -22,7 +22,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { getSalaryHistory } from "@/app/[locale]/(dashboard)/hr/payroll/actions";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { SuperJSONResult } from "superjson";
 import { Loader2, Eye } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

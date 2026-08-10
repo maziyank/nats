@@ -39,7 +39,7 @@ import { uploadFile } from "@/app/[locale]/(dashboard)/general/files/actions";
 import { useFormatCurrency } from "@/hooks";
 import { useAttachmentDialog } from "@/hooks/use-attachment-dialog";
 import { useNoteDialog } from "@/hooks/use-note-dialog";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import {
   PageFormActions,
   PageFormContent,

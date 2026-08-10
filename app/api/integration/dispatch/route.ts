@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { dispatchPendingIntegrationEvents } from "@/modules/integration/outbox";
+import { dispatchPendingIntegrationEvents } from "@/services/modules/integration/outbox";
 
 const dispatchParamsSchema = z.object({
   limit: z.coerce.number().finite().optional().catch(undefined),

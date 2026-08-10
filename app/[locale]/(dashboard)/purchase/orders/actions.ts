@@ -1,19 +1,19 @@
 "use server";
 
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/services/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@/prisma/generated/prisma/client";
 import {
   purchaseOrderSchema,
   requiredIdSchema,
-} from "@/lib/validation/schemas";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { getSession } from "@/lib/auth/auth";
+} from "@/services/lib/validation/schemas";
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { getSession } from "@/services/lib/auth/auth";
 import { PurchaseOrderInput } from "./types";
-import { SuperJSON } from "@/lib/superjson";
-import { hasPermission } from "@/lib/permissions/utils";
-import { PurchaseOrderService } from "@/modules/purchase/services/purchase-order.service";
-import { resolveUserNames, userNameRef } from "@/lib/status-tracking";
+import { SuperJSON } from "@/services/lib/superjson";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { PurchaseOrderService } from "@/services/modules/purchase/services/purchase-order.service";
+import { resolveUserNames, userNameRef } from "@/services/lib/status-tracking";
 
 export async function getPurchaseOrders(
   page: number = 1,

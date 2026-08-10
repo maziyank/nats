@@ -1,21 +1,21 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { PayrollService } from '@/modules/payroll/services/payroll.service';
-import { CreatePayrollPeriodDTO, CreateSalaryStructureDTO, CreateSalaryComponentDTO } from '@/modules/payroll/types/payroll.types';
+import { PayrollService } from '@/services/modules/payroll/services/payroll.service';
+import { CreatePayrollPeriodDTO, CreateSalaryStructureDTO, CreateSalaryComponentDTO } from '@/services/modules/payroll/types/payroll.types';
 import type { ActionResponse } from '@/types/actions';
-import { prisma } from '@/lib/prisma';
-import { verifySession, getSession } from "@/lib/auth/auth";
-import { SalaryComponentService } from '@/modules/payroll/services/salary-component.service';
+import { prisma } from '@/services/lib/prisma';
+import { verifySession, getSession } from "@/services/lib/auth/auth";
+import { SalaryComponentService } from '@/services/modules/payroll/services/salary-component.service';
 import { ContactType, PayrollPeriodStatus } from '@/prisma/generated/prisma/client';
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import type { SuperJSONResult } from "superjson";
-import { authorizedAction } from "@/lib/permissions/protected-action";
-import { hasPermission } from "@/lib/permissions/utils";
-import { StatutoryService } from '@/modules/payroll/services/statutory.service';
+import { authorizedAction } from "@/services/lib/permissions/protected-action";
+import { hasPermission } from "@/services/lib/permissions/utils";
+import { StatutoryService } from '@/services/modules/payroll/services/statutory.service';
 import { StatutoryRuleType } from '@/prisma/generated/prisma/client';
 import { z } from 'zod';
-import { requiredIdSchema, dateSchema } from '@/lib/validation/schemas';
+import { requiredIdSchema, dateSchema } from '@/services/lib/validation/schemas';
 
 const createPayrollPeriodSchema = z.object({
     name: z.string().min(1, 'Name is required'),

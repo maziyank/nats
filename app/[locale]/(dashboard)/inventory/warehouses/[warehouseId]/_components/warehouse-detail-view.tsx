@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getWarehouse, getCategories } from "../actions";
 import { InventoryTable } from "./inventory-table";
 import { notFound } from "next/navigation";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { Warehouse, Category } from "@/prisma/generated/prisma/browser";
 import { SuperJSONResult } from "superjson";
 

@@ -49,7 +49,7 @@ import {
   keepPreviousData,
 } from "@tanstack/react-query";
 import { SelectItem } from "@/components/ui/select";
-import { SuperJSON } from "@/lib/superjson";
+import { SuperJSON } from "@/services/lib/superjson";
 import { JournalEntryWithDetails } from "../types";
 import { Decimal } from "decimal.js";
 
