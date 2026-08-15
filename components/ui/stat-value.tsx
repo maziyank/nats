@@ -292,7 +292,7 @@ export function StatValue({
       ref={ref}
       data-slot="stat-value"
       className={cn(
-        "min-w-0 max-w-full whitespace-nowrap font-bold tabular-nums tracking-tight leading-none",
+        "min-w-0 max-w-full whitespace-nowrap font-bold tabular-nums tracking-tight leading-none py-2",
         className
       )}
       title={titleContent}

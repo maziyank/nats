@@ -27,7 +27,7 @@ import {
   PlusCircle,
   FileText,
 } from "lucide-react";
-import { StatValue } from "@/components/ui/stat-value";
+import { SummaryCard, SummaryCardGrid } from "@/components/ui/summary-card";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
 interface DashboardViewProps {
@@ -108,68 +108,36 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
       </div>
 
       {/* Summary Cards */}
-      <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("total_revenue")}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.totalRevenue || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">{t("current_month")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {t("total_expenses")}
-            </CardTitle>
-            <TrendingDown className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.totalExpenses || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">{t("current_month")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("net_income")}</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.netIncome || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">{t("current_month")}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t("receivables")}</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.accountsReceivable || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">
-              {t("outstanding_invoices")}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <SummaryCardGrid>
+        <SummaryCard
+          title={t("total_revenue")}
+          value={summary?.totalRevenue || 0}
+          description={t("current_month")}
+          icon={DollarSign}
+          {...currencyProps}
+        />
+        <SummaryCard
+          title={t("total_expenses")}
+          value={summary?.totalExpenses || 0}
+          description={t("current_month")}
+          icon={TrendingDown}
+          {...currencyProps}
+        />
+        <SummaryCard
+          title={t("net_income")}
+          value={summary?.netIncome || 0}
+          description={t("current_month")}
+          icon={TrendingUp}
+          {...currencyProps}
+        />
+        <SummaryCard
+          title={t("receivables")}
+          value={summary?.accountsReceivable || 0}
+          description={t("outstanding_invoices")}
+          icon={Wallet}
+          {...currencyProps}
+        />
+      </SummaryCardGrid>
 
       {/* Charts Section */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
