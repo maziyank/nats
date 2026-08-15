@@ -3,7 +3,7 @@
   "version": "1.0.0-alpha",
   "private": true,
   "scripts": {
-    "dev": "sh -c 'lsof -ti:3000 | xargs kill -9 2>/dev/null || true' && next dev",
+    "dev": "sh -c 'lsof -ti:3000 | xargs kill -9 2>/dev/null || true' && next dev  --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

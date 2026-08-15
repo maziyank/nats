@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
 import { useCompanyProfile } from "@/components/providers/session-provider";
+import { SummaryCard, SummaryCardGrid, CurrencyProps } from "@/components/ui/summary-card";
 import { StatValue } from "@/components/ui/stat-value";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
@@ -62,7 +63,7 @@ export function DashboardView() {
     const formatDate = useFormatDate();
     const profile = useCompanyProfile();
 
-    const currencyProps = {
+    const currencyProps: CurrencyProps = {
         currency: profile?.currency,
         currencySymbol: profile?.currencySymbol || undefined,
         currencyFormat: (profile?.currencyFormat as "standard" | "european" | "indian" | undefined) || undefined,
@@ -173,83 +174,42 @@ export function DashboardView() {
             <h1 className="text-xl font-bold tracking-tight">{t("title")}</h1>
 
             {/* Summary Cards */}
-            <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-                <Card className="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <TrendingUp className="h-4 w-4 text-emerald-500" />
-                            {t("total_revenue")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <StatValue
-                            className="text-emerald-600 dark:text-emerald-400"
-                            value={totalRevenue}
-                            {...currencyProps}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {t("this_month")}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="bg-linear-to-br from-red-500/10 to-red-500/5 border-red-500/20">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <TrendingDown className="h-4 w-4 text-red-500" />
-                            {t("total_expenses")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <StatValue
-                            className="text-red-600 dark:text-red-400"
-                            value={totalExpenses}
-                            {...currencyProps}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {t("this_month")}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <CreditCard className="h-4 w-4" />
-                            {t("accounts_receivable")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <StatValue
-                            maxRem={1.5}
-                            value={accountsReceivable}
-                            {...currencyProps}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {t("outstanding")}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                            <Receipt className="h-4 w-4" />
-                            {t("accounts_payable")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <StatValue
-                            maxRem={1.5}
-                            value={accountsPayable}
-                            {...currencyProps}
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {t("outstanding")}
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
+            <SummaryCardGrid>
+                <SummaryCard
+                    title={t("total_revenue")}
+                    value={totalRevenue}
+                    description={t("this_month")}
+                    icon={TrendingUp}
+                    cardClassName="bg-linear-to-br from-emerald-500/10 to-emerald-500/5 border-emerald-500/20"
+                    titleClassName="text-muted-foreground flex items-center gap-2"
+                    valueClassName="text-emerald-600 dark:text-emerald-400"
+                    {...currencyProps}
+                />
+                <SummaryCard
+                    title={t("total_expenses")}
+                    value={totalExpenses}
+                    description={t("this_month")}
+                    icon={TrendingDown}
+                    cardClassName="bg-linear-to-br from-red-500/10 to-red-500/5 border-red-500/20"
+                    titleClassName="text-muted-foreground flex items-center gap-2"
+                    valueClassName="text-red-600 dark:text-red-400"
+                    {...currencyProps}
+                />
+                <SummaryCard
+                    title={t("accounts_receivable")}
+                    value={accountsReceivable}
+                    description={t("outstanding")}
+                    icon={CreditCard}
+                    {...currencyProps}
+                />
+                <SummaryCard
+                    title={t("accounts_payable")}
+                    value={accountsPayable}
+                    description={t("outstanding")}
+                    icon={Receipt}
+                    {...currencyProps}
+                />
+            </SummaryCardGrid>
 
             {/* Net Income Banner */}
             <Card className="bg-linear-to-r from-primary/5 to-primary/10 border-primary/20">

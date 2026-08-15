@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useFormatCurrency, useFormatDate } from "@/hooks";
 import { useCompanyProfile } from "@/components/providers/session-provider";
-import { StatValue } from "@/components/ui/stat-value";
+import { SummaryCard, SummaryCardFlex } from "@/components/ui/summary-card";
 import { DataTable, Column } from "@/components/ui/data-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -140,49 +140,28 @@ export function DashboardView() {
 
         <TabsContent value="overview" className="space-y-8">
           {/* Summary Cards */}
-          <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-            <Card className="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Wallet className="h-4 w-4" /> {t("total_balance")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <StatValue
-                  value={summary.totalBalance}
-                  {...currencyProps}
-                />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Wallet className="h-4 w-4" /> {t("cash_on_hand")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <StatValue
-                  maxRem={1.5}
-                  value={summary.totalCash}
-                  {...currencyProps}
-                />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                  <Building2 className="h-4 w-4" /> {t("bank_balance")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <StatValue
-                  maxRem={1.5}
-                  value={summary.totalBank}
-                  {...currencyProps}
-                />
-              </CardContent>
-            </Card>
-          </div>
+          <SummaryCardFlex>
+            <SummaryCard
+              title={t("total_balance")}
+              value={summary.totalBalance}
+              icon={Wallet}
+              cardClassName="bg-linear-to-br from-primary/10 to-primary/5 border-primary/20"
+              titleClassName="text-muted-foreground flex items-center gap-2"
+              {...currencyProps}
+            />
+            <SummaryCard
+              title={t("cash_on_hand")}
+              value={summary.totalCash}
+              icon={Wallet}
+              {...currencyProps}
+            />
+            <SummaryCard
+              title={t("bank_balance")}
+              value={summary.totalBank}
+              icon={Building2}
+              {...currencyProps}
+            />
+          </SummaryCardFlex>
 
           {/* Recent Transactions */}
           <div className="space-y-4">

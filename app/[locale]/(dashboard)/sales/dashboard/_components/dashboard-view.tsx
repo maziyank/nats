@@ -33,7 +33,7 @@ import {
   PlusCircle,
   FileText,
 } from "lucide-react";
-import { StatValue } from "@/components/ui/stat-value";
+import { SummaryCard, SummaryCardGrid } from "@/components/ui/summary-card";
 import { CompanyProfile } from "@/prisma/generated/prisma/client";
 
 interface DashboardViewProps {
@@ -131,72 +131,37 @@ export function DashboardView({ companyProfile }: DashboardViewProps) {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <ShoppingCart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {summary?.totalOrders || 0}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Total sales orders created
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-            <Rocket className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-            <CardContent>
-              <StatValue
-                maxRem={1.5}
-                value={summary?.totalSales || 0}
-                {...currencyProps}
-              />
-              <p className="text-xs text-muted-foreground">
-                Total value of invoiced sales
-              </p>
-            </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Received
-            </CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.totalReceived || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">
-              Total amount received from customers
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Outstanding</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <StatValue
-              maxRem={1.5}
-              value={summary?.outstandingAmount || 0}
-              {...currencyProps}
-            />
-            <p className="text-xs text-muted-foreground">
-              Unpaid invoices amount
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <SummaryCardGrid>
+        <SummaryCard
+          title="Total Orders"
+          value={summary?.totalOrders || 0}
+          description="Total sales orders created"
+          icon={ShoppingCart}
+          isInteger
+          {...currencyProps}
+        />
+        <SummaryCard
+          title="Total Sales"
+          value={summary?.totalSales || 0}
+          description="Total value of invoiced sales"
+          icon={Rocket}
+          {...currencyProps}
+        />
+        <SummaryCard
+          title="Total Received"
+          value={summary?.totalReceived || 0}
+          description="Total amount received from customers"
+          icon={CreditCard}
+          {...currencyProps}
+        />
+        <SummaryCard
+          title="Outstanding"
+          value={summary?.outstandingAmount || 0}
+          description="Unpaid invoices amount"
+          icon={AlertCircle}
+          {...currencyProps}
+        />
+      </SummaryCardGrid>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
